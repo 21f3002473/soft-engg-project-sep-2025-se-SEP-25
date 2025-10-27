@@ -17,8 +17,6 @@
 //     ]
 //   }
 // }
-
-
 {
   "compilerOptions": {
     "target": "es5",

@@ -15,7 +15,7 @@ export default {
             // Dashboard data properties
         };
     },
-    methods: {
+    methods: { 
         // Dashboard methods
     },
     mounted() {
@@ -23,3 +23,11 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.dashboard {
+    padding: 20px;
+    background-color: #b90d0d;
+}
+
+</style>
