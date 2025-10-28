@@ -5,8 +5,8 @@ export async function submitLogin(url, params = {}) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            email: "this.email",
-            password: "this.password",
+            email: params['email'],
+            password: params['password'],
         }),
     });
     if (res.ok) {
