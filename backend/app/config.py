@@ -22,6 +22,15 @@ class Config:
     ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL", "admin@example.com")
     ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD", "admin")
 
+    PM_USER_EMAIL = os.getenv("PM_USER_EMAIL", "pm@example.com")
+    PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD", "supersecretpassword")
+
+    HR_USER_EMAIL = os.getenv("HR_USER_EMAIL", "hr@example.com")
+    HR_USER_PASSWORD = os.getenv("HR_USER_PASSWORD", "supersecretpassword")
+
+    EMPLOYEE_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL", "employee@example.com")
+    EMPLOYEE_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD", "supersecretpassword")
+
     PROJECT_NAME = "soft-engg-project-sep-2025-se-SEP-25"
     PROJECT_DESCRIPTION = ""
     VERSION = "0.0.1"
