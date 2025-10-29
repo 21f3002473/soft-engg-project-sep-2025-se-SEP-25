@@ -1,15 +1,15 @@
 from datetime import timedelta
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi_restful import Api, Resource
-from fastapi.security import OAuth2PasswordRequestForm
 
-from app.api.resources import UserLoginResource, ProtectedResource
+from app.api.resources import ProtectedResource, UserLoginResource
 from app.controllers import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     Token,
     authenticate_user,
     create_access_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_restful import Api, Resource
 
 
 class API:

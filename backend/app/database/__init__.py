@@ -5,10 +5,9 @@ import time
 from os import name
 from typing import Annotated
 
+from app.config import Config
 from fastapi import Depends, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-
-from app.config import Config
 
 
 class Users(SQLModel, table=True):

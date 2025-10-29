@@ -1,29 +1,28 @@
+from datetime import timedelta
+from logging import getLogger
 from typing import List, Optional
 
-from fastapi import Depends, HTTPException
-from fastapi_restful import Resource
-from sqlalchemy import log
-from sqlmodel import Session
-from logging import getLogger
 from app.api.validators import UserLoginValidator
 from app.controllers import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     authenticate_user,
     create_access_token,
     get_current_active_user,
 )
 from app.database import Users, get_session
-from datetime import timedelta
-from app.controllers import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.middleware import (
-    require_root,
-    require_hr,
-    require_pm,
-    require_employee,
+    Role,
     can_manage_employees,
     can_manage_products,
-    Role,
+    require_employee,
+    require_hr,
+    require_pm,
+    require_root,
 )
-
+from fastapi import Depends, HTTPException
+from fastapi_restful import Resource
+from sqlalchemy import log
+from sqlmodel import Session
 
 logger = getLogger(__name__)
 

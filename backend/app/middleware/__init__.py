@@ -1,10 +1,9 @@
 from enum import Enum
-from typing import List, Callable
 from functools import wraps
-
-from fastapi import Depends, HTTPException, status
+from typing import Callable, List
 
 from app.database import Users
+from fastapi import Depends, HTTPException, status
 
 
 class Role(str, Enum):
@@ -22,8 +21,10 @@ ROLE_HIERARCHY = {
     Role.PRODUCT_MANAGER: [Role.PRODUCT_MANAGER, Role.EMPLOYEE],
     Role.EMPLOYEE: [Role.EMPLOYEE],
 }
+
+
 ##########################################################
-#  this dummy data access and we dont need it for now 
+#  this dummy data access and we dont need it for now
 class Permission(str, Enum):
     """System permissions mapped to roles"""
 
@@ -48,6 +49,7 @@ class Permission(str, Enum):
     VIEW_SYSTEM_LOGS = "view_system_logs"
     GENERATE_REPORTS = "generate_reports"
     SYSTEM_CONFIG = "system_config"
+
 
 # this dummy data access and we dont need it for now
 ROLE_PERMISSIONS = {
@@ -78,6 +80,7 @@ ROLE_PERMISSIONS = {
     ],
 }
 ###############################################################
+
 
 def check_permission(user_role: str, required_permission: Permission) -> bool:
     """Check if a role has a specific permission"""
