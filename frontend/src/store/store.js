@@ -2,7 +2,7 @@ import { createStore } from 'vuex';
 
 const store = createStore({
     state: {
-        BASEURL: 'http://localhost:3000',
+        BASEURL: 'http://localhost:8000',
         TOKEN: null,
         USER: null,
         role: null,

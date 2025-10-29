@@ -21,9 +21,24 @@ const routes = [
         component: LoginPageView
     },
     {
-        path: '/adminRegister',
-        name: 'AdminRegister',
-        component: () => import('@/components/admins/RegistrationViewPage.vue')
+        path: '/admin/dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@/components/admins/Dashboard.vue'),
+    },
+    {
+        path: '/user/dashboard',
+        name: 'UserDashboard',
+        component: () => import('@/components/users/Dashboard.vue'),
+    },
+    {
+        path: '/productmanager/dashboard',
+        name: 'ProductmanagerDashboard',
+        component: () => import('@/components/productmanager/Dashboard.vue'),
+    },
+    {
+        path: '/hr/dashboard',
+        name: 'HRDashboard',
+        component: () => import('@/components/hr/Dashboard.vue'),
     },
 ]
 

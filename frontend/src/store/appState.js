@@ -9,21 +9,21 @@ export async function submitLogin(params = {}, router) {
   }
 
   try {
-    // console.log("Attempting login for:", email);
-    // console.log("password:", password);
     const res = await fetch(loginUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    //   need to change the vars in the body
+    
       body: JSON.stringify({ email, password }),
     });
 
+    console.log("Login response status:", res.status);
     const maybeJson = await (async () => {
       try { return await res.json(); } catch { return null; }
     })();
+    console.log("Login response data:", maybeJson);
 
     if (!res.ok) {
       const message =
@@ -33,7 +33,7 @@ export async function submitLogin(params = {}, router) {
     }
 
   const data = maybeJson || {};
-  const token = data.token;
+  const token = data.access_token || data.token;
 
     if (!token) {
       throw new Error("No token returned by server");
@@ -48,16 +48,19 @@ export async function submitLogin(params = {}, router) {
         store.dispatch("updateUser", data);
       }
     }
-    let val = data.role;
-    const role = data.role;
-    const routeMap = {
-    //   admin: "/adminDashboard",
-        val: "/"+role+"Dashboard",
-    //   hr: "/hrDashboard",
-    //   productmanager: "/productManagerDashboard",
-    //   user: "/userDashboard",
-    };
-    const targetRoute = routeMap[val] || "/userDashboard";
+    var role = data.role;
+    if (role == "root") {
+      role = "admin";
+    }else if (role == "pm") {
+      role = "productmanager";
+    }else if (role == "hr") {
+      role = "hr";
+    }else if (role == "employee") {
+      role = "user";
+    }else{
+      throw new Error("Invalid user role");
+    }
+    const targetRoute = `/${role}/dashboard`;
     router.replace(targetRoute);
 
     return { ok: true, data };

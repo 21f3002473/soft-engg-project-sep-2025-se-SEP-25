@@ -1,52 +1,46 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#4F00BC] to-[#29007A] text-white font-sans p-6 md:p-10">
+  <div class="min-vh-100 d-flex flex-column bg-gradient text-white p-3 p-md-4">
     
-    <header class="w-full max-w-7xl mx-auto">
-      <nav class="flex justify-between items-center">
-        <div class="text-3xl font-bold tracking-tighter">
-          Sync'em
-        </div>
-        
-        <div class="flex items-center space-x-4">
-          <span class="hidden sm:inline text-gray-300">Don't have an account?</span>
-          <a
-            href="#"
-            class="bg-white text-[#007BFF] font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors"
-          >
-            Sign Up
-          </a>
+    <header class="container">
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand fs-3 fw-bold" href="#">Sync'em</a>
+          <div class="d-flex align-items-center">
+            <span class="d-none d-sm-inline text-light me-3">Don't have an account?</span>
+            <a href="#" class="btn btn-light text-primary fw-semibold">Sign Up</a>
+          </div>
         </div>
       </nav>
     </header>
 
-    <main class="flex-grow flex flex-col justify-center items-center w-full max-w-md mx-auto pt-20 md:pt-32">
+    <main class="d-flex flex-column justify-content-center align-items-center flex-grow-1 container" style="max-width: 500px;">
       
-      <h1 class="text-4xl md:text-5xl font-bold text-center mb-6">
+      <h1 class="display-4 fw-bold text-center mb-4">
         Log in to Sync'em
       </h1>
       
-      <p class="text-lg text-gray-300 text-center mb-10">
+      <p class="fs-5 text-center mb-4" style="color: #d1d5db;">
         Welcome back! Please enter your details.
       </p>
 
-  <form @submit.prevent="handleLogin" class="w-full space-y-5">
+      <form @submit.prevent="handleLogin" class="w-100">
         
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-200 mb-2">Email address</label>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
           <input
             id="email"
             type="email"
             v-model="email"
             placeholder="Enter your email address..."
             required
-            class="w-full px-4 py-3.5 rounded-lg border-none text-gray-900 placeholder-gray-500 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            class="form-control form-control-lg"
           />
         </div>
 
-        <div>
-          <div class="flex justify-between items-baseline mb-2">
-            <label for="password" class="block text-sm font-medium text-gray-200">Password</label>
-            <a href="#" class="text-sm text-blue-300 hover:text-blue-200">Forgot password?</a>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="password" class="form-label mb-0">Password</label>
+            <a href="#" class="text-decoration-none" style="color: #93c5fd;">Forgot password?</a>
           </div>
           <input
             id="password"
@@ -54,19 +48,19 @@
             v-model="password"
             placeholder="Enter your password..."
             required
-            class="w-full px-4 py-3.5 rounded-lg border-none text-gray-900 placeholder-gray-500 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            class="form-control form-control-lg"
           />
         </div>
 
         <button
           type="submit"
           :disabled="loading"
-          class="w-full bg-[#007BFF] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-lg text-base hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-purple-800"
+          class="btn btn-primary btn-lg w-100 fw-semibold mt-3"
         >
           {{ loading ? 'Logging in…' : 'Log In' }}
         </button>
 
-        <p v-if="error" class="text-red-200 text-sm" role="alert">{{ error }}</p>
+        <p v-if="error" class="alert alert-danger mt-3 mb-0" role="alert">{{ error }}</p>
 
       </form>
     </main>
@@ -75,6 +69,7 @@
 </template>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { submitLogin } from '@/store/appState.js';
 import router from '@/router/router.js';
 
@@ -82,11 +77,11 @@ export default {
   name: 'LoginPageView',
   data() {
     return {
-        email:'',
-        password:'',
-        loading:false,
-        error:'',
-    }
+      email: '',
+      password: '',
+      loading: false,
+      error: '',
+    };
   },
   methods: {
     async handleLogin() {
@@ -98,7 +93,8 @@ export default {
       this.loading = true;
       console.log('Attempting login with', this.email, this.password);
       try {
-        await submitLogin({ email: this.email, password: this.password }, router);
+        let response = await submitLogin({ email: this.email, password: this.password }, router);
+        console.log('Login response:', response);
       } catch (e) {
         this.error = e?.message || 'Login failed. Please try again.';
       } finally {
@@ -109,17 +105,28 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
-.font-sans {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, 
-                "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+.bg-gradient {
+  background: linear-gradient(to bottom right, #4F00BC, #29007A);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+                "Noto Sans", sans-serif;
 }
 
-/* For Sampriti - Add any additional custom styles here if needed */
+.btn-primary {
+  background-color: #007BFF;
+  border-color: #007BFF;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 </style>
-
-
-
-
-
 
