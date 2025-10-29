@@ -76,6 +76,9 @@
 </template>
 
 <script>
+import { submitLogin } from '@/store/appState.js';
+import router from '@/router/router.js';
+
 export default {
   name: 'LoginPageView',
   data() {
