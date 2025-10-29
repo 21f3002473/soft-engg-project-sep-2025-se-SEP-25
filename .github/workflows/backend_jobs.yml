@@ -1,0 +1,48 @@
+name: Auto-Format with Black and isort
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install formatters
+        run: pip install black isort
+
+      - name: Run isort
+        run: isort backend
+
+      - name: Run Black
+        run: black backend
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+
+          if git diff --staged --quiet; then
+              echo "No changes to commit"
+          else
+              git commit -m "style: Auto-format with Black & isort [skip ci]"
+              git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          fi
