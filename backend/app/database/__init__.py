@@ -116,21 +116,20 @@ def create_root_user():
         session.add(pm_user)
         session.commit()
         print("PM user created.")
-        
-        
+
     # hr
     hr_email = Config.HR_USER_EMAIL
     hr_password = Config.HR_USER_PASSWORD
-    
+
     with Session(engine) as session:
         statement = select(Users).where(Users.email == hr_email)
         result = session.exec(statement)
         existing_user = result.first()
-        
+
         if existing_user:
             print("HR user already exists.")
             return
-        
+
         password_hash, salt = Users.hash_password(hr_password)
         hr_user = Users(
             email=hr_email,
@@ -142,7 +141,7 @@ def create_root_user():
         session.add(hr_user)
         session.commit()
         print("HR user created.")
-        
+
     # employee
     employee_email = Config.EMPLOYEE_USER_EMAIL
     employee_password = Config.EMPLOYEE_USER_PASSWORD
@@ -167,6 +166,7 @@ def create_root_user():
         session.add(employee_user)
         session.commit()
         print("Employee user created.")
+
 
 if __name__ == "__main__":
     SQLModel.metadata.create_all(engine)
