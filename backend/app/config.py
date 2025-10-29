@@ -28,8 +28,8 @@ class Config:
     GROQ_API_KEY = get_key(".env", "GROQ_API_KEY")
     if GROQ_API_KEY is not None:
         os.environ["GROQ_API_KEY"] = GROQ_API_KEY
-        
-    MODE = get_key(".env","MODE")
+
+    MODE = get_key(".env", "MODE")
 
     POSTGRES = {
         "user": get_key(".env", "POSTGRES_USER"),
