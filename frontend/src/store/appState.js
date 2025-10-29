@@ -1,38 +1,71 @@
 import store from "@/store/store.js";
 
-export async function submitLogin(params = {}, router) { 
-    const res = await fetch(location.origin + "/user/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            email: params['email'],
-            password: params['password'],
-        }),
-    });
-    if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("auth_token", JSON.stringify(data.token));
+export async function submitLogin(params = {}, router) {
+  const { email, password } = params || {};
+  const loginUrl = `${store.state.BASEURL}/user/login`;
 
-        if (data.role == "admin") {
-            alert("Welcome to Admin Dashboard");
-            
-            localStorage.setItem("user", JSON.stringify(data));
-            localStorage.setItem("auth_token", JSON.stringify(data.token));
-            router.push("/adminDashboard");
-        } else {
-            console.log("User Dashboard");
-            alert("Welcome to User Dashboard");
-            localStorage.setItem("user", JSON.stringify(data));
-            
-            localStorage.setItem("auth_token", JSON.stringify(data.token));
-            router.push("/userDashboard");
-        }
-    } else {
-        
-        throw new Error("Invalid email or password");
+  if (!email || !password) {
+    throw new Error("Email and password are required");
+  }
+
+  try {
+    // console.log("Attempting login for:", email);
+    // console.log("password:", password);
+    const res = await fetch(loginUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    //   need to change the vars in the body
+      body: JSON.stringify({ email, password }),
+    });
+
+    const maybeJson = await (async () => {
+      try { return await res.json(); } catch { return null; }
+    })();
+
+    if (!res.ok) {
+      const message =
+        (maybeJson && (maybeJson.message || maybeJson.error)) ||
+        (res.status === 401 ? "Invalid email or password" : "Login failed");
+      throw new Error(message);
     }
+
+  const data = maybeJson || {};
+  const token = data.token;
+
+    if (!token) {
+      throw new Error("No token returned by server");
+    }
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(data));
+
+    if (store?.dispatch) {
+      store.dispatch("updateToken", token);
+      if (store._actions?.updateUser) {
+        store.dispatch("updateUser", data);
+      }
+    }
+
+    const role = data.role;
+    const routeMap = {
+    //   admin: "/adminDashboard",
+        val: "/"+role+"Dashboard",
+    //   hr: "/hrDashboard",
+    //   productmanager: "/productManagerDashboard",
+    //   user: "/userDashboard",
+    };
+    const targetRoute = routeMap[val] || "/userDashboard";
+    router.replace(targetRoute);
+
+    return { ok: true, data };
+  } catch (err) {
+    localStorage.removeItem("token");
+    store.dispatch("clearAll");
+    throw err instanceof Error ? err : new Error("Unable to login");
+  }
 }
 
 export async function make_getrequest(url, params = {}) {
@@ -100,12 +133,10 @@ export async function make_deleterequest(url, data = {}) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
     });
     if (!response.ok) {
         throw new Error("Network response was not ok");
     }
-
     const responseData = await response.json();
     return responseData;
 }

@@ -6,6 +6,7 @@ const store = createStore({
         TOKEN: null,
         USER: null,
         role: null,
+        is_authenticated: false,
     },
     mutations: {
         setToken(state, token) {
@@ -22,6 +23,9 @@ const store = createStore({
             state.USER = null;
             state.role = null;
         },
+        setAuthentication(state, status) {
+            state.is_authenticated = status;
+        },
     },
     actions: {
         updateToken({ commit }, token) {
@@ -29,6 +33,12 @@ const store = createStore({
         },
         updateUser({ commit }, user) {
             commit('setUser', user);
+        },
+        updateRole({ commit }, role) {
+            commit('setRole', role);
+        },
+        updateAuthentication({ commit }, status) {
+            commit('setAuthentication', status);
         },
         clearAll({ commit }) {
             commit('clearAll');
