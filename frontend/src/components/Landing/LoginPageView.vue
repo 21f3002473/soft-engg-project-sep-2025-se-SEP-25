@@ -1,4 +1,3 @@
-
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#4F00BC] to-[#29007A] text-white font-sans p-6 md:p-10">
     
@@ -97,6 +96,7 @@ export default {
         return;
       }
       this.loading = true;
+      console.log('Attempting login with', this.email, this.password);
       try {
         await submitLogin({ email: this.email, password: this.password }, router);
       } catch (e) {
