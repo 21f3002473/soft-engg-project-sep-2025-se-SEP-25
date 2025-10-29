@@ -8,7 +8,6 @@
       <div class="nav-right">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/login" class="nav-link">Login</router-link>
-        <router-link to="/register" class="nav-link">Register</router-link>
       </div>
     </nav>
 
@@ -18,7 +17,11 @@
         <h1 class="welcome">WELCOME!</h1>
         <h2 class="subtitle">Sync'em Application</h2>
         <p class="tagline">Seamlessly synchronize your data, tasks, and teams.</p>
-        <router-link to="/register" class="cta-button">Get Started</router-link>
+
+        <div class="cta-form">
+          <input type="email" placeholder="Enter your email" class="email-input" />
+          <button class="cta-submit">Get Started</button>
+        </div>
       </div>
     </section>
 
@@ -101,11 +104,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(20, 150, 224, 0.799); /* soft transparent blue */
+  background: rgba(6, 83, 179, 0.345); /* ultra-light blue tint */
+  backdrop-filter: blur(3px); /* minimal blur, keeps background visible */
   padding: 20px 40px;
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 2px 8px rgba(0, 0, 50, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(90, 160, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .nav-left {
@@ -148,7 +154,7 @@
   align-items: center;
   justify-content: flex-start;
   color: white;
-  min-height: 40vh;
+  min-height: 45vh;
 }
 
 .welcome {
@@ -172,20 +178,40 @@
   margin-bottom: 25px;
 }
 
-.cta-button {
-  display: inline-block;
+/* CTA Form */
+.cta-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.email-input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  width: 260px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1e3a8a;
+}
+
+.cta-submit {
   background: linear-gradient(90deg, #6366f1, #3b82f6);
   color: white;
-  text-decoration: none;
-  padding: 10px 24px;
+  border: none;
   border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 16px;
   font-weight: 600;
+  cursor: pointer;
   transition:
     transform 0.3s ease,
     background 0.3s ease;
 }
 
-.cta-button:hover {
+.cta-submit:hover {
   background: linear-gradient(90deg, #818cf8, #60a5fa);
   transform: translateY(-2px);
 }
