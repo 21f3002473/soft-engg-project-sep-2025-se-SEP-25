@@ -40,6 +40,11 @@ const routes = [
         name: 'HRDashboard',
         component: () => import('@/components/hr/Dashboard.vue'),
     },
+    {
+        path: '/backups',
+        name: 'Backups',
+        component: () => import('@/components/admins/dataBackup.vue'),
+    },
 ]
 
 const router = createRouter({

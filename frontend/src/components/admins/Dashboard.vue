@@ -5,7 +5,6 @@
         <router-link to="/systemStatus">System Status</router-link>
         <router-link to="/logs">Logs</router-link>
         <router-link to="/updates">Updates</router-link>
-        <router-link to="/chatbotConfig">Chatbot Config</router-link>
         <router-link to="/backups">Backups</router-link>
       </div>
       <div class="account-link">
@@ -44,7 +43,7 @@
                 <template v-if="isChatbotOpen">
                     <h3>Hello I am AI</h3>
                     <div class="chat-history">
-                    <textarea name="textquery" id="textquery">
+                    <textarea name="textquery" id="textquery" rows="10">
                     Chat history will appear here...
                     </textarea>
                     </div>
