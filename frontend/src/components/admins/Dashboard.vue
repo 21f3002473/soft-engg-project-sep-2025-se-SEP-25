@@ -53,53 +53,53 @@
         </div> -->
 
         <!-- Floating Chatbot -->
-<div class="chat-float">
-  <!-- Floating trigger button -->
-  <button
-    class="chat-trigger"
-    @click="isChatbotOpen = !isChatbotOpen"
-    aria-label="Open AI chat"
-  >
-    AI
-  </button>
+            <div class="chat-float">
+            <!-- Floating trigger button -->
+            <button
+                class="chat-trigger"
+                @click="isChatbotOpen = !isChatbotOpen"
+                aria-label="Open AI chat"
+            >
+                AI
+            </button>
 
-  <!-- Chat window -->
-  <transition name="fade-slide">
-    <section
-      v-if="isChatbotOpen"
-      class="chat-window"
-      role="dialog"
-      aria-modal="true"
-      aria-label="AI Assistant"
-    >
-      <header class="chat-header">
-        <div class="title">AI Assistant</div>
-        <div class="spacer"></div>
-        <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
-      </header>
+            <!-- Chat window -->
+            <transition name="fade-slide">
+                <section
+                v-if="isChatbotOpen"
+                class="chat-window"
+                role="dialog"
+                aria-modal="true"
+                aria-label="AI Assistant"
+                >
+                <header class="chat-header">
+                    <div class="title">AI Assistant</div>
+                    <div class="spacer"></div>
+                    <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
+                </header>
 
-      <div class="chat-body" ref="scrollArea" aria-live="polite">
-        <div
-          v-for="(m, i) in messages"
-          :key="i"
-          :class="['message', m.from]"
-        >
-          {{ m.text }}
-        </div>
-      </div>
+                <div class="chat-body" ref="scrollArea" aria-live="polite">
+                    <div
+                    v-for="(m, i) in messages"
+                    :key="i"
+                    :class="['message', m.from]"
+                    >
+                    {{ m.text }}
+                    </div>
+                </div>
 
-      <form class="chat-input" @submit.prevent="sendMessage">
-        <input
-          v-model="draft"
-          type="text"
-          placeholder="Type a message…"
-          autocomplete="off"
-        />
-        <button type="submit" :disabled="!draft.trim()">Send</button>
-      </form>
-    </section>
-  </transition>
-</div>
+                <form class="chat-input" @submit.prevent="sendMessage">
+                    <input
+                    v-model="draft"
+                    type="text"
+                    placeholder="Type a message…"
+                    autocomplete="off"
+                    />
+                    <button type="submit" :disabled="!draft.trim()">Send</button>
+                </form>
+                </section>
+            </transition>
+            </div>
 
       </div>
     </main>
