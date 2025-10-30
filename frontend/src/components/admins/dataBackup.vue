@@ -68,7 +68,6 @@ export default {
 </script>
 
 <style scoped>
-/* Resets and Basic Styles (Copied from your previous file) */
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f4f7f6;
@@ -128,7 +127,6 @@ a:hover {
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  /* Add overflow for scrolling, as shown in wireframe */
   max-height: 75vh;
   overflow-y: auto;
 }
@@ -148,14 +146,14 @@ a:hover {
 
 .day-label {
   font-weight: 600;
-  flex-basis: 20%; /* Give the day label some space */
+  flex-basis: 20%; 
 }
 
 .inputs-group {
   display: flex;
   gap: 15px;
-  flex-grow: 1; /* Take remaining space */
-  justify-content: flex-end; /* Push inputs to the right */
+  flex-grow: 1; 
+  justify-content: flex-end; 
 }
 
 .backup-select,

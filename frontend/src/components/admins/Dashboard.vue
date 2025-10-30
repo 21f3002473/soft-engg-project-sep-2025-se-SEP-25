@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <div class="chatbot-area">
+        <!-- <div class="chatbot-area">
             <aside class="chatbot-panel">
                 <template v-if="isChatbotOpen">
                     <h3>Hello I am AI</h3>
@@ -50,7 +50,56 @@
                 </template>
                 <button @click="isChatbotOpen = !isChatbotOpen" class="btn btn-ai">AI</button>
             </aside>
+        </div> -->
+
+        <!-- Floating Chatbot -->
+<div class="chat-float">
+  <!-- Floating trigger button -->
+  <button
+    class="chat-trigger"
+    @click="isChatbotOpen = !isChatbotOpen"
+    aria-label="Open AI chat"
+  >
+    AI
+  </button>
+
+  <!-- Chat window -->
+  <transition name="fade-slide">
+    <section
+      v-if="isChatbotOpen"
+      class="chat-window"
+      role="dialog"
+      aria-modal="true"
+      aria-label="AI Assistant"
+    >
+      <header class="chat-header">
+        <div class="title">AI Assistant</div>
+        <div class="spacer"></div>
+        <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
+      </header>
+
+      <div class="chat-body" ref="scrollArea" aria-live="polite">
+        <div
+          v-for="(m, i) in messages"
+          :key="i"
+          :class="['message', m.from]"
+        >
+          {{ m.text }}
         </div>
+      </div>
+
+      <form class="chat-input" @submit.prevent="sendMessage">
+        <input
+          v-model="draft"
+          type="text"
+          placeholder="Type a message…"
+          autocomplete="off"
+        />
+        <button type="submit" :disabled="!draft.trim()">Send</button>
+      </form>
+    </section>
+  </transition>
+</div>
 
       </div>
     </main>
@@ -72,7 +121,9 @@ export default {
         { id: 5, name: 'EMP5', status: 'New!' },
         { id: 6, name: 'EMP6', status: 'New!' }
       ],
-      isChatbotOpen: false,
+      isChatbotOpen: this?.isChatbotOpen ?? false,
+        messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
+        draft: '',
     };
   },
   methods: {
@@ -83,6 +134,24 @@ export default {
     changeStatus() {
       console.log('Change status');
       // Logic to change status would go here
+    },
+    sendMessage() {
+      if (!this.draft.trim()) return;
+
+      // Add user message
+      this.messages.push({ from: 'user', text: this.draft.trim() });
+
+      // Simulate AI response
+      setTimeout(() => {
+        this.messages.push({ from: 'ai', text: "This is a simulated AI response." });
+        this.$nextTick(() => {
+          const chatBody = this.$refs.scrollArea;
+          chatBody.scrollTop = chatBody.scrollHeight;
+        });
+      }, 1000);
+
+      // Clear draft
+      this.draft = '';
     },
   },
   mounted() {
@@ -165,18 +234,18 @@ a:hover {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  min-width: 250px; /* Give it some size */
+  min-width: 250px; 
 }
 
 /* 2b. Main Area (List + Chat) */
 .main-area {
   display: flex;
-  gap: 25px; /* Space between list and chatbot */
+  gap: 25px; 
 }
 
 /* Employee List (Left) */
 .employee-list {
-  flex: 3; /* Takes up 3/4 of the space */
+  flex: 3; 
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -185,7 +254,7 @@ a:hover {
 .employee-item {
   display: flex;
   align-items: center;
-  gap: 15px; /* Space between items in a row */
+  gap: 15px; 
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
 }
@@ -196,7 +265,7 @@ a:hover {
 
 .emp-name {
   font-weight: 600;
-  flex-basis: 10%; /* Allocates space for the name */
+  flex-basis: 10%; 
 }
 
 .emp-status {
@@ -223,12 +292,12 @@ a:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f9f9f9;
-  flex-grow: 1; /* Takes up remaining space */
+  flex-grow: 1; 
 }
 
 /* Chatbot Panel (Right) */
 .chatbot-panel {
-  flex: 1; /* Takes up 1/4 of the space */
+  flex: 1; 
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -245,26 +314,168 @@ a:hover {
 }
 
 .chat-history {
-  flex-grow: 1; /* Makes the chat box fill vertical space */
+  flex-grow: 1; 
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 10px;
   margin-bottom: 15px;
-  min-height: 250px; /* Ensures it has a good height */
+  min-height: 250px; 
   font-family: monospace;
   color: #666;
-  overflow-y: auto; /* Adds scroll if content is long */
+  overflow-y: auto; 
 }
 
-/* THIS IS THE MODIFIED RULE */
 .btn-ai {
   background-color: #ececec;
   border: none;
-  border-radius: 50%; /* Makes it a circle */
+  border-radius: 50%; 
   width: 50px;
   height: 50px;
   font-weight: bold;
-  align-self: center; /* <<< CHANGED FROM flex-end */
-  margin-top: auto; /* Keeps it at the bottom */
+  align-self: center; 
+  margin-top: auto; 
+}
+
+/* Floating trigger button */
+.chat-trigger {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #111827; /* near-black */
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  z-index: 2000;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.chat-trigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+  background: #0b1220;
+}
+
+/* Chat window container */
+.chat-window {
+  position: fixed;
+  right: 24px;
+  bottom: 90px;
+  width: 340px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 12px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  z-index: 2000;
+}
+
+/* Header */
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f8fafc; /* slate-50 */
+  border-bottom: 1px solid #e5e7eb;
+}
+.chat-header .title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.chat-header .spacer {
+  flex: 1;
+}
+.chat-header .close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280; /* gray-500 */
+}
+.chat-header .close:hover {
+  color: #111827; /* gray-900 */
+}
+
+/* Body */
+.chat-body {
+  padding: 12px;
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #ffffff;
+}
+.message {
+  max-width: 80%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  word-wrap: break-word;
+}
+.message.ai {
+  align-self: flex-start;
+  background: #f1f5f9; /* slate-100 */
+  color: #0f172a;       /* slate-900 */
+  border-top-left-radius: 4px;
+}
+.message.user {
+  align-self: flex-end;
+  background: #2563eb; /* blue-600 */
+  color: #ffffff;
+  border-top-right-radius: 4px;
+}
+
+/* Input area */
+.chat-input {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #fafafa;
+}
+.chat-input input {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+}
+.chat-input input:focus {
+  border-color: #93c5fd; /* blue-300 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* blue-500/15% */
+}
+.chat-input button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+}
+.chat-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Open/close transition */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(6px) scale(0.995);
 }
 </style>
