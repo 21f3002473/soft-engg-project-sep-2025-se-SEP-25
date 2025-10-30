@@ -6,7 +6,7 @@
         <router-link to="/systemStatus">System Status</router-link>
         <router-link to="/logs">Logs</router-link>
         <router-link to="/updates">Updates</router-link>
-        <router-link to="/backup" class="router-link-exact-active">Backups</router-link>
+        <router-link to="/admin/dashboard/backups" class="router-link-exact-active">Backups</router-link>
       </div>
       <div class="account-link">
         <router-link to="/account">Account</router-link>
@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: 'ChatbotConfig',
+  name: 'DataBackup',
   data() {
     return {
       // Data to populate the v-for loop
@@ -56,6 +56,7 @@ export default {
   methods: {
     saveConfig() {
       console.log('Saving backup config:', this.backups);
+
       // API call to POST/PUT this.backups would go here
     }
   },
