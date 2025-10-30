@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <header class="dashboard-header">
+    <!-- <header class="dashboard-header">
       <div class="nav-links">
         <router-link to="/admin/dashboard">Home</router-link>
         <router-link to="/systemStatus">System Status</router-link>
@@ -11,7 +11,7 @@
       <div class="account-link">
         <router-link to="/account">Account</router-link>
       </div>
-    </header>
+    </header> -->
 
     <main class="dashboard-content">
       
@@ -41,6 +41,12 @@
 <script>
 export default {
   name: 'DataBackup',
+  props: {
+    title: {
+      type: String,
+      default: 'Data Backup'
+    }
+  },
   data() {
     return {
       // Data to populate the v-for loop

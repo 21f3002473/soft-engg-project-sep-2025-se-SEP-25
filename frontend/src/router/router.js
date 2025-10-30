@@ -1,9 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-// import AdminDashboard from "@/components/admins/Dashboard.vue";
-// import LoginPageView from '@/components/landing/LoginPageView.vue';
-// import LandingView from '@/components/landing/LandingView.vue';
-
 const routes = [
     {
         path: '/',
@@ -17,9 +13,40 @@ const routes = [
         component: () => import('@/components/Landing/LoginPageView.vue'),
     },
     {
-        path: '/admin/dashboard',
-        name: 'AdminDashboard',
-        component: () => import('@/components/admins/Dashboard.vue'),
+        path: '/admin',
+        component: () => import('@/components/admins/AdminLayout.vue'),
+        children: [
+            {
+            path: 'dashboard', 
+            name: 'AdminDashboard',
+            component: () => import('@/components/admins/Dashboard.vue'),
+            },
+            {
+            path: 'backups',
+            name: 'AdminBackups',
+            component: () => import('@/components/admins/dataBackup.vue'),
+            },
+            {
+                path: 'SystemStatus',                
+                name: 'SystemStatus',
+                component: () => import('@/components/admins/SystemStatus.vue'),
+            },
+            {
+                path: 'logs',
+                name: 'Logs',
+                component: () => import('@/components/admins/Logs.vue'),
+            },
+            {
+                path: 'updates',
+                name: 'Updates',
+                component: () => import('@/components/admins/Updates.vue'),
+            },
+            {
+                path: 'accounts',
+                name: 'Account',
+                component: () => import('@/components/admins/Accounts.vue'),
+            },
+        ],
     },
     {
         path: '/user',
@@ -66,11 +93,6 @@ const routes = [
         path: '/hr/dashboard',
         name: 'HRDashboard',
         component: () => import('@/components/hr/Dashboard.vue'),
-    },
-    {
-        path: '/backups',
-        name: 'Backups',
-        component: () => import('@/components/admins/dataBackup.vue'),
     },
 ]
 

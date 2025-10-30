@@ -1,26 +1,29 @@
 <template>
   <div class="dashboard">
-    <header class="dashboard-header">
+    <!-- <header class="dashboard-header">
       <div class="nav-links">
         <router-link to="/systemStatus">System Status</router-link>
         <router-link to="/logs">Logs</router-link>
         <router-link to="/updates">Updates</router-link>
-        <router-link to="/backups">Backups</router-link>
+        <router-link :to="{ name: 'AdminBackups' }">Backups</router-link>
       </div>
       <div class="account-link">
         <router-link to="/account">Account</router-link>
       </div>
-    </header>
+    </header> -->
 
     <main class="dashboard-content">
       <div class="content-header">
         <h1>{{ title }}</h1>
         <div class="search-bar">
-          <input type="text" placeholder="Search" />
+          <input type="text" placeholder="Search" v-model="searchQuery"/>
           </div>
       </div>
 
-      <div class="main-area">
+  <!-- Nested admin routes will render here (e.g., backups) -->
+  <!-- <router-view /> -->
+
+  <div class="main-area">
         
         <div class="employee-list">
           <div class="employee-item" v-for="emp in employees" :key="emp.id">
@@ -109,9 +112,14 @@
 <script>
 export default {
   name: 'AdminDashboard',
+  props: {
+    title: {
+      type: String,
+      default: 'Super Admin Dashboard'
+    }
+  },
   data() {
     return {
-      title: 'Super Admin Dashboard',
       // Dummy data to populate the v-for loop
       employees: [
         { id: 1, name: 'EMP1', status: 'New!' },
@@ -124,7 +132,27 @@ export default {
       isChatbotOpen: this?.isChatbotOpen ?? false,
         messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
         draft: '',
+        searchQuery: '',
     };
+  },
+  computed: {
+    filteredEmployees() {
+      console.log('Search query changed to:', this.searchQuery);
+
+      
+      if (!this.searchQuery) {
+        return this.employees;
+      }
+
+      return this.employees.filter(emp => {
+        return emp.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+      });
+    }
+  },
+  watch: {
+    searchQuery(newQuery) {
+      console.log('Search query Typed by Admin:', newQuery);
+    }
   },
   methods: {
     async fetchData() {
@@ -209,6 +237,7 @@ a:hover {
 
 .account-link a {
   font-weight: bold;
+
 }
 
 /* 2. Main Content Area */
@@ -228,13 +257,6 @@ a:hover {
   margin: 0;
   font-size: 28px;
   font-weight: 600;
-}
-
-.search-bar input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-width: 250px; 
 }
 
 /* 2b. Main Area (List + Chat) */
