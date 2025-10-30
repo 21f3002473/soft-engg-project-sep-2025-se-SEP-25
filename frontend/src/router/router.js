@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import AdminDashboard from "@/components/admins/Dashboard.vue";
-import LoginPageView from '@/components/Landing/LoginPageView.vue';
-import LandingView from '@/components/Landing/LandingView.vue';
+import LoginPageView from '@/components/landing/LoginPageView.vue';
+import LandingView from '@/components/landing/LandingView.vue';
 
 const routes = [
     {
