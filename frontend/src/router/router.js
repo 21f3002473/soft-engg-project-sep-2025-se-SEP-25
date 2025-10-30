@@ -40,6 +40,12 @@ const routes = [
         name: 'HRDashboard',
         component: () => import('@/components/hr/Dashboard.vue'),
     },
+    {
+        path: '/hr/chatbot',
+        name: 'HRChatbot',
+        component: () => import('@/components/hr/Chatbot.vue')
+    },
+
 ]
 
 const router = createRouter({

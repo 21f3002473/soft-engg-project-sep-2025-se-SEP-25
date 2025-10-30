@@ -1,8 +1,9 @@
 <template>
-  <div class="landing-root">
+  <div class="chatbot-root">
+    <!-- Navbar -->
     <!-- Navbar -->
     <nav class="navbar">
-      <div class="nav-left brand">Sync'em</div>
+      <div class="nav-left brand">HR Dashboard</div>
       <div class="nav-right">
         <router-link to="/hr/dashboard" class="nav-link">Dashboard</router-link>
         <router-link to="/employees" class="nav-link">Employees</router-link>
@@ -12,37 +13,35 @@
       </div>
     </nav>
 
-    <!-- Main Dashboard Section -->
-    <section class="hero">
-      <h1 class="welcome">Welcome HR!</h1>
-      <p class="subtitle">Manage your workforce efficiently and effectively.</p>
-      <p class="tagline">Stay on top of employee management, project tracking, and policy updates — all in one place.</p>
+    <!-- Chatbot Section -->
+    <section class="chat-section">
+      <div class="chat-box">
+        <h1 class="chat-title">Chatbot (ask here)</h1>
+        <textarea
+          class="chat-input"
+          placeholder="Type your question for the HR Chatbot..."
+          rows="8"
+        ></textarea>
+        <button class="chat-submit">Submit</button>
+      </div>
     </section>
-
 
     <!-- Footer -->
     <footer class="footer">
       <p>© 2025 Sync'em. All rights reserved.</p>
     </footer>
   </div>
-
 </template>
+
 <script>
 export default {
-  name: "HRDashboard",
-};
+  name: 'HrChatbot'
+}
 </script>
 
 <style scoped>
-.landing-root {
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
+.chatbot-root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial;
   color: #0b1220;
   min-height: 100vh;
@@ -55,16 +54,15 @@ export default {
   background-blend-mode: overlay;
 }
 
-/* Navbar */
+/* Navbar - fully transparent light blue */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(6, 83, 179, 0.345); /* ultra-light blue tint */
-  backdrop-filter: blur(3px);
+  background: rgba(90, 160, 255, 0.1);
+  backdrop-filter: blur(4px);
   padding: 20px 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 10px rgba(90, 160, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -101,38 +99,66 @@ export default {
   color: #dce3ff;
 }
 
-/* Hero Section */
-.hero {
-  flex-grow: 1; /* makes hero take remaining space */
-  text-align: center;
-  padding: 100px 20px 60px;
+/* Chat Section */
+.chat-section {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: center; /* centers vertically */
+  flex-grow: 1;
+  padding: 60px 20px;
   color: white;
-  min-height: 45vh;
 }
 
-.welcome {
-  font-size: 54px;
-  font-weight: 800;
-  margin-bottom: 10px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.subtitle {
-  font-size: 28px;
-  margin-bottom: 15px;
-  font-weight: 500;
-  color: #e2e8ff;
-}
-
-.tagline {
-  font-size: 18px;
+.chat-box {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 40px;
+  width: 90%;
   max-width: 700px;
-  color: #f2f4ff;
-  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.chat-title {
+  font-size: 32px;
+  color: #e2e8ff;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.chat-input {
+  width: 100%;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 16px;
+  color: #1e3a8a;
+  border: none;
+  outline: none;
+  resize: none;
+  background: rgba(255, 255, 255, 0.9);
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+
+.chat-submit {
+  background: linear-gradient(90deg, #6366f1, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+.chat-submit:hover {
+  background: linear-gradient(90deg, #818cf8, #60a5fa);
+  transform: translateY(-2px);
 }
 
 /* Footer */
