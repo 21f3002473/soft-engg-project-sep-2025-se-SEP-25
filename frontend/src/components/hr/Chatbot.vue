@@ -2,16 +2,7 @@
   <div class="chatbot-root">
     <!-- Navbar -->
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="nav-left brand">HR Dashboard</div>
-      <div class="nav-right">
-        <router-link to="/hr/dashboard" class="nav-link">Dashboard</router-link>
-        <router-link to="/employees" class="nav-link">Employees</router-link>
-        <router-link to="/projects" class="nav-link">Projects</router-link>
-        <router-link to="/hrpolicies" class="nav-link">HR Policies</router-link>
-        <router-link to="/hr/chatbot" class="nav-link">Chatbot</router-link>
-      </div>
-    </nav>
+    
 
     <!-- Chatbot Section -->
     <section class="chat-section">

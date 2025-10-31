@@ -1,16 +1,7 @@
 <template>
   <div class="landing-root">
     <!-- Navbar -->
-    <nav class="navbar">
-      <div class="nav-left brand">Sync'em</div>
-      <div class="nav-right">
-        <router-link to="/hr/dashboard" class="nav-link">Dashboard</router-link>
-        <router-link to="/employees" class="nav-link">Employees</router-link>
-        <router-link to="/projects" class="nav-link">Projects</router-link>
-        <router-link to="/hrpolicies" class="nav-link">HR Policies</router-link>
-        <router-link to="/hr/chatbot" class="nav-link">Chatbot</router-link>
-      </div>
-    </nav>
+    
 
     <!-- Main Dashboard Section -->
     <section class="hero">
