@@ -12,7 +12,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <!-- <section class="hero">
+    <section class="hero">
       <div class="hero-content">
         <h1 class="welcome">WELCOME!</h1>
         <h2 class="subtitle">Sync'em Application</h2>
@@ -23,7 +23,7 @@
           <button class="cta-submit">Get Started</button>
         </div>
       </div>
-    </section> -->
+    </section>
 
     <!-- Features Section -->
     <section class="features-section">
@@ -104,7 +104,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(26, 52, 85, 0.44); /* ultra-light blue tint (26, 52, 85, 0.44) */
+  background: rgba(6, 83, 179, 0.345); /* ultra-light blue tint */
   backdrop-filter: blur(3px); /* minimal blur, keeps background visible */
   padding: 20px 40px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -290,9 +290,5 @@
   background: rgba(0, 0, 0, 0.3);
   font-size: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  /* push this to the bottom */
-  /* push footer to the bottom in the flex column layout */
-  margin-top: auto;
-  width: 100%;
 }
 </style>
