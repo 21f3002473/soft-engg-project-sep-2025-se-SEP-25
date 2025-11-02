@@ -11,14 +11,11 @@ export default {
   name: 'UserDashboard',
   data() {
     return {
-      // Dashboard data properties
     };
   },
   methods: {
-    // Dashboard methods
   },
   mounted() {
-    // Code to run when the component is mounted
   }
 };
 </script>
