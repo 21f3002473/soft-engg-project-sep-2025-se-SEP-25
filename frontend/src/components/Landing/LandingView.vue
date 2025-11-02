@@ -12,21 +12,26 @@
     </nav>
 
     <!-- Hero Section -->
-    <!-- <section class="hero">
+    <section class="hero">
       <div class="hero-content">
         <h1 class="welcome">WELCOME!</h1>
-        <h2 class="subtitle">Sync'em Application</h2>
-        <p class="tagline">Seamlessly synchronize your data, tasks, and teams.</p>
+        <h2 class="subtitle">Sync'em — smarter HR, happier teams</h2>
+        <p class="tagline">
+          Seamlessly synchronize your data, tasks, and teams with AI-driven HR workflows and
+          instant assistance.
+        </p>
 
         <div class="cta-form">
-          <input type="email" placeholder="Enter your email" class="email-input" />
-          <button class="cta-submit">Get Started</button>
+          <router-link to="/signup" class="cta-submit">Get Started</router-link>
+          <router-link to="#features" class="cta-submit" style="background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.12);">
+            Learn More
+          </router-link>
         </div>
       </div>
-    </section> -->
+    </section>
 
     <!-- Features Section -->
-    <section class="features-section">
+    <section id="features" class="features-section">
       <div class="features-grid">
         <div class="feature-group">
           <h2 class="section-title">For HR Manager</h2>
@@ -93,10 +98,10 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center */
+    /* center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar */

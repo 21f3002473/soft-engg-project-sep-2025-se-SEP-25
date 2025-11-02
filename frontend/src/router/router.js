@@ -42,7 +42,8 @@ const routes = [
         children: [
         {
             path: '', // default child route (opens first)
-            name: 'HRDashboard',
+            index: true,
+            name: 'dashboard',
             component: () => import('@/components/hr/Dashboard.vue'),
         },
         {

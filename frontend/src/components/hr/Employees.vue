@@ -1,62 +1,67 @@
 <template>
-  <div class="employees-root">
+  <div class="employees-root container-fluid py-4">
+    <div class="container">
+      <!-- Main Section -->
+      <section class="employees-section">
+        <div class="row">
+          <!-- Left: Performance Review Table -->
+          <div class="col-md-8 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h1 class="h4 mb-0">Performance Reviews</h1>
+              <input type="text" class="form-control form-control-sm w-50" placeholder="Search Employee..." />
+            </div>
 
-    
-
-    <!-- Main Section -->
-    <section class="employees-section">
-      <div class="employees-container">
-        <!-- Left: Performance Review Table -->
-        <div class="employees-left">
-          <div class="header-row">
-            <h1 class="employees-title">Performance Reviews</h1>
-            <input
-              type="text"
-              class="search-input"
-              placeholder="Search Employee..."
-            />
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Employee</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(emp, index) in employees" :key="index">
+                    <td>{{ emp.name }}</td>
+                    <td>
+                      <span class="badge" :class="emp.status === 'Done' ? 'bg-success' : 'bg-secondary'">
+                        {{ emp.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        :class="['btn btn-sm', emp.status === 'Done' ? 'btn-success' : 'btn-primary']"
+                        type="button"
+                      >
+                        {{ emp.status === 'Upcoming' ? 'Auto Review' : 'Re-Auto Review' }}
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <table class="employees-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(emp, index) in employees" :key="index">
-                <td>{{ emp.name }}</td>
-                <td>{{ emp.status }}</td>
-                <td>
-                  <button
-                    :class="['review-btn', emp.status === 'Done' ? 'done' : '']"
-                  >
-                    {{ emp.status === 'Upcoming' ? 'Auto Review' : 'Re-Auto Review' }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Right: Review Gen Panel -->
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Review Gen</h5>
+                <p class="card-text">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet lacus a justo viverra tristique.
+                  Morbi blandit accumsan eros, nec elementum eros posuere eget.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <!-- Right: Review Gen Panel -->
-        <div class="employees-right">
-          <h2 class="reviewgen-title">Review Gen</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet lacus a justo
-            viverra tristique. Morbi blandit accumsan eros, nec elementum eros posuere eget. Duis
-            varius commodo elit, eget gravida ligula pretium ut.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <p>© 2025 Sync'em. All rights reserved.</p>
-    </footer>
+      <!-- Footer -->
+      <footer class="footer text-center mt-4">
+        <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
+      </footer>
+    </div>
   </div>
 </template>
 
@@ -78,7 +83,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .employees-root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial;
@@ -87,10 +92,10 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover;
-  background-color: rgba(10, 20, 70, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
+    center/cover; */
+  /* background-color: rgba(10, 20, 70, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar */
@@ -229,4 +234,4 @@ export default {
   font-size: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
-</style>
+</style> -->

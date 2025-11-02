@@ -1,57 +1,64 @@
 <template>
-  <div class="hrprojects-root">
-    
+  <div class="container py-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h4 mb-0">Projects Overview</h1>
+      <nav>
+        <!-- placeholder for nav actions -->
+        <a class="btn btn-outline-primary btn-sm" href="#">HR</a>
+      </nav>
+    </header>
 
-    <!-- Main content -->
-    <section class="projects-section">
-      <div class="projects-container">
-        <h2 class="projects-title">Projects Overview</h2>
+    <div class="card">
+      <div class="card-body">
+        <form class="row g-2 mb-3">
+          <div class="col-md-6">
+            <input
+              type="text"
+              v-model="searchProject"
+              class="form-control"
+              placeholder="Search by Project Name..."
+            />
+          </div>
+          <div class="col-md-6">
+            <input
+              type="text"
+              v-model="searchManager"
+              class="form-control"
+              placeholder="Search by Project Manager..."
+            />
+          </div>
+        </form>
 
-        <!-- Search bars -->
-        <div class="search-bar-container">
-          <input
-            type="text"
-            v-model="searchProject"
-            placeholder="Search by Project Name..."
-            class="search-input"
-          />
-          <input
-            type="text"
-            v-model="searchManager"
-            placeholder="Search by Project Manager..."
-            class="search-input"
-          />
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Project Name</th>
+                <th scope="col">Project Manager</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(project, index) in filteredProjects"
+                :key="index"
+              >
+                <td>{{ project.name }}</td>
+                <td>{{ project.manager }}</td>
+              </tr>
+              <tr v-if="filteredProjects.length === 0">
+                <td colspan="2" class="text-center fst-italic">
+                  No matching projects found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- Project table -->
-        <table class="projects-table">
-          <thead>
-            <tr>
-              <th>Project Name</th>
-              <th>Project Manager</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(project, index) in filteredProjects"
-              :key="index"
-              class="table-row"
-            >
-              <td>{{ project.name }}</td>
-              <td>{{ project.manager }}</td>
-            </tr>
-            <tr v-if="filteredProjects.length === 0">
-              <td colspan="2" class="no-results">No matching projects found.</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>© 2025 Sync'em. All rights reserved.</p>
-    </footer>
+      <div class="card-footer text-muted text-center">
+        © 2025 Sync'em. All rights reserved.
+      </div>
+    </div>
   </div>
 </template>
 
@@ -83,16 +90,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .hrprojects-root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
   color: #fff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar (same as HR Policies) */
@@ -235,4 +242,4 @@ export default {
     flex-direction: column;
   }
 }
-</style>
+</style> -->

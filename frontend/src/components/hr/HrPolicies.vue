@@ -1,40 +1,54 @@
 <template>
-  <div class="hrpolicies-root">
-    
-    <!-- Main content -->
-    <section class="hrpolicies-section">
-      <div class="hrpolicies-container">
+  <div class="container-fluid py-4">
+    <div class="container">
+      <div class="row g-4">
         <!-- Left: PDF viewer -->
-        <div class="pdf-viewer">
-          <iframe
-            src="/assets/policies/company_policies.pdf"
-            frameborder="0"
-            class="pdf-frame"
-          ></iframe>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body p-0">
+              <div class="ratio ratio-4x3">
+                <iframe
+                  src="https://triagelogic.com/wp-content/uploads/2018/06/Company-Policy-and-Procedure-June-1.18-V6.0.pdf"
+                  frameborder="0"
+                  class="w-100 h-100"
+                ></iframe>
+              </div>
+            </div>
+            <div class="card-footer text-muted small">Company Policies</div>
+          </div>
         </div>
 
         <!-- Right: Ask HR / Chatbot box -->
-        <div class="ask-box">
-          <h2 class="ask-title">HR Policies — Ask Here</h2>
-          <textarea
-            v-model="query"
-            placeholder="Type your question about HR policies..."
-            class="ask-input"
-          ></textarea>
-          <button class="ask-button" @click="submitQuery">Ask</button>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">HR Policies — Ask Here</h5>
 
-          <div v-if="response" class="response-box">
-            <strong>Response:</strong>
-            <p>{{ response }}</p>
+              <textarea
+                v-model="query"
+                placeholder="Type your question about HR policies..."
+                class="form-control mb-3 flex-grow-1"
+                rows="6"
+              ></textarea>
+
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" @click="submitQuery">Ask</button>
+                <button class="btn btn-outline-secondary" type="button" @click="query = ''">Clear</button>
+              </div>
+
+              <div v-if="response" class="alert alert-secondary mt-3" role="alert">
+                <strong>Response:</strong>
+                <div>{{ response }}</div>
+              </div>
+            </div>
+
+            <div class="card-footer text-muted small">Need more help? Contact HR.</div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>© 2025 Sync'em. All rights reserved.</p>
-    </footer>
+      <footer class="mt-4 text-center text-muted">© 2025 Sync'em. All rights reserved.</footer>
+    </div>
   </div>
 </template>
 
@@ -61,16 +75,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .hrpolicies-root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   color: #fff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar */
@@ -255,4 +269,4 @@ export default {
     height: 400px;
   }
 }
-</style>
+</style> -->

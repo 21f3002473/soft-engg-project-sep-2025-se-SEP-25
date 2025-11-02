@@ -1,25 +1,33 @@
 <template>
   <div class="chatbot-root">
-    <!-- Navbar -->
-    <!-- Navbar -->
-    
-
-    <!-- Chatbot Section -->
-    <section class="chat-section">
-      <div class="chat-box">
-        <h1 class="chat-title">Chatbot (ask here)</h1>
-        <textarea
-          class="chat-input"
-          placeholder="Type your question for the HR Chatbot..."
-          rows="8"
-        ></textarea>
-        <button class="chat-submit">Submit</button>
+    <section class="chat-section py-5">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h1 class="card-title h4 mb-3">Chatbot (ask here)</h1>
+                <div class="mb-3">
+                  <textarea
+                    class="form-control"
+                    placeholder="Type your question for the HR Chatbot..."
+                    rows="8"
+                  ></textarea>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button class="btn btn-primary">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>© 2025 Sync'em. All rights reserved.</p>
+    <footer class="footer bg-light py-3">
+      <div class="container text-center">
+        <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
+      </div>
     </footer>
   </div>
 </template>
@@ -30,7 +38,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .chatbot-root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial;
@@ -39,10 +47,10 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
+    center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar - fully transparent light blue */
@@ -161,4 +169,4 @@ export default {
   font-size: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
-</style>
+</style> -->

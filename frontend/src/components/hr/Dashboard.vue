@@ -1,22 +1,127 @@
 <template>
-  <div class="landing-root">
+  <div class="landing-root min-vh-100 d-flex flex-column">
     <!-- Navbar -->
-    
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Sync'em HR</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#hrNavbar"
+          aria-controls="hrNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="hrNavbar">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Employees</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Projects</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Policies</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav> -->
 
     <!-- Main Dashboard Section -->
-    <section class="hero">
-      <h1 class="welcome">Welcome HR!</h1>
-      <p class="subtitle">Manage your workforce efficiently and effectively.</p>
-      <p class="tagline">Stay on top of employee management, project tracking, and policy updates — all in one place.</p>
-    </section>
+    <main class="flex-fill">
+      <div class="container py-5">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            <h1 class="display-4 fw-bold">Welcome HR!</h1>
+            <p class="lead">Manage your workforce efficiently and effectively.</p>
+            <p class="text-muted">
+              Stay on top of employee management, project tracking, and policy updates — all in one place.
+            </p>
+            <div class="mt-4">
+              <button class="btn btn-primary me-2">View Employees</button>
+              <button class="btn btn-outline-secondary">Create Policy</button>
+            </div>
+          </div>
 
+          <div class="col-lg-5 d-none d-lg-block">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">Quick stats</h5>
+                <div class="d-flex justify-content-between">
+                  <div class="text-center">
+                    <h3 class="mb-0">124</h3>
+                    <small class="text-muted">Employees</small>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="mb-0">8</h3>
+                    <small class="text-muted">Open Roles</small>
+                  </div>
+                  <div class="text-center">
+                    <h3 class="mb-0">16</h3>
+                    <small class="text-muted">Active Projects</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="row mt-4">
+          <div class="col-md-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Employees</h5>
+                <p class="card-text text-muted">Browse and manage employee records.</p>
+                <div class="mt-auto">
+                  <a href="#" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Projects</h5>
+                <p class="card-text text-muted">Track and assign projects.</p>
+                <div class="mt-auto">
+                  <a href="#" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Policies</h5>
+                <p class="card-text text-muted">Create and update company policies.</p>
+                <div class="mt-auto">
+                  <a href="#" class="btn btn-sm btn-outline-primary">Open</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
 
     <!-- Footer -->
-    <footer class="footer">
-      <p>© 2025 Sync'em. All rights reserved.</p>
+    <footer class="bg-light text-center py-3">
+      <div class="container">
+        <small class="text-muted">© 2025 Sync'em. All rights reserved.</small>
+      </div>
     </footer>
   </div>
-
 </template>
 <script>
 export default {
@@ -24,7 +129,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .landing-root {
   font-family:
     Inter,
@@ -40,10 +145,10 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
+    center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar */
@@ -135,4 +240,4 @@ export default {
   font-size: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
-</style>
+</style> -->
