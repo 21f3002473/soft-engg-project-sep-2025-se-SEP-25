@@ -98,10 +98,9 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center */
-    /* center/cover; */
-  /* background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay; */
+  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover;
+  background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay;
 }
 
 /* Navbar */
