@@ -7,7 +7,7 @@
           <a class="navbar-brand fs-3 fw-bold" href="#">Sync'em</a>
           <div class="d-flex align-items-center">
             <span class="d-none d-sm-inline text-light me-3">Don't have an account?</span>
-            <a href="#" class="btn btn-light text-primary fw-semibold">Sign Up</a>
+            <a href="" class="btn btn-light text-primary fw-semibold">Sign Up</a>
           </div>
         </div>
       </nav>
