@@ -24,11 +24,11 @@
       </div>
     </section>
 
-    <footer class="footer bg-light py-3">
+    <!-- <footer class="footer bg-light py-3">
       <div class="container text-center">
         <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
       </div>
-    </footer>
+    </footer> -->
   </div>
 </template>
 

@@ -116,11 +116,11 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light text-center py-3">
+    <!-- <footer class="bg-light text-center py-3">
       <div class="container">
         <small class="text-muted">© 2025 Sync'em. All rights reserved.</small>
       </div>
-    </footer>
+    </footer> -->
   </div>
 </template>
 <script>

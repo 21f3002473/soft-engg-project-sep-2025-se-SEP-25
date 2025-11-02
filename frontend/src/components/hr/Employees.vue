@@ -58,9 +58,9 @@
       </section>
 
       <!-- Footer -->
-      <footer class="footer text-center mt-4">
+      <!-- <footer class="footer text-center mt-4">
         <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
-      </footer>
+      </footer> -->
     </div>
   </div>
 </template>

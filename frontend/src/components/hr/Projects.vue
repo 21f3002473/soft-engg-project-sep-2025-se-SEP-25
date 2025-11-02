@@ -55,9 +55,9 @@
         </div>
       </div>
 
-      <div class="card-footer text-muted text-center">
+      <!-- <div class="card-footer text-muted text-center">
         © 2025 Sync'em. All rights reserved.
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

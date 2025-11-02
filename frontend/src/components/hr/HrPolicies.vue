@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <footer class="mt-4 text-center text-muted">© 2025 Sync'em. All rights reserved.</footer>
+      <!-- <footer class="mt-4 text-center text-muted">© 2025 Sync'em. All rights reserved.</footer> -->
     </div>
   </div>
 </template>

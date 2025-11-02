@@ -76,9 +76,9 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <!-- <footer class="footer">
       <p>© 2025 Sync'em. All rights reserved.</p>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
