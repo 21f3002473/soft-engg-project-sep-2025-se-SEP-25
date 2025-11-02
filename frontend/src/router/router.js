@@ -68,6 +68,7 @@ const routes = [
                 component: () => import('@/components/productmanager/Dashboard.vue'),
             },
             {
+                // this is the nested route under dashboard to show client requirements
                 path: 'dashboard/requirements/:clientId',
                 name: 'ProductManagerRequirements',
                 component: () => import('@/components/productmanager/ClientRequirementsView.vue'),
@@ -77,6 +78,12 @@ const routes = [
                 path: 'clientsUpdate',
                 name: 'ProductManagerClientsUpdate',
                 component: () => import('@/components/productmanager/ClientUpdateView.vue'),
+            },
+            {
+                path: 'clientsUpdate/:id',
+                name: 'ProductManagerClientsUpdateDetails',
+                component: () => import('@/components/productmanager/UpdateClientView.vue'),
+                props: (route) => ({ clientID: route.params.id })
             },
             {
                 path: 'projects',
