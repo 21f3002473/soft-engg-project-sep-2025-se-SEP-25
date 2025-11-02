@@ -1,14 +1,18 @@
 <template>
-  <div class="min-vh-100 d-flex flex-column bg-gradient text-white p-3 p-md-4">
+  <div
+    class="min-vh-100 d-flex flex-column bg-gradient text-white p-3 p-md-4 bg-image root-stack"
+  >
+    <!-- background layer placed first so it's positioned behind all content -->
+    <div :style="bgLayerStyle" class="bg-layer" aria-hidden="true"></div>
     
     <header class="container">
       <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
           <a class="navbar-brand fs-3 fw-bold" href="#">Sync'em</a>
-          <div class="d-flex align-items-center">
+          <!-- <div class="d-flex align-items-center">
             <span class="d-none d-sm-inline text-light me-3">Don't have an account?</span>
             <a href="" class="btn btn-light text-primary fw-semibold">Sign Up</a>
-          </div>
+          </div> -->
         </div>
       </nav>
     </header>
@@ -72,6 +76,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { submitLogin } from '@/store/appState.js';
 import router from '@/router/router.js';
+// import background so bundler resolves path
+import bgImage from '@/assets/images/landing/landingPageBackgroundImage.png';
 
 export default {
   name: 'LoginPageView',
@@ -82,6 +88,18 @@ export default {
       loading: false,
       error: '',
     };
+  },
+  computed: {
+    bgLayerStyle() {
+      return {
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: 'rgba(20, 40, 108, 0.85)',
+        backgroundBlendMode: 'overlay',
+      };
+    }
   },
   methods: {
     async handleLogin() {
@@ -108,20 +126,51 @@ export default {
 
 
 <style scoped>
+/* root stacking context so bg-layer z-index:-1 sits behind everything */
+.root-stack {
+  position: relative;
+  z-index: 0;
+}
+
+.bg-layer {
+  position: fixed;
+  inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0; */
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
+  /* fallback color when image fails to load */
+  background-color: rgba(20, 40, 108, 0.85);
+  /* optional subtle blur */
+  /* filter: blur(0.5px); */
+}
+
 .bg-gradient {
-  background: linear-gradient(to bottom right, #4F00BC, #29007A);
+  /* keep font and blend-mode but avoid direct url() here so bundler does not misresolve */
+  /* background: linear-gradient(to bottom right, #4F00BC, #29007A); */
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85); */
+  background-blend-mode: overlay;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
                 "Noto Sans", sans-serif;
 }
 
+/* kept as fallback; main image is applied via bg-layer to ensure bundler resolves the path */
+/* .bg-image {
+  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center center/cover;
+  background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay;
+} */
+
 .btn-primary {
-  background-color: #007BFF;
-  border-color: #007BFF;
+  /* background-color: #007BFF; */
+  /* border-color: #007BFF; */
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  /* background-color: #0056b3; */
+  /* border-color: #0056b3; */
 }
 
 .btn-primary:disabled {
