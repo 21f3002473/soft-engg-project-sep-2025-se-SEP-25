@@ -89,11 +89,17 @@ const routes = [
                 path: 'projects',
                 name: 'ProductManagerProjects',
                 component: () => import('@/components/productmanager/ProjectsView.vue'),
-            },
+            }, // will dev this in milestone 
             {
                 path: 'performance',
                 name: 'ProductManagerPerformance',
                 component: () => import('@/components/productmanager/PerformanceView.vue'),
+            },
+            {
+                path: 'performance/:id',
+                name: 'ProductManagerPerformanceDetails',
+                component: () => import('@/components/productmanager/EmployeePerformanceView.vue'),
+                props: (route) => ({ employeeId: route.params.id })
             }
         ],
     },

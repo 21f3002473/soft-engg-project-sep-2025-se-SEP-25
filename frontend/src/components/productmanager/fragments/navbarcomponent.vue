@@ -13,9 +13,9 @@
                     <li class="nav-item">
                         <router-link class="nav-link" to="/productmanager/clientsUpdate">ClientsUpdate</router-link>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <router-link class="nav-link" to="/productmanager/projects">Projects</router-link>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <router-link class="nav-link" to="/productmanager/performance">Performance</router-link>
                     </li>
