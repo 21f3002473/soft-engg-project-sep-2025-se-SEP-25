@@ -58,10 +58,39 @@ const routes = [
         ],
     },
     {
-        path: '/productmanager/dashboard',
-        name: 'ProductmanagerDashboard',
-        component: () => import('@/components/productmanager/Dashboard.vue'),
+        path: '/productmanager',
+        component: () => import('@/components/productmanager/fragments/navbarcomponent.vue'),
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'dashboard',
+                name: 'ProductManagerDashboard',
+                component: () => import('@/components/productmanager/Dashboard.vue'),
+            },
+            {
+                path: 'dashboard/requirements/:clientId',
+                name: 'ProductManagerRequirements',
+                component: () => import('@/components/productmanager/ClientRequirementsView.vue'),
+                props: (route) => ({ clientId: route.params.clientId })
+            },
+            {
+                path: 'clientsUpdate',
+                name: 'ProductManagerClientsUpdate',
+                component: () => import('@/components/productmanager/ClientUpdateView.vue'),
+            },
+            {
+                path: 'projects',
+                name: 'ProductManagerProjects',
+                component: () => import('@/components/productmanager/ProjectsView.vue'),
+            },
+            {
+                path: 'performance',
+                name: 'ProductManagerPerformance',
+                component: () => import('@/components/productmanager/PerformanceView.vue'),
+            }
+        ],
     },
+            
     {
         path: '/hr/dashboard',
         name: 'HRDashboard',
