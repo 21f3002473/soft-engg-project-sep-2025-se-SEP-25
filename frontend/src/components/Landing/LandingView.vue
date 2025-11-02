@@ -15,18 +15,23 @@
     <section class="hero">
       <div class="hero-content">
         <h1 class="welcome">WELCOME!</h1>
-        <h2 class="subtitle">Sync'em Application</h2>
-        <p class="tagline">Seamlessly synchronize your data, tasks, and teams.</p>
+        <h2 class="subtitle">Sync'em — smarter HR, happier teams</h2>
+        <p class="tagline">
+          Seamlessly synchronize your data, tasks, and teams with AI-driven HR workflows and
+          instant assistance.
+        </p>
 
         <div class="cta-form">
-          <input type="email" placeholder="Enter your email" class="email-input" />
-          <button class="cta-submit">Get Started</button>
+          <router-link to="/signup" class="cta-submit">Get Started</router-link>
+          <router-link to="#features" class="cta-submit" style="background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.12);">
+            Learn More
+          </router-link>
         </div>
       </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features-section">
+    <section id="features" class="features-section">
       <div class="features-grid">
         <div class="feature-group">
           <h2 class="section-title">For HR Manager</h2>
@@ -71,9 +76,9 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <!-- <footer class="footer">
       <p>© 2025 Sync'em. All rights reserved.</p>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
@@ -93,10 +98,10 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover;
-  background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay;
+  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center */
+    /* center/cover; */
+  /* background-color: rgba(20, 40, 108, 0.85);
+  background-blend-mode: overlay; */
 }
 
 /* Navbar */
@@ -104,7 +109,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(6, 83, 179, 0.345); /* ultra-light blue tint */
+  background: rgba(26, 52, 85, 0.44); /* ultra-light blue tint (26, 52, 85, 0.44) */
   backdrop-filter: blur(3px); /* minimal blur, keeps background visible */
   padding: 20px 40px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -290,5 +295,9 @@
   background: rgba(0, 0, 0, 0.3);
   font-size: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
+  /* push this to the bottom */
+  /* push footer to the bottom in the flex column layout */
+  margin-top: auto;
+  width: 100%;
 }
 </style>

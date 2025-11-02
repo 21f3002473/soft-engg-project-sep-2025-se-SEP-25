@@ -62,10 +62,38 @@ const routes = [
         name: 'ProductmanagerDashboard',
         component: () => import('@/components/productmanager/Dashboard.vue'),
     },
+    
     {
-        path: '/hr/dashboard',
-        name: 'HRDashboard',
-        component: () => import('@/components/hr/Dashboard.vue'),
+        path: '/hr',
+        component: () => import('@/components/hr/HRLayout.vue'),
+        children: [
+        {
+            path: '', // default child route (opens first)
+            index: true,
+            name: 'dashboard',
+            component: () => import('@/components/hr/Dashboard.vue'),
+        },
+        {
+            path: 'chatbot',
+            name: 'HRChatbot',
+            component: () => import('@/components/hr/Chatbot.vue'),
+        },
+        {
+            path: 'employees',
+            name: 'HREmployees',
+            component: () => import('@/components/hr/Employees.vue'),
+        },
+        {
+            path: 'hrpolicies',
+            name: 'HRPolicies',
+            component: () => import('@/components/hr/HrPolicies.vue'),
+        },
+        {
+            path: 'projects',
+            name: 'HRProjects',
+            component: () => import('@/components/hr/Projects.vue'),
+        },
+    ],
     },
     {
         path: '/backups',
