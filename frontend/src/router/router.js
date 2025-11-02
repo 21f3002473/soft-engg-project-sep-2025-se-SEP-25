@@ -85,9 +85,50 @@ const routes = [
         ],
     },
     {
-        path: '/productmanager/dashboard',
-        name: 'ProductmanagerDashboard',
-        component: () => import('@/components/productmanager/Dashboard.vue'),
+        path: '/productmanager',
+        component: () => import('@/components/productmanager/fragments/navbarcomponent.vue'),
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: 'dashboard',
+                name: 'ProductManagerDashboard',
+                component: () => import('@/components/productmanager/Dashboard.vue'),
+            },
+            {
+                // this is the nested route under dashboard to show client requirements
+                path: 'dashboard/requirements/:clientId',
+                name: 'ProductManagerRequirements',
+                component: () => import('@/components/productmanager/ClientRequirementsView.vue'),
+                props: (route) => ({ clientId: route.params.clientId })
+            },
+            {
+                path: 'clientsUpdate',
+                name: 'ProductManagerClientsUpdate',
+                component: () => import('@/components/productmanager/ClientUpdateView.vue'),
+            },
+            {
+                path: 'clientsUpdate/:id',
+                name: 'ProductManagerClientsUpdateDetails',
+                component: () => import('@/components/productmanager/UpdateClientView.vue'),
+                props: (route) => ({ clientID: route.params.id })
+            },
+            {
+                path: 'projects',
+                name: 'ProductManagerProjects',
+                component: () => import('@/components/productmanager/ProjectsView.vue'),
+            }, // will dev this in milestone 
+            {
+                path: 'performance',
+                name: 'ProductManagerPerformance',
+                component: () => import('@/components/productmanager/PerformanceView.vue'),
+            },
+            {
+                path: 'performance/:id',
+                name: 'ProductManagerPerformanceDetails',
+                component: () => import('@/components/productmanager/EmployeePerformanceView.vue'),
+                props: (route) => ({ employeeId: route.params.id })
+            }
+        ],
     },
     
     {
