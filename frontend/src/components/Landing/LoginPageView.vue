@@ -5,17 +5,16 @@
     <!-- background layer placed first so it's positioned behind all content -->
     <div :style="bgLayerStyle" class="bg-layer" aria-hidden="true"></div>
     
-    <header class="container">
       <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-          <a class="navbar-brand fs-3 fw-bold" href="#">Sync'em</a>
+          <a class="navbar-brand fs-3 fw-bold" href="/">Sync'em</a>
           <!-- <div class="d-flex align-items-center">
             <span class="d-none d-sm-inline text-light me-3">Don't have an account?</span>
             <a href="" class="btn btn-light text-primary fw-semibold">Sign Up</a>
           </div> -->
+          <a class="navbar-brand fs-3 fw-bold" href="/">Home</a>
         </div>
       </nav>
-    </header>
 
     <main class="d-flex flex-column justify-content-center align-items-center flex-grow-1 container" style="max-width: 500px;">
       

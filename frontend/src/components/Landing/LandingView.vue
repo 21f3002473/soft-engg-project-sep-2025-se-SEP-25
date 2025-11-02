@@ -3,10 +3,10 @@
     <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-left">
-        <span class="brand"><i>Sync'em</i></span>
+        <span class="brand">Sync'em</span>
       </div>
       <div class="nav-right">
-        <router-link to="/" class="nav-link">Home</router-link>
+        <!-- <router-link to="/" class="nav-link">Home</router-link> -->
         <router-link to="/login" class="nav-link">Login</router-link>
       </div>
     </nav>
@@ -125,7 +125,7 @@
 }
 
 .brand {
-  font-style: italic;
+  /* font-style: italic; */
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #ffffff;
