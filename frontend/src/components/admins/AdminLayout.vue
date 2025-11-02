@@ -1,194 +1,96 @@
 <template>
   <div class="dashboard">
-    <!-- <header class="dashboard-header">
+    <header class="dashboard-header">
       <div class="nav-links">
-        <router-link to="/systemStatus">System Status</router-link>
-        <router-link to="/logs">Logs</router-link>
-        <router-link to="/updates">Updates</router-link>
-        <router-link :to="{ name: 'AdminBackups' }">Backups</router-link>
+        <router-link :to="{ name: 'AdminDashboard' }" class="router-link-exact-active">Dashboard</router-link>
+        <router-link :to="{ name: 'SystemStatus' }" class="router-link-exact-active">System Status</router-link>
+        <router-link :to="{ name: 'Logs' }" class="router-link-exact-active">Logs</router-link>
+        <router-link :to="{ name: 'Updates' }" class="router-link-exact-active">Updates</router-link>
+        <router-link :to="{ name: 'AdminBackups' }" class="router-link-exact-active">Backups</router-link>
       </div>
       <div class="account-link">
-        <router-link to="/account">Account</router-link>
+        <router-link :to="{ name: 'Account' }">Account</router-link>
       </div>
-    </header> -->
+    </header>
 
     <main class="dashboard-content">
-      <div class="content-header">
-        <h1>{{ title }}</h1>
-        <div class="search-bar">
-          <input type="text" placeholder="Search" v-model="searchQuery"/>
-          </div>
-      </div>
-
-  <!-- Nested admin routes will render here (e.g., backups) -->
-  <!-- <router-view /> -->
-
-  <div class="main-area">
-        
-        <div class="employee-list">
-          <div class="employee-item" v-for="emp in employees" :key="emp.id">
-            <span class="emp-name">{{ emp.name }}</span>
-            <span class="emp-status" :class="emp.status.toLowerCase().replace('!', '')">
-              {{ emp.status }}
-            </span>
-            <button class="btn" @click="changeStatus">Change Status</button>
-            <select class="status-dropdown">
-              <option value="">Status Change Dropdown</option>
-              <option value="active">Set Active</option>
-              <option value="pending">Set Pending</option>
-              <option value="disabled">Set Disabled</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- <div class="chatbot-area">
-            <aside class="chatbot-panel">
-                <template v-if="isChatbotOpen">
-                    <h3>Hello I am AI</h3>
-                    <div class="chat-history">
-                    <textarea name="textquery" id="textquery" rows="10">
-                    Chat history will appear here...
-                    </textarea>
-                    </div>
-                </template>
-                <button @click="isChatbotOpen = !isChatbotOpen" class="btn btn-ai">AI</button>
-            </aside>
-        </div> -->
-
-        <!-- Floating Chatbot -->
-            <div class="chat-float">
-            <!-- Floating trigger button -->
-            <button
-                class="chat-trigger"
-                @click="isChatbotOpen = !isChatbotOpen"
-                aria-label="Open AI chat"
-            >
-                AI
-            </button>
-
-            <!-- Chat window -->
-            <transition name="fade-slide">
-                <section
-                v-if="isChatbotOpen"
-                class="chat-window"
-                role="dialog"
-                aria-modal="true"
-                aria-label="AI Assistant"
-                >
-                <header class="chat-header">
-                    <div class="title">AI Assistant</div>
-                    <div class="spacer"></div>
-                    <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
-                </header>
-
-                <div class="chat-body" ref="scrollArea" aria-live="polite">
-                    <div
-                    v-for="(m, i) in messages"
-                    :key="i"
-                    :class="['message', m.from]"
-                    >
-                    {{ m.text }}
-                    </div>
-                </div>
-
-                <form class="chat-input" @submit.prevent="sendMessage">
-                    <input
-                    v-model="draft"
-                    type="text"
-                    placeholder="Type a message…"
-                    autocomplete="off"
-                    />
-                    <button type="submit" :disabled="!draft.trim()">Send</button>
-                </form>
-                </section>
-            </transition>
-            </div>
-
-      </div>
+      <router-view />
     </main>
+
+    <div class="chat-float">
+      <button
+        class="chat-trigger"
+        @click="isChatbotOpen = !isChatbotOpen"
+        aria-label="Open AI chat"
+      >
+        AI
+      </button>
+      <transition name="fade-slide">
+        <section
+          v-if="isChatbotOpen"
+          class="chat-window"
+          role="dialog"
+        >
+          <header class="chat-header">
+            <div class="title">AI Assistant</div>
+            <div class="spacer"></div>
+            <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
+          </header>
+          <div class="chat-body" ref="scrollArea" aria-live="polite">
+            <div
+              v-for="(m, i) in messages"
+              :key="i"
+              :class="['message', m.from]"
+            >
+              {{ m.text }}
+            </div>
+          </div>
+          <form class="chat-input" @submit.prevent="sendMessage">
+            <input
+              v-model="draft"
+              type="text"
+              placeholder="Type a message…"
+            />
+            <button type="submit" :disabled="!draft.trim()">Send</button>
+          </form>
+        </section>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'AdminDashboard',
+  name: 'AdminLayout',
   props: {
-    title: {
-      type: String,
-      default: 'Super Admin Dashboard'
-    }
+    title: { type: String, default: '' }
   },
   data() {
     return {
-      // Dummy data to populate the v-for loop
-      employees: [
-        { id: 1, name: 'EMP1', status: 'New!' },
-        { id: 2, name: 'EMP2', status: 'Old' },
-        { id: 3, name: 'EMP3', status: 'New!' },
-        { id: 4, name: 'EMP4', status: 'New!' },
-        { id: 5, name: 'EMP5', status: 'New!' },
-        { id: 6, name: 'EMP6', status: 'New!' }
-      ],
-      isChatbotOpen: this?.isChatbotOpen ?? false,
-        messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
-        draft: '',
-        searchQuery: '',
+      isChatbotOpen: false,
+      messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
+      draft: '',
     };
   },
-  computed: {
-    filteredEmployees() {
-      console.log('Search query changed to:', this.searchQuery);
-
-      
-      if (!this.searchQuery) {
-        return this.employees;
-      }
-
-      return this.employees.filter(emp => {
-        return emp.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-      });
-    }
-  },
-  watch: {
-    searchQuery(newQuery) {
-      console.log('Search query Typed by Admin:', newQuery);
-    }
-  },
   methods: {
-    async fetchData() {
-      console.log('Fetching data...');
-      // API call would go here
-    },
-    changeStatus() {
-      console.log('Change status');
-      // Logic to change status would go here
-    },
     sendMessage() {
       if (!this.draft.trim()) return;
-
-      // Add user message
       this.messages.push({ from: 'user', text: this.draft.trim() });
 
-      // Simulate AI response
       setTimeout(() => {
         this.messages.push({ from: 'ai', text: "This is a simulated AI response." });
         this.$nextTick(() => {
           const chatBody = this.$refs.scrollArea;
-          chatBody.scrollTop = chatBody.scrollHeight;
+          if (chatBody) {
+             chatBody.scrollTop = chatBody.scrollHeight;
+          }
         });
       }, 1000);
-
-      // Clear draft
       this.draft = '';
     },
-  },
-  mounted() {
-    // Code to run when the component is mounted
-    this.fetchData();
   }
 };
 </script>
-
 <style scoped>
 /* Resets and Basic Styles */
 .dashboard {
@@ -500,4 +402,5 @@ a:hover {
   opacity: 0;
   transform: translateY(6px) scale(0.995);
 }
+/* .router-link-exact-active { color: #007bff; font-weight: bold; } */
 </style>
