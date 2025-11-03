@@ -9,138 +9,138 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
-        component: () => import('@/components/landing/LoginPageView.vue'),
+        component: () => import('@/components/landing/LoginPage.vue'),
     },
     {
         path: '/admin',
-        component: () => import('@/components/admin/Layout.vue'),
+        component: () => import('@/components/admin/AdminLayout.vue'),
         children: [
             {
             path: 'dashboard', 
             name: 'AdminDashboard',
-            component: () => import('@/components/admin/Dashboard.vue'),
+            component: () => import('@/components/admin/AdminDashboard.vue'),
             },
             {
             path: 'backups',
             name: 'AdminBackups',
-            component: () => import('@/components/admin/DataBackup.vue'),
+            component: () => import('@/components/admin/AdminDataBackup.vue'),
             },
             {
-                path: 'SystemStatus',                
+                path: 'system-status',                
                 name: 'AdminSystemStatus',
-                component: () => import('@/components/admin/SystemStatus.vue'),
+                component: () => import('@/components/admin/AdminSystemStatus.vue'),
             },
             {
                 path: 'logs',
                 name: 'AdminLogs',
-                component: () => import('@/components/admin/Logs.vue'),
+                component: () => import('@/components/admin/AdminLogs.vue'),
             },
             {
                 path: 'updates',
                 name: 'AdminUpdates',
-                component: () => import('@/components/admin/Updates.vue'),
+                component: () => import('@/components/admin/AdminUpdates.vue'),
             },
             {
-                path: 'accounts',
+                path: 'account',
                 name: 'AdminAccount',
-                component: () => import('@/components/admin/Accounts.vue'),
+                component: () => import('@/components/admin/AdminAccount.vue'),
             },
         ],
     },
     {
         path: '/employee',
-        component: () => import('@/components/employee/Layout.vue'),
+        component: () => import('@/components/employee/EmployeeLayout.vue'),
         children: [
             {
                 path: 'dashboard',
                 name: 'EmployeeDashboard',
-                component: () => import('@/components/employee/Dashboard.vue'),
+                component: () => import('@/components/employee/EmployeeDashboard.vue'),
             },
             {
                 path: 'requests',
                 name: 'EmployeeRequests',
-                component: () => import('@/components/employee/Requests.vue'),
+                component: () => import('@/components/employee/EmployeeRequests.vue'),
                 children: [
                     {
                         path: 'leave',
                         name: 'EmployeeLeaveForm',
-                        component: () => import('@/components/employee/fragments/LeaveForm.vue'),
+                        component: () => import('@/components/employee/fragments/EmployeeLeaveForm.vue'),
                     },
                     {
                         path: 'reimbursement',
                         name: 'EmployeeReimbursementForm',
-                        component: () => import('@/components/employee/fragments/ReimbursementForm.vue'),
+                        component: () => import('@/components/employee/fragments/EmployeeReimbursementForm.vue'),
                     },
                     {
                         path: 'transfer',
                         name: 'EmployeeTransferForm',
-                        component: () => import('@/components/employee/fragments/TransferForm.vue'),
+                        component: () => import('@/components/employee/fragments/EmployeeTransferForm.vue'),
                     }
                 ]
             },
             {
                 path: 'hr-faqs',
                 name: 'EmployeeHRFAQs',
-                component: () => import('@/components/employee/HRFAQs.vue'),
+                component: () => import('@/components/employee/EmployeeHRFAQs.vue'),
             },
             {
                 path: 'learning',
                 name: 'EmployeeLearning',
-                component: () => import('@/components/employee/Learning.vue'),
+                component: () => import('@/components/employee/EmployeeLearning.vue'),
             },
             {
                 path: 'writing',
                 name: 'EmployeeWriting',
-                component: () => import('@/components/employee/Writing.vue'),
+                component: () => import('@/components/employee/EmployeeWriting.vue'),
             },
             {
                 path: 'account',
                 name: 'EmployeeAccount',
-                component: () => import('@/components/employee/Account.vue'),
+                component: () => import('@/components/employee/EmployeeAccount.vue'),
             }
         ],
     },
     {
-        path: '/productmanager',
-        component: () => import('@/components/productmanager/fragments/NavBar.vue'),
+        path: '/product-manager',
+        component: () => import('@/components/productmanager/fragments/ProductManagerNavBar.vue'),
         meta: { requiresAuth: true },
         children: [
             {
                 path: 'dashboard',
                 name: 'ProductManagerDashboard',
-                component: () => import('@/components/productmanager/Dashboard.vue'),
+                component: () => import('@/components/productmanager/ProductMangerDashboard.vue'),
             },
             {
                 path: 'dashboard/requirements/:clientId',
                 name: 'ProductManagerRequirements',
-                component: () => import('@/components/productmanager/ClientRequirements.vue'),
+                component: () => import('@/components/productmanager/ProductMangerClientRequirements.vue'),
                 props: (route) => ({ clientId: route.params.clientId })
             },
             {
-                path: 'clientsUpdate',
+                path: 'clients-update',
                 name: 'ProductManagerClientsUpdate',
-                component: () => import('@/components/productmanager/ClientUpdate.vue'),
+                component: () => import('@/components/productmanager/ProductMangerClientUpdate.vue'),
             },
             {
-                path: 'clientsUpdate/:id',
+                path: 'clients-update/:id',
                 name: 'ProductManagerClientsUpdateDetails',
-                component: () => import('@/components/productmanager/UpdateClient.vue'),
+                component: () => import('@/components/productmanager/ProductMangerUpdateClient.vue'),
                 props: (route) => ({ clientID: route.params.id })
             },
             {
                 path: 'projects',
                 name: 'ProductManagerProjects',
-                component: () => import('@/components/productmanager/Projects.vue'),
+                component: () => import('@/components/productmanager/ProductMangerProjects.vue'),
             },
             {
                 path: 'performance',
                 name: 'ProductManagerPerformance',
-                component: () => import('@/components/productmanager/Performance.vue'),
+                component: () => import('@/components/productmanager/ProductMangerPerformance.vue'),
             },
             {
                 path: 'performance/:id',
                 name: 'ProductManagerPerformanceDetails',
-                component: () => import('@/components/productmanager/EmployeePerformance.vue'),
+                component: () => import('@/components/productmanager/ProductMangerEmployeePerformance.vue'),
                 props: (route) => ({ employeeId: route.params.id })
             }
         ],
@@ -148,22 +148,22 @@ const routes = [
     
     {
         path: '/hr',
-        component: () => import('@/components/hr/Layout.vue'),
+        component: () => import('@/components/hr/HRLayout.vue'),
         children: [
         {
             path: 'dashboard',
             name: 'HRDashboard',
-            component: () => import('@/components/hr/Dashboard.vue'),
+            component: () => import('@/components/hr/HRDashboard.vue'),
         },
         {
             path: 'chatbot',
             name: 'HRChatbot',
-            component: () => import('@/components/hr/Chatbot.vue'),
+            component: () => import('@/components/hr/HRChatbot.vue'),
         },
         {
             path: 'employees',
             name: 'HREmployees',
-            component: () => import('@/components/hr/Employees.vue'),
+            component: () => import('@/components/hr/HREmployees.vue'),
         },
         {
             path: 'hrpolicies',
@@ -173,7 +173,7 @@ const routes = [
         {
             path: 'projects',
             name: 'HRProjects',
-            component: () => import('@/components/hr/Projects.vue'),
+            component: () => import('@/components/hr/HRProjects.vue'),
         },
     ],
     },

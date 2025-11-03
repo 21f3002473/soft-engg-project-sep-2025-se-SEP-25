@@ -82,6 +82,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: 'LandingView'
+}
+</script>
+
 <style scoped>
 .landing-root {
   font-family:
