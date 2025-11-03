@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="chat-header">
         <div class="chat-header-info">
-          <div class="chat-avatar">🤖</div>
+          <div class="chat-avatar mb-4">🤖</div>
           <div>
             <h3>Sync’em AI Assistant</h3>
             <span class="status-dot"></span><span class="status">Online</span>
