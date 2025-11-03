@@ -9,7 +9,6 @@ const routes = [
     {
         path: '/login',
         name: 'LoginPage',
-        // component: LoginPageView
         component: () => import('@/components/Landing/LoginPageView.vue'),
     },
     {
@@ -61,6 +60,23 @@ const routes = [
                 path: 'requests',
                 name: 'UserRequests',
                 component: () => import('@/components/users/UserRequests.vue'),
+                children: [
+                    {
+                        path: 'leave',
+                        name: 'LeaveForm',
+                        component: () => import('@/components/users/fragments/LeaveForm.vue'),
+                    },
+                    {
+                        path: 'reimbursement',
+                        name: 'ReimbursementForm',
+                        component: () => import('@/components/users/fragments/ReimbursementForm.vue'),
+                    },
+                    {
+                        path: 'transfer',
+                        name: 'TransferForm',
+                        component: () => import('@/components/users/fragments/TransferForm.vue'),
+                    }
+                ]
             },
             {
                 path: 'hr-faqs',
@@ -75,7 +91,7 @@ const routes = [
             {
                 path: 'writing-section',
                 name: 'UserWritingSection',
-                component: () => import('@/components/users/UserWritingSection.vue'),
+                component: () => import('@/components/users/UserWriting.vue'),
             },
             {
                 path: 'account',

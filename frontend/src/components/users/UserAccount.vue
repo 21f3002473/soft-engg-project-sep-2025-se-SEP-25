@@ -1,101 +1,145 @@
 <template>
-    <div class="account-page">
-      <!-- Profile Section -->
-      <section class="profile-section">
-        <div class="profile-header">
-          <div class="avatar">JD</div>
-          <div class="profile-info">
-            <h2>{{ user.name }}</h2>
-            <p class="role">{{ user.role }}</p>
-          </div>
+  <div class="account-page">
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <div class="profile-header">
+        <div class="avatar">{{ userInitials }}</div>
+        <div class="profile-info">
+          <h2>{{ user.name }}</h2>
+          <p class="role">{{ user.role }}</p>
+          <p class="department">{{ user.department }}</p>
         </div>
-      </section>
-
-      <!-- Account Details -->
-      <section class="account-section">
-        <h3>Account Information</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" v-model="user.name" />
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" v-model="user.email" />
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" v-model="user.phone" />
-          </div>
-          <div class="form-group">
-            <label>Department</label>
-            <input type="text" v-model="user.department" readonly />
-          </div>
-        </div>
-      </section>
-
-      <!-- Preferences -->
-      <section class="account-section">
-        <h3>Preferences</h3>
-        <div class="preferences">
-          <label class="checkbox">
-            <input type="checkbox" v-model="preferences.emailNotifications" />
-            Receive email notifications
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" v-model="preferences.twoFactorAuth" />
-            Enable two-factor authentication
-          </label>
-        </div>
-      </section>
-
-      <!-- Actions -->
-      <div class="actions">
-        <button class="btn primary" @click="saveChanges">Save Changes</button>
-        <button class="btn" @click="resetForm">Cancel</button>
       </div>
+    </section>
+
+    <!-- Account Details -->
+    <section class="account-section">
+      <div class="section-header">
+        <h3>Account Information</h3>
+        <button class="btn small" @click="resetForm">Reset</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group" v-for="(value, key) in editableFields" :key="key">
+          <label :for="key">{{ keyLabels[key] }}</label>
+          <input
+            :id="key"
+            v-model="user[key]"
+            :readonly="key === 'department'"
+            :type="inputTypes[key]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Preferences -->
+    <section class="account-section">
+      <h3>Preferences</h3>
+      <div class="preferences">
+        <label class="checkbox">
+          <input type="checkbox" v-model="preferences.emailNotifications" />
+          Receive email notifications
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" v-model="preferences.twoFactorAuth" />
+          Enable two-factor authentication
+        </label>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn primary" @click="saveChanges">Save Changes</button>
+      <button class="btn" @click="resetForm">Cancel</button>
     </div>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'UserAccount',
+  name: "UserAccount",
   data() {
     return {
       user: {
-        name: 'John Doe',
-        email: 'john.doe@company.com',
-        phone: '+1 234 567 8900',
-        role: 'Software Engineer',
-        department: 'Engineering'
+        name: "John Doe",
+        email: "john.doe@company.com",
+        phone: "+1 234 567 8900",
+        role: "Software Engineer",
+        department: "Engineering",
       },
+      originalUser: {},
       preferences: {
         emailNotifications: true,
-        twoFactorAuth: false
-      }
+        twoFactorAuth: false,
+      },
+      keyLabels: {
+        name: "Full Name",
+        email: "Email",
+        phone: "Phone",
+        department: "Department",
+      },
+      inputTypes: {
+        name: "text",
+        email: "email",
+        phone: "tel",
+        department: "text",
+      },
     };
+  },
+  computed: {
+    editableFields() {
+      return Object.keys(this.user)
+        .filter((key) => key !== "role")
+        .reduce((acc, key) => ((acc[key] = this.user[key]), acc), {});
+    },
+    userInitials() {
+      return this.user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    },
+  },
+  mounted() {
+    this.originalUser = JSON.parse(JSON.stringify(this.user));
   },
   methods: {
     saveChanges() {
-      // Implement save functionality
-      console.log('Saving changes:', { user: this.user, preferences: this.preferences });
+      console.log("Saving changes:", {
+        user: this.user,
+        preferences: this.preferences,
+      });
+      alert("✅ Changes saved successfully!");
     },
     resetForm() {
-      // Implement reset functionality
-      console.log('Reset form');
-    }
-  }
+      if (confirm("Reset all changes?")) {
+        this.user = JSON.parse(JSON.stringify(this.originalUser));
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .account-page {
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  background: #fafafa;
 }
 
+/* Profile Section */
 .profile-section {
-  margin-bottom: 32px;
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .profile-header {
@@ -105,50 +149,66 @@ export default {
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
-  background: #4a90e2;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
+  background: linear-gradient(135deg, #007bff, #0056d2);
+  color: #fff;
+  font-weight: 600;
+  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 24px;
 }
 
 .profile-info h2 {
   margin: 0;
   font-size: 24px;
+  color: #222;
 }
 
 .role {
-  color: #666;
-  margin: 4px 0;
+  font-weight: 500;
+  color: #555;
 }
 
+.department {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Sections */
 .account-section {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 24px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
 }
 
 .account-section h3 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: 20px;
+  color: #222;
 }
 
+/* Form Grid */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form-group label {
@@ -157,46 +217,82 @@ export default {
 }
 
 .form-group input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: 0.2s border-color;
 }
 
+.form-group input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Preferences */
 .preferences {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
+  color: #333;
 }
 
+/* Buttons */
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
 }
 
 .btn {
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 6px;
-  border: 1px solid #ddd;
-  background: white;
+  border: 1px solid #ccc;
+  background: #fff;
   cursor: pointer;
-}
-
-.btn.primary {
-  background: #4a90e2;
-  color: white;
-  border-color: #4a90e2;
+  transition: 0.2s all;
+  font-weight: 500;
 }
 
 .btn:hover {
-  opacity: 0.9;
+  background: #f0f0f0;
+}
+
+.btn.primary {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.btn.primary:hover {
+  background: #0056d2;
+}
+
+.btn.small {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 22px;
+  }
+  .account-page {
+    padding: 20px 16px;
+  }
 }
 </style>
