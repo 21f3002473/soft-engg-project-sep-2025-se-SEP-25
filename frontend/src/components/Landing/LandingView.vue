@@ -7,7 +7,7 @@
       </div>
       <div class="nav-right">
         <!-- <router-link to="/" class="nav-link">Home</router-link> -->
-        <router-link to="/login" class="nav-link">Login</router-link>
+        <router-link :to="{ name: 'Login' }" class="nav-link">Login</router-link>
       </div>
     </nav>
 
@@ -81,6 +81,12 @@
     </footer> -->
   </div>
 </template>
+
+<script>
+export default {
+  name: 'LandingView'
+}
+</script>
 
 <style scoped>
 .landing-root {
