@@ -125,7 +125,7 @@
 </template>
 <script>
 export default {
-  name: "HRDashboard",
+  name: "Dashboard",
 };
 </script>
 

@@ -3,30 +3,30 @@
     <!-- <header class="dashboard-header">
       <div class="nav-links">
         <router-link to="/systemStatus">System Status</router-link>
-        <router-link to="/logs">Logs</router-link>
+        <router-link to="/logs" class="router-link-exact-active">Logs</router-link>
         <router-link to="/updates">Updates</router-link>
         <router-link to="/chatbotConfig">Chatbot Config</router-link>
       </div>
       <div class="account-link">
-        <router-link to="/account" class="router-link-exact-active">Account</router-link>
+        <router-link to="/account">Account</router-link>
       </div>
     </header> -->
 
     <main class="dashboard-content">
-      <h1>Account Settings</h1>
+      <h1>Logs</h1>
       <div class="content-placeholder">
-        <p>Admin profile information, password change form, and API key management would be displayed here.</p>
-      </div>
+        <p>A live-tailing log viewer (e.g., for application, system, or audit logs) would go here.</p>
+        </div>
     </main>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'AccountView',
+  name: 'Logs',
   data() {
     return {
-      // User data
+      // Log data or filters would go here
     };
   }
 };

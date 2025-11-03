@@ -4,18 +4,18 @@
       <div class="nav-links">
         <router-link to="/systemStatus">System Status</router-link>
         <router-link to="/logs">Logs</router-link>
-        <router-link to="/updates" class="router-link-exact-active">Updates</router-link>
+        <router-link to="/updates">Updates</router-link>
         <router-link to="/chatbotConfig">Chatbot Config</router-link>
       </div>
       <div class="account-link">
-        <router-link to="/account">Account</router-link>
+        <router-link to="/account" class="router-link-exact-active">Account</router-link>
       </div>
     </header> -->
 
     <main class="dashboard-content">
-      <h1>Updates</h1>
+      <h1>Account Settings</h1>
       <div class="content-placeholder">
-        <p>Software update status, package versions, and a "Check for Updates" button would be displayed here.</p>
+        <p>Admin profile information, password change form, and API key management would be displayed here.</p>
       </div>
     </main>
   </div>
@@ -23,17 +23,15 @@
 
 <script>
 export default {
-  name: 'UpdatesView',
+  name: 'Account',
   data() {
     return {
-      // Version info, update status, etc.
     };
   }
 };
 </script>
 
 <style scoped>
-/* All styles are identical to ChatbotConfig.vue */
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f4f7f6;

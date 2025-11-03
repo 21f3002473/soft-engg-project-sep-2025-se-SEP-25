@@ -1,6 +1,5 @@
 <template>
   <div class="account-page">
-    <!-- Profile Section -->
     <section class="profile-section">
       <div class="profile-header">
         <div class="avatar">{{ userInitials }}</div>
@@ -12,7 +11,6 @@
       </div>
     </section>
 
-    <!-- Account Details -->
     <section class="account-section">
       <div class="section-header">
         <h3>Account Information</h3>
@@ -31,7 +29,6 @@
       </div>
     </section>
 
-    <!-- Preferences -->
     <section class="account-section">
       <h3>Preferences</h3>
       <div class="preferences">
@@ -56,7 +53,7 @@
 
 <script>
 export default {
-  name: "UserAccount",
+  name: "Account",
   data() {
     return {
       user: {

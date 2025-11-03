@@ -21,7 +21,7 @@
 
 <script>
 
-import ClientCardComponent from './fragments/ClientCardComponent.vue';
+import ClientCardComponent from './fragments/ClientCard.vue';
 
 export default {
     name: 'ProductmanagerDashboard',

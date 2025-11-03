@@ -1,6 +1,5 @@
 <template>
   <div class="user-learning">
-    <!-- Personalized Learning Section -->
     <section class="section ">
       <h2 class="section-heading">Personalized Learning</h2>
       <div class="courses-grid">
@@ -20,7 +19,6 @@
       </div>
     </section>
 
-    <!-- Recommendations Section -->
     <section class="section mt-2">
       <h2 class="section-heading">Recommended for You</h2>
       <div class="recommendations-grid">
@@ -48,7 +46,7 @@
 
 <script>
 export default {
-  name: 'UserLearning',
+  name: 'Learning',
   data() {
     return {
       courses: [
@@ -89,7 +87,6 @@ export default {
   min-height: 100vh;
 }
 
-/* Header */
 .header-row {
   display: flex;
   align-items: center;
@@ -103,7 +100,6 @@ export default {
   letter-spacing: 0.3px;
 }
 
-/* Section Titles */
 .section {
   margin-bottom: 40px;
 }
@@ -114,7 +110,6 @@ export default {
   margin-bottom: 20px;
 }
 
-/* Courses Grid */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -167,7 +162,6 @@ export default {
   transform: translateY(-2px);
 }
 
-/* Recommendations */
 .recommendations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -193,7 +187,6 @@ export default {
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
 }
 
-/* Top Icon Section */
 .rec-top {
   display: flex;
   justify-content: center;
@@ -206,7 +199,6 @@ export default {
   font-size: 24px;
 }
 
-/* Body Section */
 .rec-body {
   text-align: center;
   padding: 10px 12px;
@@ -222,7 +214,6 @@ export default {
   color: #475569;
 }
 
-/* Footer Action */
 .rec-footer {
   text-align: center;
   background: rgba(37, 99, 235, 0.05);
@@ -238,7 +229,6 @@ export default {
   color: #1e3a8a;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .header-row {
     flex-direction: column;

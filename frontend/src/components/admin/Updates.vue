@@ -3,8 +3,8 @@
     <!-- <header class="dashboard-header">
       <div class="nav-links">
         <router-link to="/systemStatus">System Status</router-link>
-        <router-link to="/logs" class="router-link-exact-active">Logs</router-link>
-        <router-link to="/updates">Updates</router-link>
+        <router-link to="/logs">Logs</router-link>
+        <router-link to="/updates" class="router-link-exact-active">Updates</router-link>
         <router-link to="/chatbotConfig">Chatbot Config</router-link>
       </div>
       <div class="account-link">
@@ -13,26 +13,27 @@
     </header> -->
 
     <main class="dashboard-content">
-      <h1>Logs</h1>
+      <h1>Updates</h1>
       <div class="content-placeholder">
-        <p>A live-tailing log viewer (e.g., for application, system, or audit logs) would go here.</p>
-        </div>
+        <p>Software update status, package versions, and a "Check for Updates" button would be displayed here.</p>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'LogsView',
+  name: 'Updates',
   data() {
     return {
-      // Log data or filters would go here
+      // Version info, update status, etc.
     };
   }
 };
 </script>
 
 <style scoped>
+/* All styles are identical to ChatbotConfig.vue */
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f4f7f6;

@@ -14,22 +14,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/productmanager/dashboard">
+                        <router-link class="nav-link" :to="{ name: 'ProductManagerDashboard' }">
                             Dashboard
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/productmanager/clientsUpdate">
+                        <router-link class="nav-link" :to="{ name: 'ProductManagerClientsUpdate' }">
                             Clients
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/productmanager/performance">
+                        <router-link class="nav-link" :to="{ name: 'ProductManagerPerformance' }">
                             Performance
                         </router-link>
                     </li>
                     <li class="nav-item ms-2">
-                        <router-link class="btn btn-outline-light btn-sm" to="/login">
+                        <router-link class="btn btn-outline-light btn-sm" :to="{ name: 'Login' }">
                             Logout
                         </router-link>
                     </li>
@@ -43,7 +43,7 @@
 
 <script>
 export default {
-    name: 'NavbarComponent',
+    name: 'NavBar',
 };
 </script>
 

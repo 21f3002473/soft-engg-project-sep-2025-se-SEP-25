@@ -52,7 +52,6 @@ function scrollToBottom() {
     })
 }
 
-// simple rule-based bot replies using dummy data
 const canned = [
     "I'm a demo bot — try asking about 'price', 'hours', or say 'hello'.",
     "Prices depend on the product. This is demo data.",
@@ -76,14 +75,13 @@ function botReply(userText) {
     } else if (text.includes('features')) {
         reply = "This demo supports sending messages and getting canned replies."
     } else {
-        // random canned fallback
         reply = canned[Math.floor(Math.random() * canned.length)]
     }
 
     setTimeout(() => {
         messages.value.push({ id: idCounter++, sender: 'bot', text: reply, time: formatTime() })
         scrollToBottom()
-    }, 700 + Math.random() * 600) // simulate typing delay
+    }, 700 + Math.random() * 600)
 }
 
 function sendMessage() {
@@ -97,7 +95,6 @@ function sendMessage() {
     botReply(text)
 }
 
-// ensure scrolled on mount
 scrollToBottom()
 </script>
 

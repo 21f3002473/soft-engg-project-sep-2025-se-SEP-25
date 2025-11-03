@@ -3,7 +3,6 @@
     <header class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h4 mb-0">Projects Overview</h1>
       <nav>
-        <!-- placeholder for nav actions -->
         <a class="btn btn-outline-primary btn-sm" href="#">HR</a>
       </nav>
     </header>
@@ -64,7 +63,7 @@
 
 <script>
 export default {
-  name: "HrProjectsPage",
+  name: "ProjectsPage",
   data() {
     return {
       searchProject: "",

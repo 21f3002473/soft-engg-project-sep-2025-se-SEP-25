@@ -2,7 +2,6 @@
   <div class="container-fluid py-4">
     <div class="container">
       <div class="row g-4">
-        <!-- Left: PDF viewer -->
         <div class="col-12 col-md-6">
           <div class="card h-100">
             <div class="card-body p-0">
@@ -18,7 +17,6 @@
           </div>
         </div>
 
-        <!-- Right: Ask HR / Chatbot box -->
         <div class="col-12 col-md-6">
           <div class="card h-100">
             <div class="card-body d-flex flex-column">
@@ -54,7 +52,7 @@
 
 <script>
 export default {
-  name: "HrPoliciesPage",
+  name: "HRPolicies",
   data() {
     return {
       query: "",

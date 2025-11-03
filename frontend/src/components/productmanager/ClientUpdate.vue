@@ -4,7 +4,7 @@
         <div class="row g-4">
             <div class="col-12 col-sm-6 col-md-4 col-lg-3" v-for="client in ClientList" :key="client.id">
                 <RouterLink :to="{ name: 'ProductManagerClientsUpdateDetails', params: { id: client.id } }" class="text-decoration-none">
-                    <ClientCardComponent :id="client.id" :clientname="client.clientname" :description="client.description" />
+                    <ClientCard :id="client.id" :clientname="client.clientname" :description="client.description" />
                 </RouterLink>
             </div>
         </div>
@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import ClientCardComponent from './fragments/ClientCardComponent.vue';
+import ClientCard from './fragments/ClientCard.vue';
 
 export default {
-    name: 'ClientUpdateView',
+    name: 'ClientUpdate',
     components: {
-        ClientCardComponent
+        ClientCard
     },
     data() {
         return {

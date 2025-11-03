@@ -67,7 +67,7 @@
 
 <script>
 export default {
-  name: 'HrEmployees',
+  name: 'Employees',
   data() {
     return {
       employees: [

@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'UserDashboard',
+  name: 'Dashboard',
   data() {
     return {
       stats: [

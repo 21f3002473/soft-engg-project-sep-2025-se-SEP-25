@@ -21,26 +21,26 @@
       <div class="col-lg-9 col-md-8">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-primary text-white">
-            <h3 class="h5 mb-0">Client Requirements</h3>
+            <h3 class="h5 mb-0">Client Updates</h3>
           </div>
           <div class="card-body">
             <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
               
               <div class="flex-md-shrink-0" style="min-width: 280px;">
                 <div class="alert alert-light border mb-0">
-                  <p class="text-muted mb-3">Requirements and details for client {{ clientId }}</p>
+                  <p class="text-muted mb-3">Updates and details for client {{ clientId }}</p>
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                      <strong class="text-primary">Requirement 1:</strong>
-                      <span class="ms-2">Description of requirement 1.</span>
+                      <strong class="text-primary">Update 1:</strong>
+                      <span class="ms-2">Description of update 1.</span>
                     </li>
                     <li class="list-group-item">
-                      <strong class="text-primary">Requirement 2:</strong>
-                      <span class="ms-2">Description of requirement 2.</span>
+                      <strong class="text-primary">Update 2:</strong>
+                      <span class="ms-2">Description of update 2.</span>
                     </li>
                     <li class="list-group-item">
-                      <strong class="text-primary">Requirement 3:</strong>
-                      <span class="ms-2">Description of requirement 3.</span>
+                      <strong class="text-primary">Update 3:</strong>
+                      <span class="ms-2">Description of update 3.</span>
                     </li>
                   </ul>
                 </div>
@@ -51,7 +51,7 @@
                   <i class="bi bi-chat-dots-fill text-primary me-2 fs-5"></i>
                   <h5 class="mb-0">AI Assistant</h5>
                 </div>
-                <ChatbotComponent />
+                <Chatbot />
               </div>
 
             </div>
@@ -62,29 +62,18 @@
   </div>
 
 </template>
-
 <script>
-import ChatbotComponent from './fragments/chatbotComponent.vue';
 
-export default {
-  name: 'ClientRequirementsView',
-  props: {
-    clientId: {
-      type: [String, Number],
-      required: true
+import Chatbot from './fragments/Chatbot.vue';
+
+export default{
+    name: "UpdateClient",
+    props:{
+        clientId:{type:String}
+    },
+    components:{
+        Chatbot
     }
-  },
-  components: {
-    ChatbotComponent
-  }
 }
-</script>
 
-<style scoped>
-/* Minimal custom styles - Bootstrap handles most of the styling */
-@media (max-width: 768px) {
-  .card-body .border.rounded {
-    min-height: 300px;
-  }
-}
-</style>
+</script>

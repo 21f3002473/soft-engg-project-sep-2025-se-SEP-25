@@ -7,22 +7,21 @@
         </div>
 
         <ul class="nav-links">
-          <li><router-link to="/user/dashboard" active-class="active">Dashboard</router-link></li>
-          <li><router-link to="/user/learning" active-class="active">Learning</router-link></li>
-          <li><router-link to="/user/requests" active-class="active">Requests</router-link></li>
-          <li><router-link to="/user/hr-faqs" active-class="active">HR FAQs</router-link></li>
-          <li><router-link to="/user/writing-section" active-class="active">Writing</router-link></li>
+          <li><router-link :to="{ name: 'EmployeeDashboard' }" active-class="active">Dashboard</router-link></li>
+          <li><router-link :to="{ name: 'EmployeeLearning' }" active-class="active">Learning</router-link></li>
+          <li><router-link :to="{ name: 'EmployeeRequests' }" active-class="active">Requests</router-link></li>
+          <li><router-link :to="{ name: 'EmployeeHRFAQs' }" active-class="active">HR FAQs</router-link></li>
+          <li><router-link :to="{ name: 'EmployeeWriting' }" active-class="active">Writing</router-link></li>
         </ul>
       </div>
 
-      <!-- Right Section -->
       <div class="nav-right">
         <div class="search-container mx-3">
           <i class="fas fa-search"></i>
           <input type="search" placeholder="Search..." class="nav-search" />
         </div>
-        <router-link to="/user/account" active-class="active" class="account">
-          <i class="fas fa-user-circle"></i>
+        <router-link :to="{ name: 'EmployeeAccount' }" active-class="active" class="account">
+          <i class="fas fa-employee-circle"></i>
           <span>Account</span>
         </router-link>
       </div>
@@ -37,7 +36,6 @@ export default {
 </script>
 
 <style scoped>
-/* Navbar Base */
 .top-nav {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
@@ -54,10 +52,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 30px; /* slightly increased horizontal padding */
+  padding: 10px 30px;
 }
 
-/* Left Section */
 .nav-left {
   display: flex;
   align-items: center;
@@ -66,7 +63,6 @@ export default {
   min-width: 0;
 }
 
-/* Brand */
 .brand {
   display: flex;
   align-items: center;
@@ -80,10 +76,9 @@ export default {
   color: #2563eb;
   white-space: nowrap;
   letter-spacing: 0.5px;
-  transform: translateY(1px); /* tiny visual alignment tweak */
+  transform: translateY(1px);
 }
 
-/* Navigation Links */
 .nav-links {
   list-style: none;
   display: flex;
@@ -116,7 +111,6 @@ export default {
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-/* Right Section */
 .nav-right {
   display: flex;
   align-items: center;
@@ -124,7 +118,6 @@ export default {
   flex-shrink: 0;
 }
 
-/* Search */
 .search-container {
   position: relative;
 }
@@ -156,7 +149,6 @@ export default {
   box-shadow: 0 0 0 2px #3b82f6;
 }
 
-/* Account */
 .account {
   display: flex;
   align-items: center;
@@ -180,7 +172,6 @@ export default {
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-/* Responsiveness */
 @media (max-width: 850px) {
   .nav-inner {
     flex-direction: column;

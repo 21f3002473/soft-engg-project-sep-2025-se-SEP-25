@@ -16,7 +16,6 @@
           </div>
         </div>
 
-        <!-- Pie Chart Card -->
         <div class="card shadow-sm mt-3">
           <div class="card-header bg-info text-white">
             <h5 class="mb-0">Current Stats</h5>
@@ -29,7 +28,6 @@
 
       
       <div class="col-lg-9 col-md-8">
-        <!-- Line Chart Card -->
         <div class="card shadow-sm mb-3">
           <div class="card-header bg-success text-white">
             <h5 class="mb-0">Performance Trends</h5>
@@ -44,7 +42,7 @@
             <h3 class="h5 mb-0">AI Performance Assistant</h3>
           </div>
           <div class="card-body">
-            <ChatbotComponent />
+            <Chatbot />
           </div>
         </div>
       </div>
@@ -54,13 +52,13 @@
 </template>
 
 <script>
-import ChatbotComponent from './fragments/chatbotComponent.vue';
+import Chatbot from './fragments/Chatbot.vue';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
 export default {
-  name: 'EmployeePerformanceView',
+  name: 'EmployeePerformance',
   props: {
     employeeId: {
       type: [String, Number],
@@ -68,7 +66,7 @@ export default {
     }
   },
   components: {
-    ChatbotComponent
+    Chatbot
   },
   data() {
     return {

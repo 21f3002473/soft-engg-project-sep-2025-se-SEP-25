@@ -6,7 +6,7 @@
             <div class="d-flex flex-row flex-wrap">
                 <div class="p-2" v-for="Employee in EmployeeList" :key="Employee.id">
                     <RouterLink :to="{ name: 'ProductManagerPerformanceDetails', params: { id: Employee.id } }">
-                        <EmployeeCardComponent
+                        <EmployeeCard
                             :id="Employee.id"
                             :employeename="Employee.employeename"
                             :description="Employee.description"
@@ -21,10 +21,10 @@
 
 <script>
 
-import EmployeeCardComponent from './fragments/EmployeeCardComponent.vue';
+import EmployeeCard from './fragments/EmployeeCard.vue';
 
 export default {
-    name: 'PerformanceView',
+    name: 'Performance',
     data() {
         return {
             EmployeeList: [
@@ -53,13 +53,11 @@ export default {
         };
     },
     components: {
-        EmployeeCardComponent
+        EmployeeCard
     },
     methods: {
-        // Dashboard methods
     },
     mounted() {
-        // Code to run when the component is mounted
     }
 };
 </script>

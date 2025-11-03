@@ -159,7 +159,6 @@ textarea {
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
-/* smooth fade + slide-in effect */
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }

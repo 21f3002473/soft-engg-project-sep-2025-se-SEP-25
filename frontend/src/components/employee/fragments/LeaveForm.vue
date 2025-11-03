@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     submitForm() {
-      alert(`✅ Leave form submitted by ${this.form.name || 'Unknown Employee'}`);
+      alert(`Leave form submitted by ${this.form.name || 'Unknown Employee'}`);
     }
   }
 };
@@ -144,7 +144,6 @@ textarea {
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
-/* Smooth slide and fade when form appears */
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }

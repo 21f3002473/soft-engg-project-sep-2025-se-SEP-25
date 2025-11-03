@@ -111,7 +111,7 @@
 
 <script>
 export default {
-  name: 'AdminDashboard',
+  name: 'Dashboard',
   props: {
     title: {
       type: String,

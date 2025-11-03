@@ -3,13 +3,13 @@
     <header class="dashboard-header">
       <div class="nav-links">
         <router-link :to="{ name: 'AdminDashboard' }" class="router-link-exact-active">Dashboard</router-link>
-        <router-link :to="{ name: 'SystemStatus' }" class="router-link-exact-active">System Status</router-link>
-        <router-link :to="{ name: 'Logs' }" class="router-link-exact-active">Logs</router-link>
-        <router-link :to="{ name: 'Updates' }" class="router-link-exact-active">Updates</router-link>
+        <router-link :to="{ name: 'AdminSystemStatus' }" class="router-link-exact-active">System Status</router-link>
+        <router-link :to="{ name: 'AdminLogs' }" class="router-link-exact-active">Logs</router-link>
+        <router-link :to="{ name: 'AdminUpdates' }" class="router-link-exact-active">Updates</router-link>
         <router-link :to="{ name: 'AdminBackups' }" class="router-link-exact-active">Backups</router-link>
       </div>
       <div class="account-link">
-        <router-link :to="{ name: 'Account' }">Account</router-link>
+        <router-link :to="{ name: 'AdminAccount' }">Account</router-link>
       </div>
     </header>
 
@@ -92,7 +92,6 @@ export default {
 };
 </script>
 <style scoped>
-/* Resets and Basic Styles */
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f4f7f6;

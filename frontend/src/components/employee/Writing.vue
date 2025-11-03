@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'UserWriting',
+  name: 'Writing',
   data() {
     return {
       text: ''

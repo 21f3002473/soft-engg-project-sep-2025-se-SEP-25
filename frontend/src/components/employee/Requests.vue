@@ -1,6 +1,5 @@
 <template>
   <div class="user-requests">
-    <!-- Header -->
     <div class="page-header">
       <h1 class="page-title">Requests</h1>
       <div class="header-right">
@@ -13,9 +12,7 @@
       </div>
     </div>
 
-    <!-- Requests + Nested Form -->
     <section class="panel">
-      <!-- Requests List -->
       <transition name="fade">
         <div v-if="filteredItems.length" class="requests-grid">
           <div
@@ -40,7 +37,6 @@
       </transition>
 
 
-      <!-- Form Display Area -->
       <transition name="slide-fade">
         <div v-if="$route.params.id || $route.path.includes('requests/')" class="form-section">
           <router-view />
@@ -52,7 +48,7 @@
 
 <script>
 export default {
-  name: "UserRequests",
+  name: "Requests",
   data() {
     return {
       search: "",
@@ -96,7 +92,6 @@ export default {
   color: #1e293b;
 }
 
-/* Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -124,7 +119,6 @@ export default {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* Panel */
 .panel {
   background: #fff;
   border-radius: 16px;
@@ -133,7 +127,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* Requests Grid */
 .requests-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -186,7 +179,6 @@ export default {
   transform: translateY(-2px);
 }
 
-/* Form Section (below the list) */
 .form-section {
   background: #eeeff1;
   border-radius: 12px;
@@ -207,7 +199,6 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-/* Animations */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -224,7 +215,6 @@ export default {
   transform: translateY(20px);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .search {
     width: 100%;

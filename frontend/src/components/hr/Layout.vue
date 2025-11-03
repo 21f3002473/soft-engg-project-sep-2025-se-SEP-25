@@ -11,19 +11,19 @@
         <div class="collapse navbar-collapse" id="navbarHR">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <router-link to="/hr" class="nav-link">Dashboard</router-link>
+              <router-link :to="{ name: 'HRDashboard' }" class="nav-link">Dashboard</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/hr/employees" class="nav-link">Employees</router-link>
+              <router-link :to="{ name: 'HREmployees' }" class="nav-link">Employees</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/hr/projects" class="nav-link">Projects</router-link>
+              <router-link :to="{ name: 'HRProjects' }" class="nav-link">Projects</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/hr/hrpolicies" class="nav-link">HR Policies</router-link>
+              <router-link :to="{ name: 'HRPolicies' }" class="nav-link">HR Policies</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/hr/chatbot" class="nav-link">Chatbot</router-link>
+              <router-link :to="{ name: 'HRChatbot' }" class="nav-link">Chatbot</router-link>
             </li>
           </ul>
         </div>

@@ -1,9 +1,7 @@
 <template>
   <div class="user-shell">
-    <!-- Navbar -->
     <UserNavBar />
 
-    <!-- Page Content -->
     <main class="content">
       <transition name="fade-slide" mode="out-in">
         <div v-if="title" key="title" class="page-header">
@@ -17,7 +15,6 @@
       </section>
     </main>
 
-    <!-- Floating Chat Button -->
     <button
       class="chat-toggle"
       @click="toggleChat"
@@ -37,7 +34,7 @@ import UserNavBar from './fragments/NavBar.vue';
 import ChatPopup from './fragments/ChatPopup.vue';
 
 export default {
-  name: 'UserLayout',
+  name: 'Layout',
   components: { UserNavBar, ChatPopup },
   props: {
     title: { type: String, default: '' }
@@ -54,7 +51,6 @@ export default {
 </script>
 
 <style scoped>
-/* Layout base */
 .user-shell {
   min-height: 100vh;
   background: linear-gradient(135deg, #e9f1ff 0%, #f9fbff 100%);
@@ -62,18 +58,16 @@ export default {
   flex-direction: column;
 }
 
-/* Content area */
 .content {
   max-width: 1200px;
-  margin: 16px auto 32px; /* reduced top margin */
+  margin: 16px auto 32px;
   padding: 16px;
   width: 90%;
 }
 
-/* Header */
 .page-header {
   text-align: left;
-  margin-bottom: 16px; /* tighter header spacing */
+  margin-bottom: 16px;
 }
 
 .page-title {
@@ -90,7 +84,6 @@ export default {
   border-radius: 6px;
 }
 
-/* Page Body */
 .page-body {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 14px;
@@ -101,7 +94,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* Floating Chat Button */
 .chat-toggle {
   position: fixed;
   right: 30px;
@@ -133,7 +125,6 @@ export default {
   font-size: 24px;
 }
 
-/* Animations */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.3s ease;

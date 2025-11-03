@@ -1,13 +1,11 @@
 <template>
   <div class="user-hr-faqs">
-    <!-- Header with search -->
     <div class="header-row">
       <div class="spacer"></div>
       <div class="header-right">
       </div>
     </div>
 
-    <!-- FAQs Section -->
     <section class="section">
       <h2 class="section-heading">HR FAQs</h2>
       <div class="faq-container">
@@ -32,7 +30,6 @@
       </div>
     </section>
 
-    <!-- Help Section -->
     <section class="section">
       <h2 class="section-heading">Need More Help?</h2>
       <div class="help-box">
@@ -48,7 +45,7 @@
 
 <script>
 export default {
-  name: 'UserHRFAQs',
+  name: 'HRFAQs',
   data() {
     return {
       search: '',
@@ -109,7 +106,6 @@ export default {
   animation: fadeIn 0.4s ease-in;
 }
 
-/* Header */
 .header-row {
   display: flex;
   align-items: center;
@@ -134,7 +130,6 @@ export default {
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
-/* Sections */
 .section {
   margin-bottom: 32px;
 }
@@ -145,7 +140,6 @@ export default {
   color: #007bff;
 }
 
-/* FAQ Container */
 .faq-container {
   background: #fff;
   border: 1px solid #e1e5f2;
@@ -156,7 +150,7 @@ export default {
 .faq-item {
   border-bottom: 1px solid #f0f2fa;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: 0.2s ease;
 }
 .faq-item:last-child {
   border-bottom: none;
@@ -183,7 +177,6 @@ export default {
   line-height: 1.5;
 }
 
-/* Help Section */
 .help-box {
   background: linear-gradient(145deg, #f0f6ff, #e7f0ff);
   border: 1px solid #d2e4ff;
@@ -213,7 +206,6 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
 }
 
-/* Animations */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.25s ease;
@@ -234,7 +226,6 @@ export default {
   }
 }
 
-/* Responsive */
 @media (max-width: 720px) {
   .header-right .search {
     width: 100%;

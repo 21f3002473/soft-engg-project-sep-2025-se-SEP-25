@@ -1,7 +1,6 @@
 <template>
   <Transition name="slide">
     <div v-if="isOpen" class="chat-popup">
-      <!-- Header -->
       <div class="chat-header">
         <div class="chat-header-info">
           <div class="chat-avatar mb-4">🤖</div>
@@ -12,7 +11,6 @@
         </div>
       </div>
 
-      <!-- Messages -->
       <div class="chat-messages" ref="messagesContainer">
         <div
           v-for="(msg, idx) in messages"
@@ -73,7 +71,6 @@ export default {
     async sendMessage() {
       if (!this.newMessage.trim()) return;
 
-      // Add user message
       this.messages.push({
         text: this.newMessage,
         sender: "user",
@@ -82,11 +79,9 @@ export default {
       const userMessage = this.newMessage;
       this.newMessage = "";
 
-      // Simulate typing
       this.isTyping = true;
       await new Promise((r) => setTimeout(r, 1200));
 
-      // Bot response
       this.isTyping = false;
       this.messages.push({
         text: `Got it! You mentioned "${userMessage}". Let me process that for you.`,
@@ -104,7 +99,6 @@ export default {
 </script>
 
 <style scoped>
-/* Overall popup container */
 .chat-popup {
   position: fixed;
   right: 28px;
@@ -121,13 +115,11 @@ export default {
   animation: fadeIn 0.3s ease;
 }
 
-/* Entry animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Slide transition */
 .slide-enter-active, .slide-leave-active {
   transition: all 0.3s ease;
 }
@@ -136,7 +128,6 @@ export default {
   transform: translateY(30px);
 }
 
-/* Header */
 .chat-header {
   padding: 14px 18px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -174,7 +165,6 @@ export default {
   margin-right: 4px;
 }
 
-/* Messages */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -214,7 +204,6 @@ export default {
   text-align: right;
 }
 
-/* Typing dots */
 .typing-indicator {
   display: flex;
   gap: 5px;
@@ -236,7 +225,6 @@ export default {
   50% { transform: translateY(-4px); opacity: 1; }
 }
 
-/* Input area */
 .chat-input {
   padding: 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
