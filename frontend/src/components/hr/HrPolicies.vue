@@ -4,15 +4,17 @@
       <div class="row g-4">
         <!-- Left: PDF viewer -->
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100"> 
             <div class="card-body p-0">
-              <div class="ratio ratio-4x3">
-                <iframe
-                  src="https://triagelogic.com/wp-content/uploads/2018/06/Company-Policy-and-Procedure-June-1.18-V6.0.pdf"
-                  frameborder="0"
-                  class="w-100 h-100"
-                ></iframe>
-              </div>
+              <div class="ratio ratio-4x3"> 
+                <div class="card-body p-0" style="height: 40vh;">
+                  <iframe
+                    src="https://triagelogic.com/wp-content/uploads/2018/06/Company-Policy-and-Procedure-June-1.18-V6.0.pdf#toolbar=0&navpanes=0&scrollbar=1"
+                    frameborder="0"
+                    class="w-100 h-100"
+                  ></iframe>
+                </div>
+              </div> 
             </div>
             <div class="card-footer text-muted small">Company Policies</div>
           </div>
