@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row g-4">
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100"> 
             <div class="card-body p-0">
                <div class="ratio ratio-4x3"> 
                 <div class="card-body p-0" style="height: 40vh;">
