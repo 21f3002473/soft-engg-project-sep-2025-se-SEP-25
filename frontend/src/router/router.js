@@ -101,7 +101,7 @@ const routes = [
         ],
     },
     {
-        path: '/product-manager',
+        path: '/productmanager',
         component: () => import('@/components/productmanager/fragments/ProductManagerNavBar.vue'),
         meta: { requiresAuth: true },
         children: [
