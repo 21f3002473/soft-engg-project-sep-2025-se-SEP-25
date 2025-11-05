@@ -1,5 +1,5 @@
 import store from "@/store/store.js";
-import { PREDEF_USERS } from "@/store/predef_cred.js"; 
+import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
 
 export async function submitLogin(params = {}, router) {
   const { email, password } = params || {};
@@ -9,7 +9,7 @@ export async function submitLogin(params = {}, router) {
     throw new Error("Email and password are required");
   }
 
-  
+// remove the below block to disable local login after backend integration is done
   const localUser = PREDEF_USERS[email];
   if (localUser && localUser.password === password) {
     
@@ -48,7 +48,7 @@ export async function submitLogin(params = {}, router) {
 
     return { ok: true, data };
   }
-
+ // remove above block to disable local login after backend integration is done
   
   try {
     const res = await fetch(loginUrl, {
