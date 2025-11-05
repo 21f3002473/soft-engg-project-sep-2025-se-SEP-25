@@ -1,4 +1,5 @@
 import store from "@/store/store.js";
+import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
 
 export async function submitLogin(params = {}, router) {
   const { email, password } = params || {};
@@ -8,6 +9,47 @@ export async function submitLogin(params = {}, router) {
     throw new Error("Email and password are required");
   }
 
+// remove the below block to disable local login after backend integration is done
+  const localUser = PREDEF_USERS[email];
+  if (localUser && localUser.password === password) {
+    
+    const data = {
+      email: localUser.email,
+      role: localUser.role,
+      name: localUser.name,
+      access_token: localUser.token,
+    };
+
+    
+    localStorage.setItem("token", localUser.token);
+    localStorage.setItem("user", JSON.stringify(data));
+
+    if (store?.dispatch) {
+      store.dispatch("updateToken", localUser.token);
+      if (store._actions?.updateUser) {
+        store.dispatch("updateUser", data);
+      }
+    }
+
+    var role = data.role;
+    if (role == "root") {
+      role = "admin";
+    } else if (role == "pm") {
+      role = "productmanager";
+    } else if (role == "hr") {
+      role = "hr";
+    } else if (role == "employee") {
+      role = "employee";
+    } else {
+      throw new Error("Invalid user role");
+    }
+    const targetRoute = `/${role}/dashboard`;
+    router.replace(targetRoute);
+
+    return { ok: true, data };
+  }
+ // remove above block to disable local login after backend integration is done
+  
   try {
     const res = await fetch(loginUrl, {
       method: "POST",
@@ -32,8 +74,8 @@ export async function submitLogin(params = {}, router) {
       throw new Error(message);
     }
 
-  const data = maybeJson || {};
-  const token = data.access_token || data.token;
+    const data = maybeJson || {};
+    const token = data.access_token || data.token;
 
     if (!token) {
       throw new Error("No token returned by server");
@@ -48,7 +90,7 @@ export async function submitLogin(params = {}, router) {
         store.dispatch("updateUser", data);
       }
     }
-    var role = data.role;
+    // var role = data.role; // removed for time being 
     if (role == "root") {
       role = "admin";
     }else if (role == "pm") {
@@ -56,7 +98,7 @@ export async function submitLogin(params = {}, router) {
     }else if (role == "hr") {
       role = "hr";
     }else if (role == "employee") {
-      role = "user";
+      role = "employee";
     }else{
       throw new Error("Invalid user role");
     }
