@@ -25,13 +25,6 @@
               <h2 class="request-title">{{ item.title }}</h2>
               <p class="request-desc">{{ item.description }}</p>
             </div>
-            <router-link
-              :to="`/user/requests/${item.title.toLowerCase()}`"
-              class="form-btn"
-              @click.stop
-            >
-              Open Form
-            </router-link>
           </div>
         </div>
       </transition>
@@ -80,7 +73,7 @@ export default {
   },
   methods: {
     openForm(item) {
-      this.$router.push(`/user/requests/${item.title.toLowerCase()}`);
+      this.$router.push(`/employee/requests/${item.title.toLowerCase()}`);
     },
   },
 };
