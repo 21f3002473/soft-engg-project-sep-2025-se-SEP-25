@@ -3,16 +3,15 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 
 from app.api import API
-from app.database import SQLModel, Users, create_root_user, engine, get_session
+from app.database import create_root_user, get_session, init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    SQLModel.metadata.create_all(engine)
+    init_db()
     create_root_user()
-
     yield
 
 

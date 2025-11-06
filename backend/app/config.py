@@ -4,8 +4,6 @@ import secrets
 
 from dotenv import get_key, load_dotenv
 
-# load env keys
-
 load_dotenv(
     verbose=True,
 )
@@ -34,9 +32,9 @@ class Config:
     PROJECT_NAME = "soft-engg-project-sep-2025-se-SEP-25"
     PROJECT_DESCRIPTION = ""
     VERSION = "0.0.1"
-    GROQ_API_KEY = get_key(".env", "GROQ_API_KEY")
-    if GROQ_API_KEY is not None:
-        os.environ["GROQ_API_KEY"] = GROQ_API_KEY
+    OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
+    if OPENAI_API_KEY is not None:
+        os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
     MODE = get_key(".env", "MODE")
 

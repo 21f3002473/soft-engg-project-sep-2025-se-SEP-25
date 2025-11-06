@@ -1,0 +1,195 @@
+import hashlib
+import hmac
+import secrets
+import time
+from os import name
+from datetime import datetime, timezone
+from typing import Annotated, Optional, List
+
+from app.config import Config
+from sqlmodel import Field, Session, SQLModel, create_engine, select, Relationship
+from sqlalchemy import event
+from app.utils import current_utc_time
+from enum import Enum
+
+
+class Users(SQLModel, table=True):
+    id: int | None = Field(
+        default=None,
+        primary_key=True,
+    )
+    email: str = Field(
+        index=True,
+    )
+    name: str = Field(
+        index=True,
+        nullable=False,
+    )
+    password_hash: str = Field(
+        index=False,
+        nullable=False,
+    )
+    salt: str = Field(default_factory=lambda: secrets.token_hex(16), nullable=False)
+    role: str = Field(
+        default="employee",
+        index=True,
+        nullable=False,
+    )
+    
+    department_id: Optional[int] = Field(default=None, foreign_key="department.id")
+    reporting_manager: Optional[int] = Field(default=None, foreign_key="users.id")
+    img_base64: Optional[str] = Field(default=None)
+    
+    department: Optional["Department"] = Relationship(back_populates="users")
+    managed_departments: List["Department"] = Relationship(back_populates="manager")
+    requests: list["Request"] = Relationship(back_populates="user")
+    leaves: list["Leave"] = Relationship(back_populates="user")
+    reimbursements: list["Reimbursement"] = Relationship(back_populates="user")
+    transfer_requests: list["TransferRequest"] = Relationship(back_populates="user")
+    todos: list["ToDo"] = Relationship(back_populates="user")
+    user_courses: list["UserCourse"] = Relationship(back_populates="user")
+    announcements: list["Announcement"] = Relationship(back_populates="user")
+
+
+
+    def generate_token(self) -> str:
+
+        expiry = int(time.time()) + 86400
+        token_data = f"{self.id}:{self.email}:{expiry}"
+        signature = hmac.new(
+            Config.SECRET_KEY.encode(), token_data.encode(), hashlib.sha256
+        ).hexdigest()
+        return f"{token_data}:{signature}"
+
+    def verify_password(self, password: str) -> bool:
+        password_hash = hashlib.sha256(f"{password}{self.salt}".encode()).hexdigest()
+        return hmac.compare_digest(self.password_hash, password_hash)
+
+    @staticmethod
+    def hash_password(password: str, salt: str = None) -> tuple[str, str]:
+
+        if salt is None:
+            salt = secrets.token_hex(16)
+        password_hash = hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
+        return password_hash, salt
+    
+class Department(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(index=True, nullable=False)
+    manager_id: Optional[int] = Field(default=None, foreign_key="users.id")
+
+    manager: Optional["Users"] = Relationship(back_populates="managed_departments")
+    users: List["Users"] = Relationship(back_populates="department")
+    
+class RequestTypeEnum(str, Enum):
+    LEAVE = "leave"
+    REIMBURSEMENT = "reimbursement"
+    TRANSFER = "transfer"
+    
+class StatusTypeEnum(str, Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    
+class Request(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    request_type: RequestTypeEnum = Field(nullable=False)
+    status: StatusTypeEnum = Field(nullable=False)
+    user_id: int = Field(foreign_key="users.id")
+
+    created_date: datetime = Field(default_factory=current_utc_time)
+    modified_date: datetime = Field(default_factory=current_utc_time)
+
+    leave_id: Optional[int] = Field(default=None, foreign_key="leave.id")
+    reimbursement_id: Optional[int] = Field(default=None, foreign_key="reimbursement.id")
+    transfer_id: Optional[int] = Field(default=None, foreign_key="transferrequest.id")
+
+    user: "Users" = Relationship(back_populates="requests")
+    leave: Optional["Leave"] = Relationship(back_populates="request")
+    reimbursement: Optional["Reimbursement"] = Relationship(back_populates="request")
+    transfer: Optional["TransferRequest"] = Relationship(back_populates="request")
+    
+@event.listens_for(Request, "before_update", propagate=True)
+def update_modified_date(mapper, connection, target):
+    target.modified_date = datetime.now(timezone.utc)
+    
+class Leave(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    leave_type: str = Field(nullable=False)
+    from_date: datetime = Field(nullable=False)
+    to_date: datetime = Field(nullable=False)
+    reason: Optional[str] = Field(default=None)
+
+    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
+
+    user: Optional["Users"] = Relationship(back_populates="leaves")
+    request: Optional["Request"] = Relationship(back_populates="leave")
+
+class Reimbursement(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    expense_type: str = Field(nullable=False)
+    amount: float = Field(nullable=False)
+    date_expense: datetime = Field(nullable=False)
+    remark: Optional[str] = Field(default=None)
+
+    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
+
+    user: Optional["Users"] = Relationship(back_populates="reimbursements")
+    request: Optional["Request"] = Relationship(back_populates="reimbursement")
+
+    
+class TransferRequest(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    current_department: str = Field(nullable=False)
+    request_department: str = Field(nullable=False)
+    reason: Optional[str] = Field(default=None)
+
+    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
+
+    user: Optional["Users"] = Relationship(back_populates="transfer_requests")
+    request: Optional["Request"] = Relationship(back_populates="transfer")
+    
+
+class QuickNote(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    topic: str = Field(nullable=False)
+    notes: str = Field(nullable=False)
+    
+class UserCourse(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    course_id: int = Field(foreign_key="course.id")
+    status: StatusTypeEnum = Field(nullable=False)
+
+    user: Optional["Users"] = Relationship(back_populates="user_courses")
+    course: Optional["Course"] = Relationship(back_populates="user_courses")
+
+
+class Course(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    course_name: str = Field(nullable=False)
+    course_link: Optional[str] = Field(default=None)
+    topics: Optional[str] = Field(default=None)
+
+    user_courses: List["UserCourse"] = Relationship(back_populates="course")
+    user_course_completions: List["UserCourseCompleted"] = Relationship(back_populates="course")
+    
+class ToDo(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    task: str = Field(nullable=False)
+    status: StatusTypeEnum = Field(nullable=False)
+    date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    deadline: Optional[datetime] = Field(default=None)
+
+    user: Optional["Users"] = Relationship(back_populates="todos")
+    
+class Announcement(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    announcement: str = Field(nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    user: Optional["Users"] = Relationship(back_populates="announcements")
