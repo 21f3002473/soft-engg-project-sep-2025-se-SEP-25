@@ -26,7 +26,7 @@
               <p class="request-desc">{{ item.description }}</p>
             </div>
             <router-link
-              :to="`/user/requests/${item.title.toLowerCase()}`"
+              :to="{ name: `Employee${item.title}Form` }"
               class="form-btn"
               @click.stop
             >
