@@ -3,7 +3,7 @@
     <header class="dashboard-header">
       <div class="nav-links">
         <router-link :to="{ name: 'AdminDashboard' }" class="router-link-exact-active">Dashboard</router-link>
-        <router-link :to="{ name: 'AdminSystemStatus' }" class="router-link-exact-active">System Status</router-link>
+        <router-link :to="{ name: 'AdminAddEmployee' }" class="router-link-exact-active">Add Employee</router-link>
         <router-link :to="{ name: 'AdminLogs' }" class="router-link-exact-active">Logs</router-link>
         <router-link :to="{ name: 'AdminUpdates' }" class="router-link-exact-active">Updates</router-link>
         <router-link :to="{ name: 'AdminBackups' }" class="router-link-exact-active">Backups</router-link>

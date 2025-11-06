@@ -12,11 +12,16 @@ const routes = [
         component: () => import('@/components/Landing/LoginPage.vue'),
     },
     {
+        path: '/logout',
+        name: 'Logout',
+        component: () => import('@/components/Landing/LoginPage.vue'),
+    },
+    {
         path: '/admin',
         component: () => import('@/components/admin/AdminLayout.vue'),
         children: [
             {
-            path: 'dashboard', 
+            path: '', 
             name: 'AdminDashboard',
             component: () => import('@/components/admin/AdminDashboard.vue'),
             },
@@ -26,9 +31,9 @@ const routes = [
             component: () => import('@/components/admin/AdminDataBackup.vue'),
             },
             {
-                path: 'system-status',                
-                name: 'AdminSystemStatus',
-                component: () => import('@/components/admin/AdminSystemStatus.vue'),
+                path: 'add-employee',
+                name: 'AdminAddEmployee',
+                component: () => import('@/components/admin/AdminAddEmployee.vue'),
             },
             {
                 path: 'logs',
