@@ -17,6 +17,11 @@ const routes = [
         component: () => import('@/components/Landing/LoginPage.vue'), 
     },
     {
+        path: '/adminregister',
+        name: 'AdminRegistration',
+        component: () => import('@/components/admin/AdminRegistration.vue'),
+    },
+    {
         path: '/admin',
         component: () => import('@/components/admin/AdminLayout.vue'),
         children: [

@@ -1,16 +1,5 @@
 <template>
   <div class="dashboard">
-    <!-- <header class="dashboard-header">
-      <div class="nav-links">
-        <router-link to="/systemStatus">System Status</router-link>
-        <router-link to="/logs" class="router-link-exact-active">Logs</router-link>
-        <router-link to="/updates">Updates</router-link>
-        <router-link to="/chatbotConfig">Chatbot Config</router-link>
-      </div>
-      <div class="account-link">
-        <router-link to="/account">Account</router-link>
-      </div>
-    </header> -->
 
     <main class="dashboard-content">
       <h1>Logs</h1>

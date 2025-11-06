@@ -10,6 +10,7 @@
       </div>
       <div class="account-link">
         <router-link :to="{ name: 'AdminAccount' }">Account</router-link>
+        <button class="btn logout-btn" @click="logout">Logout</button>
       </div>
     </header>
 
@@ -87,6 +88,31 @@ export default {
         });
       }, 1000);
       this.draft = '';
+    },
+    async logout() {
+      console.log('Logging out...');
+      // 1. Clear tokens & session data
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+
+      // API call to invalidate session on server (if applicable)
+      
+      // using axios
+      // await this.$axios.post('/api/logout');
+      
+      // using fetch
+      // await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      // or
+      // await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+
+      // 2. If you're using Vuex or Pinia
+      if (this.$store) {
+        this.$store.commit('logout');  // example for Vuex mutation
+        // or for Pinia: useAuthStore().$reset();
+      }
+
+      // 3. Redirect to login
+      this.$router.push({ name: 'Login' });
     },
   }
 };
@@ -402,4 +428,19 @@ a:hover {
   transform: translateY(6px) scale(0.995);
 }
 /* .router-link-exact-active { color: #007bff; font-weight: bold; } */
+.logout-btn {
+  margin-left: 20px;
+  padding: 6px 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+
 </style>
