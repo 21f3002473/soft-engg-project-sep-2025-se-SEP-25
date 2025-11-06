@@ -127,6 +127,11 @@
 export default {
   name: "HRDashboard",
 };
+Data = {
+  return: {},
+  chartData: {},
+  chartOptions: {},
+};
 </script>
 
 <!-- <style scoped>
