@@ -38,11 +38,16 @@ class Project(SQLModel, table=True):
     user_projects: List["UserProject"] = Relationship(back_populates="project")
 
 class UserProject(SQLModel, table=True):
-    project_id: Optional[int] = Field(default=None, foreign_key="project.id", primary_key=True)
-    user_id: Optional[int] = Field(default=None, foreign_key="users.id", primary_key=True)
-    
+    project_id: Optional[int] = Field(
+        default=None, foreign_key="project.id", primary_key=True
+    )
+    user_id: Optional[int] = Field(
+        default=None, foreign_key="users.id", primary_key=True
+    )
+
     user: Optional["User"] = Relationship(back_populates="user_projects")
     project: Optional["Project"] = Relationship(back_populates="user_projects")
+
 
 class Requirement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
