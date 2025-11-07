@@ -1,26 +1,32 @@
 from datetime import datetime, timezone
 from typing import Optional
-
+from enum import Enum
 from sqlalchemy import event
 from sqlmodel import Field, SQLModel
 
 
-class SystemLog(SQLModel, table=True):
+class Log(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    log_id: str = Field(index=True, nullable=False, unique=True)
-    message: str = Field(nullable=False)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    user_id: str = Field(index=True, nullable=False)
+    text_log: str = Field(nullable=False)
+    time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class BackupTypeEnum(str, Enum):
+    FULL = "full"
+    INCREMENTAL = "incremental"
+    DIFFERENTIAL = "differential"
 
 class Backup(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    backup_id: str = Field(index=True, nullable=False, unique=True)
-    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    day: str = Field(nullable=False)
+    backup_type: BackupTypeEnum = Field(nullable=False)
+    date_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 @event.listens_for(Backup, "after_insert", propagate=True)
 def log_backup_creation(mapper, connection, target):
-    log = SystemLog(
-        log_id=f"backup-{target.backup_id}", message="Backup created successfully"
+    log = Log(
+        user_id="admin",
+        text_log=f"{target.backup_type.value.capitalize()} backup performed on {target.day}",
     )
-    connection.execute(SystemLog.__table__.insert(), log.dict())
+    connection.execute(Log.__table__.insert(), log.model_dump())

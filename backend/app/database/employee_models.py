@@ -38,6 +38,8 @@ class User(SQLModel, table=True):
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="users.id")
     img_base64: Optional[str] = Field(default=None)
+    
+    attendances: list["Attendance"] = Relationship(back_populates="user")
 
     department: Optional["Department"] = Relationship(back_populates="users")
     managed_departments: List["Department"] = Relationship(back_populates="manager")
@@ -53,6 +55,8 @@ class User(SQLModel, table=True):
     performance_reviews: list["PerformanceReview"] = Relationship(back_populates="user")
 
     managed_projects: List["Project"] = Relationship(back_populates="manager")
+    emp_todos: List["EmpTodo"] = Relationship(back_populates="user")
+    updates: List["Update"] = Relationship(back_populates="created_by_user")
     user_projects: List["UserProject"] = Relationship(back_populates="user")
 
     def generate_token(self) -> str:
@@ -75,6 +79,26 @@ class User(SQLModel, table=True):
             salt = secrets.token_hex(16)
         password_hash = hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
         return password_hash, salt
+    
+
+class AttendanceStatusEnum(str, Enum):
+    PRESENT = "present"
+    ABSENT = "absent"
+    LEAVE = "leave"
+    REMOTE = "remote"
+
+
+class Attendance(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id")
+    date: datetime = Field(default_factory=lambda: current_utc_time().date())
+    check_in: Optional[datetime] = Field(default=None)
+    check_out: Optional[datetime] = Field(default=None)
+    status: AttendanceStatusEnum = Field(default=AttendanceStatusEnum.PRESENT)
+    worked_hours: Optional[float] = Field(default=None)
+    remarks: Optional[str] = Field(default=None)
+
+    user: Optional["Users"] = Relationship(back_populates="attendances")
 
 
 class Department(SQLModel, table=True):
