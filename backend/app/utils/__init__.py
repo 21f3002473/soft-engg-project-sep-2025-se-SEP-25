@@ -1,1 +1,1 @@
-from utils.py import current_utc_time
+from app.utils.utils import current_utc_time

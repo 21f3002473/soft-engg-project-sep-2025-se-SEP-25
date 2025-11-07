@@ -9,7 +9,7 @@ from app.controllers import (
     create_access_token,
     get_current_active_user,
 )
-from app.database import Users, get_session
+from app.database import User, get_session
 from app.middleware import (
     Role,
     can_manage_employees,
@@ -69,7 +69,7 @@ class UserLoginResource(Resource):
 
 
 class ProtectedResource(Resource):
-    def get(self, current_user: Users = Depends(get_current_active_user)):
+    def get(self, current_user: User = Depends(get_current_active_user)):
         """Protected endpoint that requires authentication"""
         return {
             "email": current_user.email,
@@ -82,8 +82,8 @@ class ProtectedResource(Resource):
 class AdminResource(Resource):
     def get(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(require_root()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_root()),
     ):
         """ROOT only - System administration endpoint"""
         return {
@@ -96,8 +96,8 @@ class AdminResource(Resource):
 class EmployeeManagementResource(Resource):
     def get(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(require_hr()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
         """HR or ROOT - View all employees"""
@@ -110,8 +110,8 @@ class EmployeeManagementResource(Resource):
 
     def post(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(can_manage_employees()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(can_manage_employees()),
         session: Session = Depends(get_session),
     ):
         """HR or ROOT - Create/manage employees"""
@@ -124,8 +124,8 @@ class EmployeeManagementResource(Resource):
 class ProductManagementResource(Resource):
     def get(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(require_pm()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_pm()),
         session: Session = Depends(get_session),
     ):
         """PM or ROOT - View products"""
@@ -137,8 +137,8 @@ class ProductManagementResource(Resource):
 
     def post(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(can_manage_products()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(can_manage_products()),
         session: Session = Depends(get_session),
     ):
         """PM or ROOT - Create/manage products"""
@@ -151,8 +151,8 @@ class ProductManagementResource(Resource):
 class ProfileResource(Resource):
     def get(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(require_employee()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_employee()),
     ):
         """Any authenticated user - View own profile"""
         return {
@@ -164,8 +164,8 @@ class ProfileResource(Resource):
 
     def put(
         self,
-        current_user: Users = Depends(get_current_active_user),
-        _: Users = Depends(require_employee()),
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
         """Any authenticated user - Update own profile"""

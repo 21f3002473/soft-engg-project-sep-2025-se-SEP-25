@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from app.config import Config
-from app.database import Users, get_session
+from app.database import User, get_session
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -27,7 +27,7 @@ class TokenData(BaseModel):
 
 def query_user_by_email(email: str):
     session = next(get_session())
-    statement = select(Users).where(Users.email == email)
+    statement = select(User).where(User.email == email)
     result = session.exec(statement)
     user = result.first()
     return user
@@ -74,5 +74,5 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-async def get_current_active_user(current_user: Users = Depends(get_current_user)):
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user

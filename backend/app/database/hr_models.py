@@ -12,7 +12,7 @@ class PerformanceReview(SQLModel, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    user: Optional["Users"] = Relationship(back_populates="performance_reviews")
+    user: Optional["User"] = Relationship(back_populates="performance_reviews")
     
 @event.listens_for(PerformanceReview, "before_update", propagate=True)
 def update_review_timestamp(mapper, connection, target):

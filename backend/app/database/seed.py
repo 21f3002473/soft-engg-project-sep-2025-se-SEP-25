@@ -1,13 +1,13 @@
 from app.config import Config
 from app.database.connection import engine
-from app.database.employee_models import Users
+from app.database.employee_models import User
 
 def create_root_user():
     root_email = Config.ROOT_USER_EMAIL
     root_password = Config.ROOT_USER_PASSWORD
 
     with Session(engine) as session:
-        statement = select(Users).where(Users.email == root_email)
+        statement = select(User).where(User.email == root_email)
         result = session.exec(statement)
         existing_user = result.first()
 
@@ -15,8 +15,8 @@ def create_root_user():
             print("Root user already exists.")
             return
 
-        password_hash, salt = Users.hash_password(root_password)
-        root_user = Users(
+        password_hash, salt = User.hash_password(root_password)
+        root_user = User(
             email=root_email,
             name="root",
             password_hash=password_hash,
@@ -32,7 +32,7 @@ def create_root_user():
     pm_password = Config.PM_USER_PASSWORD
 
     with Session(engine) as session:
-        statement = select(Users).where(Users.email == pm_email)
+        statement = select(User).where(User.email == pm_email)
         result = session.exec(statement)
         existing_user = result.first()
 
@@ -40,8 +40,8 @@ def create_root_user():
             print("PM user already exists.")
             return
 
-        password_hash, salt = Users.hash_password(pm_password)
-        pm_user = Users(
+        password_hash, salt = User.hash_password(pm_password)
+        pm_user = User(
             email=pm_email,
             name="pm",
             password_hash=password_hash,
@@ -57,7 +57,7 @@ def create_root_user():
     hr_password = Config.HR_USER_PASSWORD
 
     with Session(engine) as session:
-        statement = select(Users).where(Users.email == hr_email)
+        statement = select(User).where(User.email == hr_email)
         result = session.exec(statement)
         existing_user = result.first()
 
@@ -65,8 +65,8 @@ def create_root_user():
             print("HR user already exists.")
             return
 
-        password_hash, salt = Users.hash_password(hr_password)
-        hr_user = Users(
+        password_hash, salt = User.hash_password(hr_password)
+        hr_user = User(
             email=hr_email,
             name="hr",
             password_hash=password_hash,
@@ -82,7 +82,7 @@ def create_root_user():
     employee_password = Config.EMPLOYEE_USER_PASSWORD
 
     with Session(engine) as session:
-        statement = select(Users).where(Users.email == employee_email)
+        statement = select(User).where(User.email == employee_email)
         result = session.exec(statement)
         existing_user = result.first()
 
@@ -90,8 +90,8 @@ def create_root_user():
             print("Employee user already exists.")
             return
 
-        password_hash, salt = Users.hash_password(employee_password)
-        employee_user = Users(
+        password_hash, salt = User.hash_password(employee_password)
+        employee_user = User(
             email=employee_email,
             name="employee",
             password_hash=password_hash,
