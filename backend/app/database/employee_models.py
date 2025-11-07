@@ -3,8 +3,8 @@ import hmac
 import secrets
 import time
 from datetime import datetime, timezone
-from typing import Optional, List
 from enum import Enum
+from typing import List, Optional
 
 from app.config import Config
 from app.utils import current_utc_time
@@ -168,7 +168,7 @@ class QuickNote(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     topic: str = Field(nullable=False)
     notes: str = Field(nullable=False)
-    
+
 
 class Course(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -178,6 +178,7 @@ class Course(SQLModel, table=True):
 
     user_courses: List["UserCourse"] = Relationship(back_populates="course")
 
+
 class UserCourse(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
@@ -186,7 +187,8 @@ class UserCourse(SQLModel, table=True):
 
     user: Optional["User"] = Relationship(back_populates="user_courses")
     course: Optional["Course"] = Relationship(back_populates="user_courses")
-    
+
+
 class ToDo(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
