@@ -38,7 +38,7 @@ class User(SQLModel, table=True):
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="users.id")
     img_base64: Optional[str] = Field(default=None)
-    
+
     attendances: list["Attendance"] = Relationship(back_populates="user")
 
     department: Optional["Department"] = Relationship(back_populates="users")
@@ -79,7 +79,7 @@ class User(SQLModel, table=True):
             salt = secrets.token_hex(16)
         password_hash = hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
         return password_hash, salt
-    
+
 
 class AttendanceStatusEnum(str, Enum):
     PRESENT = "present"

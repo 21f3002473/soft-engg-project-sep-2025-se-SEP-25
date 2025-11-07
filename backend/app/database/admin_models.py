@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
 from sqlalchemy import event
 from sqlmodel import Field, SQLModel
 
@@ -11,10 +12,12 @@ class Log(SQLModel, table=True):
     text_log: str = Field(nullable=False)
     time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
 class BackupTypeEnum(str, Enum):
     FULL = "full"
     INCREMENTAL = "incremental"
     DIFFERENTIAL = "differential"
+
 
 class Backup(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
