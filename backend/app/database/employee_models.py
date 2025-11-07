@@ -7,9 +7,10 @@ from typing import Optional, List
 from enum import Enum
 
 from app.config import Config
-from sqlmodel import Field, SQLModel, Relationship
-from sqlalchemy import event
 from app.utils import current_utc_time
+from sqlalchemy import event
+from sqlmodel import Field, Relationship, SQLModel
+
 
 class User(SQLModel, table=True):
     id: int | None = Field(
@@ -40,7 +41,7 @@ class User(SQLModel, table=True):
 
     department: Optional["Department"] = Relationship(back_populates="users")
     managed_departments: List["Department"] = Relationship(back_populates="manager")
-    
+
     requests: list["Request"] = Relationship(back_populates="user")
     leaves: list["Leave"] = Relationship(back_populates="user")
     reimbursements: list["Reimbursement"] = Relationship(back_populates="user")
@@ -48,12 +49,11 @@ class User(SQLModel, table=True):
     todos: list["ToDo"] = Relationship(back_populates="user")
     user_courses: list["UserCourse"] = Relationship(back_populates="user")
     announcements: list["Announcement"] = Relationship(back_populates="user")
-    
+
     performance_reviews: list["PerformanceReview"] = Relationship(back_populates="user")
-    
+
     managed_projects: List["Project"] = Relationship(back_populates="manager")
     user_projects: List["UserProject"] = Relationship(back_populates="user")
-
 
     def generate_token(self) -> str:
 

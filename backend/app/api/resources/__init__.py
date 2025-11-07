@@ -1,6 +1,5 @@
 from datetime import timedelta
 from logging import getLogger
-from typing import List, Optional
 
 from app.api.validators import UserLoginValidator
 from app.controllers import (

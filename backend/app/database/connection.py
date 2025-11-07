@@ -14,8 +14,9 @@ def get_session():
 
 
 def init_db():
+    import app.database.admin_models
     import app.database.employee_models
     import app.database.hr_models
-    import app.database.admin_models
     import app.database.product_manager_models
+
     SQLModel.metadata.create_all(engine)

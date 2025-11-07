@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional
 from datetime import datetime, timezone
+from typing import Optional
+
 from sqlalchemy import event
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class PerformanceReview(SQLModel, table=True):
@@ -17,6 +18,7 @@ class PerformanceReview(SQLModel, table=True):
 @event.listens_for(PerformanceReview, "before_update", propagate=True)
 def update_review_timestamp(mapper, connection, target):
     target.modified_at = datetime.now(timezone.utc)
+
 
 class HRPolicy(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

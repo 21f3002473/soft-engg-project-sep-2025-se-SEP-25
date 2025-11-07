@@ -1,5 +1,7 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
+
 
 class Client(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -7,6 +9,7 @@ class Client(SQLModel, table=True):
     client_name: str = Field(nullable=False)
 
     projects: List["Project"] = Relationship(back_populates="client")
+
 
 class Project(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
