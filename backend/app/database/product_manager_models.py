@@ -1,5 +1,7 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
+
 
 class Client(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -7,6 +9,7 @@ class Client(SQLModel, table=True):
     client_name: str = Field(nullable=False)
 
     projects: List["Project"] = Relationship(back_populates="client")
+
 
 class Project(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -21,10 +24,16 @@ class Project(SQLModel, table=True):
     assigned_users: List["Users"] = Relationship(
         back_populates="assigned_projects", link_model="ProjectUserLink"
     )
-    
+
+
 class ProjectUser(SQLModel, table=True):
-    project_id: Optional[int] = Field(default=None, foreign_key="project.id", primary_key=True)
-    user_id: Optional[int] = Field(default=None, foreign_key="users.id", primary_key=True)
+    project_id: Optional[int] = Field(
+        default=None, foreign_key="project.id", primary_key=True
+    )
+    user_id: Optional[int] = Field(
+        default=None, foreign_key="users.id", primary_key=True
+    )
+
 
 class Requirement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
