@@ -1,7 +1,7 @@
 from app.config import Config
 from sqlmodel import Session, select
 from app.database.connection import engine
-from app.database.models import Users
+from app.database.employee_models import Users
 
 def create_root_user():
     root_email = Config.ROOT_USER_EMAIL

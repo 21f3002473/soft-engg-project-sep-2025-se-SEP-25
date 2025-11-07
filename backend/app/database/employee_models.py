@@ -2,12 +2,11 @@ import hashlib
 import hmac
 import secrets
 import time
-from os import name
 from datetime import datetime, timezone
-from typing import Annotated, Optional, List
+from typing import Optional, List
 
 from app.config import Config
-from sqlmodel import Field, Session, SQLModel, create_engine, select, Relationship
+from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import event
 from app.utils import current_utc_time
 from enum import Enum
@@ -42,6 +41,7 @@ class Users(SQLModel, table=True):
     
     department: Optional["Department"] = Relationship(back_populates="users")
     managed_departments: List["Department"] = Relationship(back_populates="manager")
+    
     requests: list["Request"] = Relationship(back_populates="user")
     leaves: list["Leave"] = Relationship(back_populates="user")
     reimbursements: list["Reimbursement"] = Relationship(back_populates="user")
@@ -49,7 +49,13 @@ class Users(SQLModel, table=True):
     todos: list["ToDo"] = Relationship(back_populates="user")
     user_courses: list["UserCourse"] = Relationship(back_populates="user")
     announcements: list["Announcement"] = Relationship(back_populates="user")
-
+    
+    performance_reviews: list["PerformanceReview"] = Relationship(back_populates="user")
+    
+    managed_projects: List["Project"] = Relationship(back_populates="manager")
+    assigned_projects: List["Project"] = Relationship(
+        back_populates="assigned_users", link_model=ProjectUser
+    )
 
 
     def generate_token(self) -> str:
@@ -174,7 +180,6 @@ class Course(SQLModel, table=True):
     topics: Optional[str] = Field(default=None)
 
     user_courses: List["UserCourse"] = Relationship(back_populates="course")
-    user_course_completions: List["UserCourseCompleted"] = Relationship(back_populates="course")
     
 class ToDo(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
