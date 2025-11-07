@@ -9,8 +9,6 @@ from app.config import Config
 from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import event
 from app.utils import current_utc_time
-from enum import Enum
-
 
 class Users(SQLModel, table=True):
     id: int | None = Field(
@@ -34,11 +32,11 @@ class Users(SQLModel, table=True):
         index=True,
         nullable=False,
     )
-    
+
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="users.id")
     img_base64: Optional[str] = Field(default=None)
-    
+
     department: Optional["Department"] = Relationship(back_populates="users")
     managed_departments: List["Department"] = Relationship(back_populates="manager")
     
@@ -78,7 +76,8 @@ class Users(SQLModel, table=True):
             salt = secrets.token_hex(16)
         password_hash = hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
         return password_hash, salt
-    
+
+
 class Department(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, nullable=False)
@@ -86,16 +85,19 @@ class Department(SQLModel, table=True):
 
     manager: Optional["Users"] = Relationship(back_populates="managed_departments")
     users: List["Users"] = Relationship(back_populates="department")
-    
+
+
 class RequestTypeEnum(str, Enum):
     LEAVE = "leave"
     REIMBURSEMENT = "reimbursement"
     TRANSFER = "transfer"
-    
+
+
 class StatusTypeEnum(str, Enum):
     PENDING = "pending"
     COMPLETED = "completed"
-    
+
+
 class Request(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     request_type: RequestTypeEnum = Field(nullable=False)
@@ -106,18 +108,22 @@ class Request(SQLModel, table=True):
     modified_date: datetime = Field(default_factory=current_utc_time)
 
     leave_id: Optional[int] = Field(default=None, foreign_key="leave.id")
-    reimbursement_id: Optional[int] = Field(default=None, foreign_key="reimbursement.id")
+    reimbursement_id: Optional[int] = Field(
+        default=None, foreign_key="reimbursement.id"
+    )
     transfer_id: Optional[int] = Field(default=None, foreign_key="transferrequest.id")
 
     user: "Users" = Relationship(back_populates="requests")
     leave: Optional["Leave"] = Relationship(back_populates="request")
     reimbursement: Optional["Reimbursement"] = Relationship(back_populates="request")
     transfer: Optional["TransferRequest"] = Relationship(back_populates="request")
-    
+
+
 @event.listens_for(Request, "before_update", propagate=True)
 def update_modified_date(mapper, connection, target):
     target.modified_date = datetime.now(timezone.utc)
-    
+
+
 class Leave(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
@@ -130,6 +136,7 @@ class Leave(SQLModel, table=True):
 
     user: Optional["Users"] = Relationship(back_populates="leaves")
     request: Optional["Request"] = Relationship(back_populates="leave")
+
 
 class Reimbursement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -144,7 +151,7 @@ class Reimbursement(SQLModel, table=True):
     user: Optional["Users"] = Relationship(back_populates="reimbursements")
     request: Optional["Request"] = Relationship(back_populates="reimbursement")
 
-    
+
 class TransferRequest(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
@@ -156,13 +163,14 @@ class TransferRequest(SQLModel, table=True):
 
     user: Optional["Users"] = Relationship(back_populates="transfer_requests")
     request: Optional["Request"] = Relationship(back_populates="transfer")
-    
+
 
 class QuickNote(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     topic: str = Field(nullable=False)
     notes: str = Field(nullable=False)
-    
+
+
 class UserCourse(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
@@ -190,7 +198,8 @@ class ToDo(SQLModel, table=True):
     deadline: Optional[datetime] = Field(default=None)
 
     user: Optional["Users"] = Relationship(back_populates="todos")
-    
+
+
 class Announcement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")

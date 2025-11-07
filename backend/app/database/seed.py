@@ -1,5 +1,4 @@
 from app.config import Config
-from sqlmodel import Session, select
 from app.database.connection import engine
 from app.database.employee_models import Users
 
