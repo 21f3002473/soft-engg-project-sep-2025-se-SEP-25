@@ -47,7 +47,7 @@ class UserProject(SQLModel, table=True):
         default=None, foreign_key="project.id", primary_key=True
     )
     user_id: Optional[int] = Field(
-        default=None, foreign_key="users.id", primary_key=True
+        default=None, foreign_key="user.id", primary_key=True
     )
 
     user: Optional["User"] = Relationship(back_populates="user_projects")

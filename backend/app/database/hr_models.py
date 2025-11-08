@@ -7,7 +7,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 class PerformanceReview(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     comments: Optional[str] = Field(default=None)
     rating: int = Field(ge=1, le=5, nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

@@ -13,6 +13,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class User(SQLModel, table=True):
+    __tablename__ = "user"
     id: int | None = Field(
         default=None,
         primary_key=True,
@@ -36,13 +37,19 @@ class User(SQLModel, table=True):
     )
 
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
-    reporting_manager: Optional[int] = Field(default=None, foreign_key="users.id")
+    reporting_manager: Optional[int] = Field(default=None, foreign_key="user.id")
     img_base64: Optional[str] = Field(default=None)
 
     attendances: list["Attendance"] = Relationship(back_populates="user")
 
-    department: Optional["Department"] = Relationship(back_populates="users")
-    managed_departments: List["Department"] = Relationship(back_populates="manager")
+    department: Optional["Department"] = Relationship(
+        back_populates="users",
+        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"}
+    )
+    managed_departments: List["Department"] = Relationship(
+        back_populates="manager",
+        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"}
+    )
 
     requests: list["Request"] = Relationship(back_populates="user")
     leaves: list["Leave"] = Relationship(back_populates="user")
@@ -90,7 +97,7 @@ class AttendanceStatusEnum(str, Enum):
 
 class Attendance(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     date: datetime = Field(default_factory=lambda: current_utc_time().date())
     check_in: Optional[datetime] = Field(default=None)
     check_out: Optional[datetime] = Field(default=None)
@@ -98,16 +105,22 @@ class Attendance(SQLModel, table=True):
     worked_hours: Optional[float] = Field(default=None)
     remarks: Optional[str] = Field(default=None)
 
-    user: Optional["Users"] = Relationship(back_populates="attendances")
+    user: Optional["User"] = Relationship(back_populates="attendances")
 
 
 class Department(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, nullable=False)
-    manager_id: Optional[int] = Field(default=None, foreign_key="users.id")
+    manager_id: Optional[int] = Field(default=None, foreign_key="user.id")
 
-    manager: Optional["User"] = Relationship(back_populates="managed_departments")
-    users: List["User"] = Relationship(back_populates="department")
+    manager: Optional["User"] = Relationship(
+        back_populates="managed_departments",
+        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"}
+    )
+    users: List["User"] = Relationship(
+        back_populates="department",
+        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"}
+    )
 
 
 class RequestTypeEnum(str, Enum):
@@ -125,7 +138,7 @@ class Request(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     request_type: RequestTypeEnum = Field(nullable=False)
     status: StatusTypeEnum = Field(nullable=False)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
 
     created_date: datetime = Field(default_factory=current_utc_time)
     modified_date: datetime = Field(default_factory=current_utc_time)
@@ -149,43 +162,46 @@ def update_modified_date(mapper, connection, target):
 
 class Leave(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     leave_type: str = Field(nullable=False)
     from_date: datetime = Field(nullable=False)
     to_date: datetime = Field(nullable=False)
     reason: Optional[str] = Field(default=None)
 
-    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
-
     user: Optional["User"] = Relationship(back_populates="leaves")
-    request: Optional["Request"] = Relationship(back_populates="leave")
+    request: Optional["Request"] = Relationship(
+        back_populates="leave",
+        sa_relationship_kwargs={"foreign_keys": "[Request.leave_id]", "uselist": False}
+    )
 
 
 class Reimbursement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     expense_type: str = Field(nullable=False)
     amount: float = Field(nullable=False)
     date_expense: datetime = Field(nullable=False)
     remark: Optional[str] = Field(default=None)
 
-    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
-
     user: Optional["User"] = Relationship(back_populates="reimbursements")
-    request: Optional["Request"] = Relationship(back_populates="reimbursement")
+    request: Optional["Request"] = Relationship(
+        back_populates="reimbursement",
+        sa_relationship_kwargs={"foreign_keys": "[Request.reimbursement_id]", "uselist": False}
+    )
 
 
 class TransferRequest(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     current_department: str = Field(nullable=False)
     request_department: str = Field(nullable=False)
     reason: Optional[str] = Field(default=None)
 
-    request_id: Optional[int] = Field(default=None, foreign_key="request.id")
-
     user: Optional["User"] = Relationship(back_populates="transfer_requests")
-    request: Optional["Request"] = Relationship(back_populates="transfer")
+    request: Optional["Request"] = Relationship(
+        back_populates="transfer",
+        sa_relationship_kwargs={"foreign_keys": "[Request.transfer_id]", "uselist": False}
+    )
 
 
 class QuickNote(SQLModel, table=True):
@@ -205,7 +221,7 @@ class Course(SQLModel, table=True):
 
 class UserCourse(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     course_id: int = Field(foreign_key="course.id")
     status: StatusTypeEnum = Field(nullable=False)
 
@@ -215,7 +231,7 @@ class UserCourse(SQLModel, table=True):
 
 class ToDo(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     task: str = Field(nullable=False)
     status: StatusTypeEnum = Field(nullable=False)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -226,7 +242,7 @@ class ToDo(SQLModel, table=True):
 
 class Announcement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="users.id")
+    user_id: int = Field(foreign_key="user.id")
     announcement: str = Field(nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
