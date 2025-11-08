@@ -10,13 +10,10 @@ load_dotenv(
 
 
 class Config:
-    # Database settings
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
-    # Security
     SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
 
-    # Root user
     ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL", "admin@example.com")
     ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD", "admin")
 

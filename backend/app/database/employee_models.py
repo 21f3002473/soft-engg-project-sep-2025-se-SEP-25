@@ -240,7 +240,7 @@ class ToDo(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     task: str = Field(nullable=False)
     status: StatusTypeEnum = Field(nullable=False)
-    date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    date_created: datetime = Field(default_factory=current_utc_time)
     deadline: Optional[datetime] = Field(default=None)
 
     user: Optional["User"] = Relationship(back_populates="todos")
@@ -250,6 +250,6 @@ class Announcement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     announcement: str = Field(nullable=False)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=current_utc_time)
 
     user: Optional["User"] = Relationship(back_populates="announcements")
