@@ -2,7 +2,7 @@ from enum import Enum
 from functools import wraps
 from typing import Callable, List
 
-from app.database import Users
+from app.database import User
 from fastapi import Depends, HTTPException, status
 
 
@@ -112,7 +112,7 @@ class RoleChecker:
     def __init__(self, allowed_roles: List[Role]):
         self.allowed_roles = allowed_roles
 
-    def __call__(self, current_user: Users) -> Users:
+    def __call__(self, current_user: User) -> User:
         if not check_role_access(current_user.role, self.allowed_roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -132,7 +132,7 @@ class PermissionChecker:
     def __init__(self, required_permissions: List[Permission]):
         self.required_permissions = required_permissions
 
-    def __call__(self, current_user: Users) -> Users:
+    def __call__(self, current_user: User) -> User:
         for permission in self.required_permissions:
             if not check_permission(current_user.role, permission):
                 raise HTTPException(
