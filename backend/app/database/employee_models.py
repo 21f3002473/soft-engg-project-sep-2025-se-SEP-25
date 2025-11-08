@@ -44,11 +44,11 @@ class User(SQLModel, table=True):
 
     department: Optional["Department"] = Relationship(
         back_populates="users",
-        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"},
     )
     managed_departments: List["Department"] = Relationship(
         back_populates="manager",
-        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"},
     )
 
     requests: list["Request"] = Relationship(back_populates="user")
@@ -115,11 +115,11 @@ class Department(SQLModel, table=True):
 
     manager: Optional["User"] = Relationship(
         back_populates="managed_departments",
-        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[Department.manager_id]"},
     )
     users: List["User"] = Relationship(
         back_populates="department",
-        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[User.department_id]"},
     )
 
 
@@ -171,7 +171,7 @@ class Leave(SQLModel, table=True):
     user: Optional["User"] = Relationship(back_populates="leaves")
     request: Optional["Request"] = Relationship(
         back_populates="leave",
-        sa_relationship_kwargs={"foreign_keys": "[Request.leave_id]", "uselist": False}
+        sa_relationship_kwargs={"foreign_keys": "[Request.leave_id]", "uselist": False},
     )
 
 
@@ -186,7 +186,10 @@ class Reimbursement(SQLModel, table=True):
     user: Optional["User"] = Relationship(back_populates="reimbursements")
     request: Optional["Request"] = Relationship(
         back_populates="reimbursement",
-        sa_relationship_kwargs={"foreign_keys": "[Request.reimbursement_id]", "uselist": False}
+        sa_relationship_kwargs={
+            "foreign_keys": "[Request.reimbursement_id]",
+            "uselist": False,
+        },
     )
 
 
@@ -200,7 +203,10 @@ class TransferRequest(SQLModel, table=True):
     user: Optional["User"] = Relationship(back_populates="transfer_requests")
     request: Optional["Request"] = Relationship(
         back_populates="transfer",
-        sa_relationship_kwargs={"foreign_keys": "[Request.transfer_id]", "uselist": False}
+        sa_relationship_kwargs={
+            "foreign_keys": "[Request.transfer_id]",
+            "uselist": False,
+        },
     )
 
 

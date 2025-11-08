@@ -1,7 +1,7 @@
-from sqlmodel import Session, select
 from app.config import Config
 from app.database.connection import engine
 from app.database.employee_models import User
+from sqlmodel import Session, select
 
 
 def create_root_user():
