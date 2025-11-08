@@ -4,13 +4,14 @@ from typing import Optional
 
 from sqlalchemy import event
 from sqlmodel import Field, SQLModel
+from app.utils import current_utc_time
 
 
 class Log(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: str = Field(index=True, nullable=False)
     text_log: str = Field(nullable=False)
-    time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    time: datetime = Field(default_factory=current_utc_time)
 
 
 class BackupTypeEnum(str, Enum):
@@ -23,7 +24,7 @@ class Backup(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     day: str = Field(nullable=False)
     backup_type: BackupTypeEnum = Field(nullable=False)
-    date_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    date_time: datetime = Field(default_factory=current_utc_time)
 
 
 @event.listens_for(Backup, "after_insert", propagate=True)

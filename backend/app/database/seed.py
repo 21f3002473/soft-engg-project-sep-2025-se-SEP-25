@@ -29,7 +29,6 @@ def create_root_user():
         session.commit()
         print("Root user created.")
 
-    # pm
     pm_email = Config.PM_USER_EMAIL
     pm_password = Config.PM_USER_PASSWORD
 
@@ -54,7 +53,6 @@ def create_root_user():
         session.commit()
         print("PM user created.")
 
-    # hr
     hr_email = Config.HR_USER_EMAIL
     hr_password = Config.HR_USER_PASSWORD
 
@@ -79,7 +77,6 @@ def create_root_user():
         session.commit()
         print("HR user created.")
 
-    # employee
     employee_email = Config.EMPLOYEE_USER_EMAIL
     employee_password = Config.EMPLOYEE_USER_PASSWORD
 
