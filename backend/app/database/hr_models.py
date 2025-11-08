@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 from typing import Optional
 
+from app.utils import current_utc_time
 from sqlalchemy import event
 from sqlmodel import Field, Relationship, SQLModel
-from app.utils import current_utc_time
 
 
 class PerformanceReview(SQLModel, table=True):

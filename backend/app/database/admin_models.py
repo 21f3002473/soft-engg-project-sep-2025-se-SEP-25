@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
+from app.utils import current_utc_time
 from sqlalchemy import event
 from sqlmodel import Field, SQLModel
-from app.utils import current_utc_time
 
 
 class Log(SQLModel, table=True):
