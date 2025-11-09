@@ -4,21 +4,16 @@ import secrets
 
 from dotenv import get_key, load_dotenv
 
-# load env keys
-
 load_dotenv(
     verbose=True,
 )
 
 
 class Config:
-    # Database settings
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
-    # Security
     SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
 
-    # Root user
     ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL", "admin@example.com")
     ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD", "admin")
 
@@ -34,9 +29,9 @@ class Config:
     PROJECT_NAME = "soft-engg-project-sep-2025-se-SEP-25"
     PROJECT_DESCRIPTION = ""
     VERSION = "0.0.1"
-    GROQ_API_KEY = get_key(".env", "GROQ_API_KEY")
-    if GROQ_API_KEY is not None:
-        os.environ["GROQ_API_KEY"] = GROQ_API_KEY
+    OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
+    if OPENAI_API_KEY is not None:
+        os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
     MODE = get_key(".env", "MODE")
 
