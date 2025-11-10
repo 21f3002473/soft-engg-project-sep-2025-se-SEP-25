@@ -77,3 +77,14 @@ exit
 postgresql://your_username:your_password@localhost/your_database_name
 ```
 
+## Environment Configuration
+
+Create a `.env` file in the backend directory with the following variables:
+
+```bash
+# Generate a secure SECRET_KEY
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Add the generated key to your `.env` file:
+
