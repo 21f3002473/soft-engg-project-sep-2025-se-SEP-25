@@ -20,7 +20,6 @@ def make_app():
 
     allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
     if not allowed_origins or allowed_origins == [""]:
-
         allowed_origins = ["http://localhost:8080"]
 
     app.add_middleware(
@@ -45,3 +44,7 @@ def make_app():
         }
 
     return app
+
+
+# Create app instance for uvicorn to reference
+app = make_app()

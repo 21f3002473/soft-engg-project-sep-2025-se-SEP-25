@@ -11,6 +11,8 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_restful import Api, Resource
 
+from app.api.resources.pr_resources.dashboard import PRDashboardResource
+
 
 class API:
     def __init__(self, FastAPI: FastAPI):
@@ -18,6 +20,8 @@ class API:
         self.api = Api(FastAPI)
         self.register_router(UserLoginResource, "/user/login")
         self.register_router(ProtectedResource, "/me")
+        # product manager routes
+        self.register_router(PRDashboardResource, "/pr/dashboard")
 
         @FastAPI.post("/token", response_model=Token)
         async def login_for_access_token(
