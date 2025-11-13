@@ -395,7 +395,6 @@ class AdminAccountResource(Resource):
         }
 
 
-
 # APIs for admin section
 
 from fastapi import APIRouter
