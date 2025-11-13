@@ -27,7 +27,7 @@ class PRDashboardResource(Resource):
                     "email": current_user.email,
                     "role": current_user.role,
                 },
-                "projects": [],  
+                "projects": [],
                 "stats": {
                     "total_projects": 0,
                     "active_projects": 0,
@@ -41,5 +41,3 @@ class PRDashboardResource(Resource):
                 "error": str(e),
                 "status": "error",
             }, 500
-
-

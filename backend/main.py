@@ -1,7 +1,5 @@
 import uvicorn
 
-
-
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",  # Reference the app instance, not the factory

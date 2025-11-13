@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from app.api.resources import ProtectedResource, UserLoginResource
+from app.api.resources.pr_resources.dashboard import PRDashboardResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     Token,
@@ -10,8 +11,6 @@ from app.controllers import (
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_restful import Api, Resource
-
-from app.api.resources.pr_resources.dashboard import PRDashboardResource
 
 
 class API:

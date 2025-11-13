@@ -45,12 +45,11 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: User = Depends(lambda: None)) -> User:
-        
+
         from app.controllers import get_current_active_user
 
-        
         if current_user is None:
-            
+
             pass
 
         if not check_role_access(current_user.role, self.allowed_roles):

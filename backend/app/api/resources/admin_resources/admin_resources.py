@@ -17,7 +17,6 @@ from sqlmodel import Session, select
 # -----------------------------
 
 
-
 class AdminRegistrationValidator(BaseModel):
     name: str = Field(min_length=1)
     email: EmailStr
