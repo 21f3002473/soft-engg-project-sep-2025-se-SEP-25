@@ -1,1 +1,3 @@
-from app.utils.utils import current_utc_time
+from .utils import current_utc_time
+
+__all__ = ["current_utc_time"]

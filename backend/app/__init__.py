@@ -32,9 +32,44 @@ def make_app():
         max_age=600,
     )
 
-    _ = API(app)
+    api = API(app)
 
-    @app.get("/")
+    # General
+    from app.api.resources import UserLoginResource
+
+    api.register_router(UserLoginResource, "/api/user")
+
+    # Employee
+    from app.api.resources.employee import (
+        DashboardResource,
+        LearningResource,
+        LeaveRequestResource,
+        ReimbursementRequestResource,
+        TransferRequestResource,
+        HRFAQResource,
+        QuickNotesResource,
+        AccountResource,
+        AIAssistantResource,
+    )
+
+    api.register_router(DashboardResource, "/api/employee/dashboard")
+    api.register_router(LearningResource, "/api/employee/learning")
+
+    api.register_router(LeaveRequestResource, "/api/employee/requests/leave")
+    api.register_router(
+        ReimbursementRequestResource, "/api/employee/requests/reimbursement"
+    )
+    api.register_router(TransferRequestResource, "/requests/transfer")
+
+    api.register_router(HRFAQResource, "/api/employee/hr-faqs")
+
+    api.register_router(QuickNotesResource, "/api/employee/quick-notes")
+
+    api.register_router(AccountResource, "/api/employee/account")
+
+    api.register_router(AIAssistantResource, "/api/employee/assistant")
+
+    @app.get("/api")
     def index():
         return {
             "message": "app_running",

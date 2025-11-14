@@ -7,5 +7,5 @@ class API:
         super().__init__()
         self.api = Api(FastAPI)
 
-    def register_router(self, router: Resource):
-        self.api.add_resource(router)
+    def register_router(self, resource: Resource, path: str):
+        self.api.add_resource(resource, path)
