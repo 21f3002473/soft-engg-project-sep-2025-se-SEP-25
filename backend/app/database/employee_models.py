@@ -39,7 +39,7 @@ class User(SQLModel, table=True):
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="user.id")
     img_base64: Optional[str] = Field(default=None)
-    
+
     quick_notes: list["QuickNote"] = Relationship(back_populates="user")
 
     attendances: list["Attendance"] = Relationship(back_populates="user")
@@ -258,6 +258,7 @@ class Announcement(SQLModel, table=True):
     created_at: datetime = Field(default_factory=current_utc_time)
 
     user: Optional["User"] = Relationship(back_populates="announcements")
+
 
 class FAQ(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

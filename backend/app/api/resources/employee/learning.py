@@ -1,16 +1,20 @@
 from logging import getLogger
+
+from app.database import Course, User, UserCourse, get_session
+from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-
-from app.database import get_session, User, Course, UserCourse
-from app.middleware import require_employee
 
 logger = getLogger(__name__)
 
 
 class LearningResource(Resource):
-    def get(self, current_user: User = Depends(require_employee()), session: Session = Depends(get_session),):
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
 
         try:
             user_id = current_user.id
@@ -23,19 +27,20 @@ class LearningResource(Resource):
 
             personalized_list = []
             for uc, course in personalized:
-                personalized_list.append({
-                    "course_id": course.id,
-                    "course_name": course.course_name,
-                    "course_link": course.course_link,
-                    "topics": course.topics,
-                    "status": uc.status.value,
-                })
+                personalized_list.append(
+                    {
+                        "course_id": course.id,
+                        "course_name": course.course_name,
+                        "course_link": course.course_link,
+                        "topics": course.topics,
+                        "status": uc.status.value,
+                    }
+                )
 
             enrolled_course_ids = {uc.course_id for uc, c in personalized}
 
             recommended_courses = session.exec(
-                select(Course)
-                .where(Course.id.not_in(enrolled_course_ids))
+                select(Course).where(Course.id.not_in(enrolled_course_ids))
             ).all()
 
             recommended_list = [

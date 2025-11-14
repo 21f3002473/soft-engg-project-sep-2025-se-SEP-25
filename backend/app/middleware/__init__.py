@@ -2,9 +2,9 @@ from enum import Enum
 from functools import wraps
 from typing import Callable, List
 
+from app.controllers import get_current_user
 from app.database import User
 from fastapi import Depends, HTTPException, status
-from app.controllers import get_current_user
 
 
 class Role(str, Enum):

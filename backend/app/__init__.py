@@ -41,15 +41,15 @@ def make_app():
 
     # Employee
     from app.api.resources.employee import (
-        DashboardResource,
-        LearningResource,
-        LeaveRequestResource,
-        ReimbursementRequestResource,
-        TransferRequestResource,
-        HRFAQResource,
-        QuickNotesResource,
         AccountResource,
         AIAssistantResource,
+        DashboardResource,
+        HRFAQResource,
+        LearningResource,
+        LeaveRequestResource,
+        QuickNotesResource,
+        ReimbursementRequestResource,
+        TransferRequestResource,
     )
 
     api.register_router(DashboardResource, "/api/employee/dashboard")
