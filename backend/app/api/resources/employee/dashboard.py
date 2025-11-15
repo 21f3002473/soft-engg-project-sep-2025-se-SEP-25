@@ -9,7 +9,7 @@ from app.database import (
     UserCourse,
     get_session,
 )
-from app.middleware import require_employee
+from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, func, select
@@ -227,3 +227,135 @@ class ToDoResource(Resource):
         session.commit()
 
         return {"message": "Task deleted successfully"}
+
+
+class AnnouncementAdminListCreateResource(Resource):
+
+    def get(
+        self,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """HR: Fetch all announcements"""
+
+        ann_list = session.exec(
+            select(Announcement).order_by(Announcement.created_at.desc())
+        ).all()
+
+        return [
+            {
+                "id": a.id,
+                "announcement": a.announcement,
+                "created_at": a.created_at,
+                "user_id": a.user_id,
+            }
+            for a in ann_list
+        ]
+
+    def post(
+        self,
+        data: dict,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """HR: Create a new announcement"""
+
+        text = data.get("announcement")
+        if not text:
+            raise HTTPException(400, "announcement field is required")
+
+        ann = Announcement(
+            user_id=current_user.id,
+            announcement=text,
+        )
+
+        session.add(ann)
+        session.commit()
+        session.refresh(ann)
+
+        return {"message": "Announcement created", "id": ann.id}
+
+
+class AnnouncementAdminDetailResource(Resource):
+
+    def get(
+        self,
+        ann_id: int,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """HR: Get a specific announcement"""
+
+        ann = session.get(Announcement, ann_id)
+        if not ann:
+            raise HTTPException(404, "Announcement not found")
+
+        return {
+            "id": ann.id,
+            "announcement": ann.announcement,
+            "created_at": ann.created_at,
+            "user_id": ann.user_id,
+        }
+
+    def put(
+        self,
+        ann_id: int,
+        data: dict,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """HR: Update an announcement"""
+
+        ann = session.get(Announcement, ann_id)
+        if not ann:
+            raise HTTPException(404, "Announcement not found")
+
+        if "announcement" in data:
+            ann.announcement = data["announcement"]
+
+        session.commit()
+        session.refresh(ann)
+
+        return {"message": "Announcement updated"}
+
+    def delete(
+        self,
+        ann_id: int,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """HR: Delete an announcement"""
+
+        ann = session.get(Announcement, ann_id)
+        if not ann:
+            raise HTTPException(404, "Announcement not found")
+
+        session.delete(ann)
+        session.commit()
+
+        return {"message": "Announcement deleted"}
+
+
+class AnnouncementEmployeeResource(Resource):
+
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Employee: Get their announcements"""
+
+        ann_list = session.exec(
+            select(Announcement)
+            .where(Announcement.user_id == current_user.id)
+            .order_by(Announcement.created_at.desc())
+        ).all()
+
+        return [
+            {
+                "id": a.id,
+                "announcement": a.announcement,
+                "created_at": a.created_at,
+            }
+            for a in ann_list
+        ]

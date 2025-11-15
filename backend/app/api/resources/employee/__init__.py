@@ -1,8 +1,24 @@
-from .account import AccountResource
-from .assistant import AIAssistantResource
-from .dashboard import AllToDoResource, DashboardResource, ToDoResource
+from .dashboard import (
+    AllToDoResource,
+    DashboardResource,
+    ToDoResource,
+    AnnouncementAdminListCreateResource,
+    AnnouncementAdminDetailResource,
+    AnnouncementEmployeeResource,
+)
+
 from .hr_faq import HRFAQCreateResource, HRFAQDetailResource, HRFAQListEmployeeResource
-from .learning import LearningResource
+
+from .learning import (
+    LearningResource,
+    CourseAdminListCreateResource,
+    CourseAdminDetailResource,
+    CourseAssignmentListResource,
+    CourseAssignmentDetailResource,
+    CourseAssignmentEmployeeResource,
+    CourseRecommendationResource,
+)
+
 from .request import (
     AllLeaveRequestResource,
     AllReimbursementRequestResource,
@@ -11,13 +27,27 @@ from .request import (
     ReimbursementRequestResource,
     TransferRequestResource,
 )
+
 from .writing import AllQuickNotesResource, QuickNotesResource
+
+from .account import AccountResource
+
+from .assistant import AIAssistantResource
 
 __all__ = [
     "DashboardResource",
     "AllToDoResource",
     "ToDoResource",
+    "AnnouncementAdminListCreateResource",
+    "AnnouncementAdminDetailResource",
+    "AnnouncementEmployeeResource",
     "LearningResource",
+    "CourseAdminListCreateResource",
+    "CourseAdminDetailResource",
+    "CourseAssignmentListResource",
+    "CourseAssignmentDetailResource",
+    "CourseAssignmentEmployeeResource",
+    "CourseRecommendationResource",
     "LeaveRequestResource",
     "ReimbursementRequestResource",
     "TransferRequestResource",

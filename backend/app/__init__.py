@@ -41,23 +41,34 @@ def make_app():
 
     # Employee
     from app.api.resources.employee import (
-        AccountResource,
-        AIAssistantResource,
         AllLeaveRequestResource,
         AllQuickNotesResource,
         AllReimbursementRequestResource,
         AllToDoResource,
         AllTransferRequestResource,
         DashboardResource,
+        AnnouncementAdminListCreateResource,
+        AnnouncementAdminDetailResource,
+        AnnouncementEmployeeResource,
+        AccountResource,
+        AIAssistantResource,
         HRFAQCreateResource,
         HRFAQDetailResource,
         HRFAQListEmployeeResource,
         LearningResource,
+        CourseAdminListCreateResource,
+        CourseAdminDetailResource,
+        CourseAssignmentListResource,
+        CourseAssignmentDetailResource,
+        CourseAssignmentEmployeeResource,
+        CourseRecommendationResource,
         LeaveRequestResource,
         QuickNotesResource,
         ReimbursementRequestResource,
         ToDoResource,
         TransferRequestResource,
+        AccountResource,
+        AIAssistantResource,
     )
 
     emp_base_url = "/api/employee"
@@ -66,8 +77,25 @@ def make_app():
     api.register_router(DashboardResource, f"{emp_base_url}/dashboard")
     api.register_router(AllToDoResource, f"{emp_base_url}/todo")
     api.register_router(ToDoResource, f"{emp_base_url}/todo/{{task_id}}")
+    api.register_router(AnnouncementEmployeeResource, f"{emp_base_url}/annoucements")
+    api.register_router(
+        AnnouncementAdminListCreateResource, f"{hr_base_url}/annoucement"
+    )
+    api.register_router(
+        AnnouncementAdminDetailResource, f"{hr_base_url}/annoucement/{{ann_id}}"
+    )
 
     api.register_router(LearningResource, f"{emp_base_url}/learning")
+    api.register_router(CourseAssignmentEmployeeResource, f"{emp_base_url}/courses")
+    api.register_router(CourseRecommendationResource, f"{emp_base_url}/recommendations")
+    api.register_router(CourseAdminListCreateResource, f"{hr_base_url}/course")
+    api.register_router(
+        CourseAdminDetailResource, f"{hr_base_url}/course/{{course_id}}"
+    )
+    api.register_router(CourseAssignmentListResource, f"{hr_base_url}/course/assign/{{user_id}}")
+    api.register_router(
+        CourseAssignmentDetailResource, f"{hr_base_url}/course/assign/edit/{{assign_id}}"
+    )
 
     api.register_router(AllLeaveRequestResource, f"{emp_base_url}/requests/leave")
     api.register_router(
