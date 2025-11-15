@@ -49,9 +49,12 @@ class API:
             CourseAssignmentEmployeeResource, f"{emp_base_url}/courses"
         )
         self.register_router(
-            EmployeeCourseUpdateByCourseIdResource, f"{emp_base_url}/course/{{course_id}}"
+            EmployeeCourseUpdateByCourseIdResource,
+            f"{emp_base_url}/course/{{course_id}}",
         )
-        self.register_router(CourseRecommendationResource, f"{emp_base_url}/recommendations")
+        self.register_router(
+            CourseRecommendationResource, f"{emp_base_url}/recommendations"
+        )
         self.register_router(CourseAdminListCreateResource, f"{hr_base_url}/course")
         self.register_router(
             CourseAdminDetailResource, f"{hr_base_url}/course/{{course_id}}"
@@ -68,7 +71,9 @@ class API:
         self.register_router(
             AllReimbursementRequestResource, f"{emp_base_url}/requests/reimbursement"
         )
-        self.register_router(AllTransferRequestResource, f"{emp_base_url}/requests/transfer")
+        self.register_router(
+            AllTransferRequestResource, f"{emp_base_url}/requests/transfer"
+        )
         self.register_router(
             LeaveRequestResource, f"{emp_base_url}/requests/leave/{{leave_id}}"
         )
