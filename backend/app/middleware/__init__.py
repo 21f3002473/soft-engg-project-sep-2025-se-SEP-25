@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import List
 
-from app.controllers import get_current_user
 from app.database import RoleEnum, User
 from fastapi import Depends, HTTPException, status
 
@@ -83,40 +82,11 @@ def check_role_access(user_role: str, allowed_roles: List[RoleEnum]) -> bool:
         return False
 
 
-class RoleChecker:
-    """
-    Dependency class to check if user has required roles.
-    Includes authentication via get_current_active_user.
-
-    Usage in routes:
-    def get(self, current_user: User = Depends(require_pm())):
-    """
-
-    def __init__(self, allowed_roles: List[RoleEnum]):
-        self.allowed_roles = allowed_roles
-
-    def __call__(self, current_user: User = Depends(lambda: None)) -> User:
-
-        from app.controllers import get_current_active_user
-
-        if current_user is None:
-
-            pass
-
-        if not check_role_access(current_user.role, self.allowed_roles):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required roles: {[r.value for r in self.allowed_roles]}. Your role: {current_user.role}",
-            )
-        return current_user
-
-
 def require_root():
     """Require ROOT role (superuser only)"""
     from app.controllers import get_current_active_user
 
     def check_root(current_user: User = Depends(get_current_active_user)) -> User:
-        print(current_user.role, RoleEnum.ROOT)
         if not check_role_access(current_user.role, [RoleEnum.ROOT]):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

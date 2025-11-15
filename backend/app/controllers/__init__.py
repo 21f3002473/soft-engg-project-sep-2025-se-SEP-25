@@ -13,6 +13,8 @@ from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 
+logger = getLogger(__name__)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 SECRET_KEY = Config.SECRET_KEY
@@ -63,6 +65,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    if not token or len(token.strip()) == 0:
+        logger.error("Empty token received")
+        raise credentials_exception
+
+    token_parts = token.split(".")
+    if len(token_parts) != 3:
+        logger.error(f"Invalid token format. Expected 3 parts, got {len(token_parts)}")
+        raise credentials_exception
 
     if not token or len(token.strip()) == 0:
         logger.error("Empty token received")

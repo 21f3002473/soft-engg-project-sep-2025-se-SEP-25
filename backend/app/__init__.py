@@ -46,4 +46,5 @@ def make_app():
     return app
 
 
+# Create app instance for uvicorn to reference
 app = make_app()

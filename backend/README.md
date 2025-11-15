@@ -49,14 +49,19 @@ CREATE DATABASE your_database_name;
 4. create user 
 
 ```sql
-CREATE USER your_username WITH PASSWORD 'your_password';
+CREATE USER myuser WITH PASSWORD '12345678';
 
 ``` 
 
 5. grant all privileges to the user on the database 
 
 ```sql
-GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_username;
+GRANT ALL PRIVILEGES ON DATABASE se_preprod TO myuser;
+```
+Also, you might want to set the ownership of the public schema to the created user:
+```sql
+GRANT ALL PRIVILEGES ON SCHEMA public TO myuser;
+ALTER SCHEMA public OWNER TO myuser;
 ```
 
 6. exit psql shell 
