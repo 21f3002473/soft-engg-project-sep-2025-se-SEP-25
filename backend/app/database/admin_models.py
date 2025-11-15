@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 
 from app.utils import current_utc_time
-from sqlalchemy import event
+from sqlalchemy import Column, Enum as SQLEnum, event
 from sqlmodel import Field, SQLModel
 
 
@@ -23,7 +23,9 @@ class BackupTypeEnum(str, Enum):
 class Backup(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     day: str = Field(nullable=False)
-    backup_type: BackupTypeEnum = Field(nullable=False)
+    backup_type: BackupTypeEnum = Field(
+        sa_column=Column(SQLEnum(BackupTypeEnum, native_enum=False, length=20), nullable=False)
+    )
     date_time: datetime = Field(default_factory=current_utc_time)
 
 
