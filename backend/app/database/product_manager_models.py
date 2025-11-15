@@ -7,9 +7,9 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class StatusTypeEnum(str, Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
 
 
 class Client(SQLModel, table=True):
@@ -30,7 +30,7 @@ class Project(SQLModel, table=True):
     project_id: str = Field(index=True, unique=True, nullable=False)
     project_name: str = Field(nullable=False)
     description: Optional[str] = Field(default=None)
-    status: StatusTypeEnum = Field(default=StatusTypeEnum.IN_PROGRESS)
+    status: StatusTypeEnum = Field(default=StatusTypeEnum.PENDING)
     client_id: int = Field(foreign_key="client.id", nullable=False)
     manager_id: Optional[int] = Field(foreign_key="user.id")
 

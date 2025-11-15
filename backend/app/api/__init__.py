@@ -12,6 +12,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_restful import Api, Resource
 
 from app.api.resources.pr_resources.dashboard import PRDashboardResource
+from app.api.resources.pr_resources.clients import ClientsResource, ClientRequirementResource, ClientUpdatesResource
+from app.api.resources.pr_resources.employee import EmployeesResource, EmployeePerformanceResource
+from app.api.resources.pr_resources.project import ProjectsResource
 
 
 class API:
@@ -22,6 +25,13 @@ class API:
         self.register_router(ProtectedResource, "/me")
         # product manager routes
         self.register_router(PRDashboardResource, "/pr/dashboard")
+        self.register_router(ClientsResource, "/pr/clients")
+
+        self.register_router(ClientRequirementResource, "/pr/client/requirements/{client_id}")
+        self.register_router(ClientUpdatesResource, "/pr/client/updates/{client_id}")
+        self.register_router(EmployeesResource, "/pr/employees")
+        self.register_router(EmployeePerformanceResource, "/pr/employee/performance/{employee_id}")
+        self.register_router(ProjectsResource, "/pr/projects")
 
         @FastAPI.post("/token", response_model=Token)
         async def login_for_access_token(
