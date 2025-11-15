@@ -41,34 +41,32 @@ def make_app():
 
     # Employee
     from app.api.resources.employee import (
+        AccountResource,
+        AIAssistantResource,
         AllLeaveRequestResource,
         AllQuickNotesResource,
         AllReimbursementRequestResource,
         AllToDoResource,
         AllTransferRequestResource,
-        DashboardResource,
-        AnnouncementAdminListCreateResource,
         AnnouncementAdminDetailResource,
+        AnnouncementAdminListCreateResource,
         AnnouncementEmployeeResource,
-        AccountResource,
-        AIAssistantResource,
+        CourseAdminDetailResource,
+        CourseAdminListCreateResource,
+        CourseAssignmentDetailResource,
+        CourseAssignmentEmployeeResource,
+        CourseAssignmentListResource,
+        CourseRecommendationResource,
+        DashboardResource,
         HRFAQCreateResource,
         HRFAQDetailResource,
         HRFAQListEmployeeResource,
         LearningResource,
-        CourseAdminListCreateResource,
-        CourseAdminDetailResource,
-        CourseAssignmentListResource,
-        CourseAssignmentDetailResource,
-        CourseAssignmentEmployeeResource,
-        CourseRecommendationResource,
         LeaveRequestResource,
         QuickNotesResource,
         ReimbursementRequestResource,
         ToDoResource,
         TransferRequestResource,
-        AccountResource,
-        AIAssistantResource,
     )
 
     emp_base_url = "/api/employee"
@@ -92,9 +90,12 @@ def make_app():
     api.register_router(
         CourseAdminDetailResource, f"{hr_base_url}/course/{{course_id}}"
     )
-    api.register_router(CourseAssignmentListResource, f"{hr_base_url}/course/assign/{{user_id}}")
     api.register_router(
-        CourseAssignmentDetailResource, f"{hr_base_url}/course/assign/edit/{{assign_id}}"
+        CourseAssignmentListResource, f"{hr_base_url}/course/assign/{{user_id}}"
+    )
+    api.register_router(
+        CourseAssignmentDetailResource,
+        f"{hr_base_url}/course/assign/edit/{{assign_id}}",
     )
 
     api.register_router(AllLeaveRequestResource, f"{emp_base_url}/requests/leave")
