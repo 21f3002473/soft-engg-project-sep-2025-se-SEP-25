@@ -7,6 +7,8 @@ from app.database import create_root_user, get_session, init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# from backend.app import api
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +22,6 @@ def make_app():
 
     allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
     if not allowed_origins or allowed_origins == [""]:
-
         allowed_origins = ["http://localhost:8080"]
 
     app.add_middleware(
@@ -45,3 +46,7 @@ def make_app():
         }
 
     return app
+
+
+# Create app instance for uvicorn to reference
+app = make_app()

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.employee import *
+from app.api.resources.pr_resources.dashboard import PRDashboardResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -21,6 +22,8 @@ class API:
         # General
         self.register_router(UserLoginResource, "/user/login")
         self.register_router(ProtectedResource, "/me")
+        # product manager routes
+        self.register_router(PRDashboardResource, "/pr/dashboard")
 
         # Employee
         emp_base_url = "/api/employee"

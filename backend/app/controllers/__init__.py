@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from logging import getLogger
 from typing import Optional
 
 from app.config import Config
@@ -9,6 +10,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlmodel import Session, select
+
+logger = getLogger(__name__)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
@@ -60,17 +63,30 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    if not token or len(token.strip()) == 0:
+        logger.error("Empty token received")
+        raise credentials_exception
+
+    token_parts = token.split(".")
+    if len(token_parts) != 3:
+        logger.error(f"Invalid token format. Expected 3 parts, got {len(token_parts)}")
+        raise credentials_exception
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except JWTError:
+        logger.debug(f"Token data: {token_data}")
+    except JWTError as e:
+        logger.error(f"JWT decoding error: {str(e)}", exc_info=True)
         raise credentials_exception
 
     user = query_user_by_email(token_data.username)
     if user is None:
+        logger.error(f"User not found for email: {token_data.username}")
         raise credentials_exception
     return user
 

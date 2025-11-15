@@ -1,6 +1,5 @@
 from enum import Enum
-from functools import wraps
-from typing import Callable, List
+from typing import List
 
 from app.controllers import get_current_user
 from app.database import RoleEnum, User
