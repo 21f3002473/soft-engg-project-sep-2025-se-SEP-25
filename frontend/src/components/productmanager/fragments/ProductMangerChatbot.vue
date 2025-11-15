@@ -1,201 +1,190 @@
 <template>
-    <div class="chatbot">
-        <div class="chat-header">
-            <h3>Demo Chatbot</h3>
-            <small>Simple demo with dummy data</small>
+  <div class="chatbot-container d-flex flex-column h-100">
+    <!-- Chat Messages Area -->
+    <div class="chat-messages flex-grow-1 overflow-auto mb-3 p-2" ref="messageContainer">
+      <div v-if="messages.length === 0" class="text-center text-muted py-4">
+        <i class="bi bi-chat-quote fs-1"></i>
+        <p class="mt-2">Start a conversation about {{ clientName || 'this client' }}</p>
+      </div>
+      
+      <div 
+        v-for="(message, index) in messages" 
+        :key="index"
+        :class="['message', message.sender === 'user' ? 'user-message' : 'ai-message']"
+      >
+        <div class="message-content">
+          <div class="message-header d-flex align-items-center mb-1">
+            <i :class="message.sender === 'user' ? 'bi bi-person-circle' : 'bi bi-robot'" class="me-2"></i>
+            <strong>{{ message.sender === 'user' ? 'You' : 'AI Assistant' }}</strong>
+            <small class="ms-auto text-muted">{{ message.timestamp }}</small>
+          </div>
+          <p class="mb-0">{{ message.text }}</p>
         </div>
-
-        <div ref="messagesContainer" class="messages">
-            <div
-                v-for="msg in messages"
-                :key="msg.id"
-                :class="['message', msg.sender === 'bot' ? 'bot' : 'user']"
-            >
-                <div class="bubble">
-                    <div class="text">{{ msg.text }}</div>
-                    <div class="meta">{{ msg.time }}</div>
-                </div>
-            </div>
-        </div>
-
-        <form class="composer" @submit.prevent="sendMessage">
-            <input
-                v-model="input"
-                type="text"
-                placeholder="Type a message and press Enter..."
-                @keydown.enter.exact.prevent="sendMessage"
-            />
-            <button type="button" @click="sendMessage">Send</button>
-        </form>
+      </div>
     </div>
+
+    <!-- Input Area -->
+    <div class="chat-input">
+      <form @submit.prevent="sendMessage" class="d-flex gap-2">
+        <input
+          v-model="userInput"
+          type="text"
+          class="form-control"
+          placeholder="Ask about requirements, tasks, or client details..."
+          :disabled="isSending"
+        />
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          :disabled="!userInput.trim() || isSending"
+        >
+          <span v-if="isSending" class="spinner-border spinner-border-sm me-1"></span>
+          <i v-else class="bi bi-send-fill"></i>
+        </button>
+      </form>
+    </div>
+  </div>
 </template>
 
-<script setup>
-import { ref, nextTick } from 'vue'
-
-let idCounter = 1
-const formatTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-
-const messages = ref([
-    { id: idCounter++, sender: 'bot', text: 'Hello! I am a demo chatbot. How can I help you today?', time: formatTime() },
-    { id: idCounter++, sender: 'user', text: 'Show me some demo features.', time: formatTime() },
-    { id: idCounter++, sender: 'bot', text: 'I can answer simple questions, echo text, or return canned replies.', time: formatTime() },
-])
-
-const input = ref('')
-const messagesContainer = ref(null)
-
-function scrollToBottom() {
-    nextTick(() => {
-        const el = messagesContainer.value
-        if (el) el.scrollTop = el.scrollHeight
-    })
-}
-
-const canned = [
-    "I'm a demo bot — try asking about 'price', 'hours', or say 'hello'.",
-    "Prices depend on the product. This is demo data.",
-    "We are open 9am–5pm in this demo.",
-    "Nice to meet you!",
-    "I don't understand fully, but this is a sample reply."
-]
-
-function botReply(userText) {
-    const text = (userText || '').toLowerCase()
-
-    let reply = ''
-    if (!userText || text.trim() === '') {
-        reply = "You didn't type anything — try a question."
-    } else if (text.includes('price') || text.includes('cost')) {
-        reply = "Demo prices: Basic $10, Pro $30. (dummy values)"
-    } else if (text.includes('hello') || text.includes('hi')) {
-        reply = "Hello! How can I help in this demo?"
-    } else if (text.includes('hours') || text.includes('open')) {
-        reply = "Demo hours: Mon–Fri 9am–5pm."
-    } else if (text.includes('features')) {
-        reply = "This demo supports sending messages and getting canned replies."
-    } else {
-        reply = canned[Math.floor(Math.random() * canned.length)]
+<script>
+export default {
+  name: 'ProductMangerChatbot',
+  props: {
+    clientId: {
+      type: [String, Number],
+      required: false
+    },
+    clientName: {
+      type: String,
+      default: 'Client'
     }
+  },
+  data() {
+    return {
+      messages: [],
+      userInput: '',
+      isSending: false
+    };
+  },
+  methods: {
+    async sendMessage() {
+      if (!this.userInput.trim()) return;
 
-    setTimeout(() => {
-        messages.value.push({ id: idCounter++, sender: 'bot', text: reply, time: formatTime() })
-        scrollToBottom()
-    }, 700 + Math.random() * 600)
-}
+      const userMessage = {
+        sender: 'user',
+        text: this.userInput,
+        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      };
 
-function sendMessage() {
-    const text = input.value.trim()
-    if (!text) return
+      this.messages.push(userMessage);
+      const query = this.userInput;
+      this.userInput = '';
+      this.isSending = true;
 
-    messages.value.push({ id: idCounter++, sender: 'user', text, time: formatTime() })
-    input.value = ''
-    scrollToBottom()
+      // Scroll to bottom
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
 
-    botReply(text)
-}
-
-scrollToBottom()
+      // Simulate AI response (replace with actual API call)
+      setTimeout(() => {
+        const aiMessage = {
+          sender: 'ai',
+          text: `I understand you're asking about "${query}" for ${this.clientName}. This is a simulated response. In production, this would connect to your AI backend.`,
+          timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
+        this.messages.push(aiMessage);
+        this.isSending = false;
+        
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      }, 1000);
+    },
+    scrollToBottom() {
+      const container = this.$refs.messageContainer;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+  },
+  mounted() {
+    // Welcome message
+    this.messages.push({
+      sender: 'ai',
+      text: `Hello! I'm here to help you with ${this.clientName}'s requirements and project details. How can I assist you today?`,
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    });
+  }
+};
 </script>
 
 <style scoped>
-.chatbot {
-    width: 100%;
-    max-width: 480px;
-    min-height: 400px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    background: #fafafa;
-    font-family: Arial, Helvetica, sans-serif;
+.chatbot-container {
+  min-height: 400px;
+  max-height: 500px;
 }
 
-.chat-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid #eee;
-    background: #fff;
-}
-
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: linear-gradient(180deg,#fafafa,#fff);
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .message {
-    display: flex;
+  display: flex;
+  margin-bottom: 0.5rem;
 }
 
-.message.user {
-    justify-content: flex-end;
+.user-message {
+  justify-content: flex-end;
 }
 
-.message.bot {
-    justify-content: flex-start;
+.user-message .message-content {
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 12px 12px 0 12px;
+  max-width: 70%;
+  padding: 0.75rem;
 }
 
-.bubble {
-    max-width: 78%;
-    padding: 8px 10px;
-    border-radius: 12px;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+.ai-message {
+  justify-content: flex-start;
 }
 
-.message.user .bubble {
-    background: #0b93f6;
-    color: #fff;
-    border-bottom-right-radius: 4px;
+.ai-message .message-content {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  border-radius: 12px 12px 12px 0;
+  max-width: 70%;
+  padding: 0.75rem;
 }
 
-.message.bot .bubble {
-    background: #f1f1f1;
-    color: #222;
-    border-bottom-left-radius: 4px;
+.message-header {
+  font-size: 0.875rem;
 }
 
-.meta {
-    font-size: 10px;
-    opacity: 0.7;
-    margin-top: 6px;
-    text-align: right;
+.chat-input {
+  border-top: 1px solid #dee2e6;
+  padding-top: 0.75rem;
 }
 
-.composer {
-    display: flex;
-    gap: 8px;
-    padding: 10px;
-    border-top: 1px solid #eee;
-    background: #fff;
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
 }
 
-.composer input {
-    flex: 1;
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    outline: none;
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
-.composer input:focus {
-    border-color: #a6d1ff;
-    box-shadow: 0 0 0 3px rgba(11,147,246,0.08);
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
 }
 
-.composer button {
-    padding: 8px 12px;
-    background: #0b93f6;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.composer button:hover {
-    opacity: 0.95;
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>
