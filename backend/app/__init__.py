@@ -35,19 +35,19 @@ def make_app():
 
     api = API(app)
 
-    # General 
+    # General
     from app.api.resources import UserLoginResource
 
     api.register_router(UserLoginResource, "/api/login")
 
     # Admin
     from app.api.resources.admin_resources.admin_resources import (
-        AdminRegistrationResource,
+        AdminAccountResource,
+        AdminBackupResource,
         AdminDashboardResource,
         AdminEmployeeResource,
-        AdminBackupResource,
+        AdminRegistrationResource,
         AdminUpdatesResource,
-        AdminAccountResource,
     )
 
     api.register_router(AdminRegistrationResource, "/api/admin/register")

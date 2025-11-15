@@ -10,7 +10,7 @@ from app.middleware import Role, can_view_system_logs, require_root
 from fastapi import Depends, HTTPException, Query, status
 from fastapi_restful import Resource
 from pydantic import BaseModel, EmailStr, Field
-from sqlmodel import Session, select 
+from sqlmodel import Session, select
 
 # -----------------------------
 # Validators / Schemas
