@@ -1,31 +1,85 @@
 from enum import Enum
 from typing import List
 
-from app.database import User
+from app.controllers import get_current_user
+from app.database import RoleEnum, User
 from fastapi import Depends, HTTPException, status
 
-
-class Role(str, Enum):
-    """User roles in the system"""
-
-    ROOT = "root"
-    HUMAN_RESOURCE = "hr"
-    PRODUCT_MANAGER = "pm"
-    EMPLOYEE = "employee"
-
-
 ROLE_HIERARCHY = {
-    Role.ROOT: [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.HUMAN_RESOURCE: [Role.HUMAN_RESOURCE, Role.EMPLOYEE],
-    Role.PRODUCT_MANAGER: [Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.EMPLOYEE: [Role.EMPLOYEE],
+    RoleEnum.ROOT: [
+        RoleEnum.ROOT,
+        RoleEnum.HUMAN_RESOURCE,
+        RoleEnum.PRODUCT_MANAGER,
+        RoleEnum.EMPLOYEE,
+    ],
+    RoleEnum.HUMAN_RESOURCE: [RoleEnum.HUMAN_RESOURCE, RoleEnum.EMPLOYEE],
+    RoleEnum.PRODUCT_MANAGER: [RoleEnum.PRODUCT_MANAGER, RoleEnum.EMPLOYEE],
+    RoleEnum.EMPLOYEE: [RoleEnum.EMPLOYEE],
 }
 
 
-def check_role_access(user_role: str, allowed_roles: List[Role]) -> bool:
+##########################################################
+#  this dummy data access and we dont need it for now
+class Permission(str, Enum):
+    """System permissions mapped to roles"""
+
+    CREATE_USER = "create_user"
+    DELETE_USER = "delete_user"
+    UPDATE_USER_ROLE = "update_user_role"
+    VIEW_ALL_USERS = "view_all_users"
+
+    MANAGE_EMPLOYEES = "manage_employees"
+    VIEW_EMPLOYEE_RECORDS = "view_employee_records"
+    MANAGE_PAYROLL = "manage_payroll"
+    MANAGE_RECRUITMENT = "manage_recruitment"
+
+    MANAGE_PRODUCTS = "manage_products"
+    VIEW_PRODUCTS = "view_products"
+    MANAGE_PROJECTS = "manage_projects"
+    VIEW_ANALYTICS = "view_analytics"
+
+    VIEW_OWN_PROFILE = "view_own_profile"
+    UPDATE_OWN_PROFILE = "update_own_profile"
+
+    VIEW_SYSTEM_LOGS = "view_system_logs"
+    GENERATE_REPORTS = "generate_reports"
+    SYSTEM_CONFIG = "system_config"
+
+
+# this dummy data access and we dont need it for now
+ROLE_PERMISSIONS = {
+    RoleEnum.ROOT: [perm for perm in Permission],
+    RoleEnum.HUMAN_RESOURCE: [
+        Permission.VIEW_ALL_USERS,
+        Permission.MANAGE_EMPLOYEES,
+        Permission.VIEW_EMPLOYEE_RECORDS,
+        Permission.MANAGE_PAYROLL,
+        Permission.MANAGE_RECRUITMENT,
+        Permission.GENERATE_REPORTS,
+        Permission.VIEW_OWN_PROFILE,
+        Permission.UPDATE_OWN_PROFILE,
+    ],
+    RoleEnum.PRODUCT_MANAGER: [
+        Permission.MANAGE_PRODUCTS,
+        Permission.VIEW_PRODUCTS,
+        Permission.MANAGE_PROJECTS,
+        Permission.VIEW_ANALYTICS,
+        Permission.VIEW_EMPLOYEE_RECORDS,
+        Permission.VIEW_OWN_PROFILE,
+        Permission.UPDATE_OWN_PROFILE,
+    ],
+    RoleEnum.EMPLOYEE: [
+        Permission.VIEW_PRODUCTS,
+        Permission.VIEW_OWN_PROFILE,
+        Permission.UPDATE_OWN_PROFILE,
+    ],
+}
+
+
+def check_role_access(user_role: str, allowed_roles: List[RoleEnum]) -> bool:
     """Check if user's role is in the allowed roles (considering hierarchy)"""
     try:
-        role = Role(user_role)
+        role = RoleEnum(user_role)
         user_allowed_roles = ROLE_HIERARCHY.get(role, [])
         return any(allowed_role in user_allowed_roles for allowed_role in allowed_roles)
     except ValueError:
@@ -41,7 +95,7 @@ class RoleChecker:
     def get(self, current_user: User = Depends(require_pm())):
     """
 
-    def __init__(self, allowed_roles: List[Role]):
+    def __init__(self, allowed_roles: List[RoleEnum]):
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: User = Depends(lambda: None)) -> User:
@@ -65,7 +119,7 @@ def require_root():
     from app.controllers import get_current_active_user
 
     def check_root(current_user: User = Depends(get_current_active_user)) -> User:
-        if not check_role_access(current_user.role, [Role.ROOT]):
+        if not check_role_access(current_user.role, [RoleEnum.ROOT]):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Access denied. Required role: ROOT. Your role: {current_user.role}",
@@ -80,7 +134,9 @@ def require_hr():
     from app.controllers import get_current_active_user
 
     def check_hr(current_user: User = Depends(get_current_active_user)) -> User:
-        if not check_role_access(current_user.role, [Role.ROOT, Role.HUMAN_RESOURCE]):
+        if not check_role_access(
+            current_user.role, [RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE]
+        ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Access denied. Required roles: ROOT or HR. Your role: {current_user.role}",
@@ -95,7 +151,9 @@ def require_pm():
     from app.controllers import get_current_active_user
 
     def check_pm(current_user: User = Depends(get_current_active_user)) -> User:
-        if not check_role_access(current_user.role, [Role.ROOT, Role.PRODUCT_MANAGER]):
+        if not check_role_access(
+            current_user.role, [RoleEnum.ROOT, RoleEnum.PRODUCT_MANAGER]
+        ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Access denied. Required roles: ROOT or PM. Your role: {current_user.role}",
@@ -112,7 +170,12 @@ def require_employee():
     def check_employee(current_user: User = Depends(get_current_active_user)) -> User:
         if not check_role_access(
             current_user.role,
-            [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE],
+            [
+                RoleEnum.ROOT,
+                RoleEnum.HUMAN_RESOURCE,
+                RoleEnum.PRODUCT_MANAGER,
+                RoleEnum.EMPLOYEE,
+            ],
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -129,7 +192,8 @@ def require_hr_or_pm():
 
     def check_hr_or_pm(current_user: User = Depends(get_current_active_user)) -> User:
         if not check_role_access(
-            current_user.role, [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER]
+            current_user.role,
+            [RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE, RoleEnum.PRODUCT_MANAGER],
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

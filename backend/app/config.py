@@ -39,6 +39,7 @@ class Config:
     OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
     if OPENAI_API_KEY is not None:
         os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     MODE = get_key(".env", "MODE")
 

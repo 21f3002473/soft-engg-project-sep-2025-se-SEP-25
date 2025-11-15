@@ -33,31 +33,9 @@ def make_app():
         max_age=600,
     )
 
-    api = API(app)
+    API(app)
 
-    # General
-    from app.api.resources import UserLoginResource
-
-    api.register_router(UserLoginResource, "/api/login")
-
-    # Admin
-    from app.api.resources.admin_resources.admin_resources import (
-        AdminAccountResource,
-        AdminBackupResource,
-        AdminDashboardResource,
-        AdminEmployeeResource,
-        AdminRegistrationResource,
-        AdminUpdatesResource,
-    )
-
-    api.register_router(AdminRegistrationResource, "/api/admin/register")
-    api.register_router(AdminDashboardResource, "/api/admin/summary")
-    api.register_router(AdminEmployeeResource, "/api/admin/employees")
-    api.register_router(AdminBackupResource, "/api/admin/backup-config")
-    api.register_router(AdminUpdatesResource, "/api/admin/updates")
-    api.register_router(AdminAccountResource, "/api/admin/account")
-
-    @app.get("/")
+    @app.get("/api")
     def index():
         return {
             "message": "app_running",
