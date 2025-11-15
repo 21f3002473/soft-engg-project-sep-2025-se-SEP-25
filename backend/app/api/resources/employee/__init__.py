@@ -10,7 +10,6 @@ from .dashboard import (
 )
 from .hr_faq import HRFAQCreateResource, HRFAQDetailResource, HRFAQListEmployeeResource
 from .learning import (
-    LearningResource,
     CourseAdminDetailResource,
     CourseAdminListCreateResource,
     CourseAssignmentDetailResource,
@@ -18,6 +17,7 @@ from .learning import (
     CourseAssignmentListResource,
     CourseRecommendationResource,
     EmployeeCourseUpdateByCourseIdResource,
+    LearningResource,
 )
 from .request import (
     AllLeaveRequestResource,
