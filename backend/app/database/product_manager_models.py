@@ -3,7 +3,8 @@ from enum import Enum
 from typing import List, Optional
 
 from app.utils import current_utc_time
-from sqlalchemy import Column, Enum as SQLEnum
+from sqlalchemy import Column
+from sqlalchemy import Enum as SQLEnum
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -33,7 +34,7 @@ class Project(SQLModel, table=True):
     description: Optional[str] = Field(default=None)
     status: StatusTypeEnum = Field(
         default=StatusTypeEnum.PENDING,
-        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20))
+        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20)),
     )
     client_id: int = Field(foreign_key="client.id", nullable=False)
     manager_id: Optional[int] = Field(foreign_key="user.id")
@@ -89,7 +90,7 @@ class EmpTodo(SQLModel, table=True):
     client_id: Optional[int] = Field(foreign_key="client.id", nullable=True)
     status: StatusTypeEnum = Field(
         default=StatusTypeEnum.PENDING,
-        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20))
+        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20)),
     )
     weightage: float = Field(default=0.0)
     user_id: Optional[int] = Field(foreign_key="user.id")

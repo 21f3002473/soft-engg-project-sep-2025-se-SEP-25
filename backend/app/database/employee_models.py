@@ -8,7 +8,9 @@ from typing import List, Optional
 
 from app.config import Config
 from app.utils import current_utc_time
-from sqlalchemy import Column, Enum as SQLEnum, event
+from sqlalchemy import Column
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import event
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -39,7 +41,7 @@ class User(SQLModel, table=True):
     salt: str = Field(default_factory=lambda: secrets.token_hex(16), nullable=False)
     role: RoleEnum = Field(
         default=RoleEnum.EMPLOYEE,
-        sa_column=Column(SQLEnum(RoleEnum, native_enum=False, length=30))
+        sa_column=Column(SQLEnum(RoleEnum, native_enum=False, length=30)),
     )
 
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
@@ -111,7 +113,7 @@ class Attendance(SQLModel, table=True):
     check_out: Optional[datetime] = Field(default=None)
     status: AttendanceStatusEnum = Field(
         default=AttendanceStatusEnum.PRESENT,
-        sa_column=Column(SQLEnum(AttendanceStatusEnum, native_enum=False, length=20))
+        sa_column=Column(SQLEnum(AttendanceStatusEnum, native_enum=False, length=20)),
     )
     worked_hours: Optional[float] = Field(default=None)
     remarks: Optional[str] = Field(default=None)
@@ -148,10 +150,14 @@ class StatusTypeEnum(str, Enum):
 class Request(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     request_type: RequestTypeEnum = Field(
-        sa_column=Column(SQLEnum(RequestTypeEnum, native_enum=False, length=20), nullable=False)
+        sa_column=Column(
+            SQLEnum(RequestTypeEnum, native_enum=False, length=20), nullable=False
+        )
     )
     status: StatusTypeEnum = Field(
-        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False)
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
     )
     user_id: int = Field(foreign_key="user.id")
 
@@ -248,7 +254,9 @@ class UserCourse(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     course_id: int = Field(foreign_key="course.id")
     status: StatusTypeEnum = Field(
-        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False)
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
     )
 
     user: Optional["User"] = Relationship(back_populates="user_courses")
@@ -260,7 +268,9 @@ class ToDo(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")
     task: str = Field(nullable=False)
     status: StatusTypeEnum = Field(
-        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False)
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
     )
     date_created: datetime = Field(default_factory=current_utc_time)
     deadline: Optional[datetime] = Field(default=None)

@@ -59,9 +59,7 @@ def make_app():
         return Response(
             content=yaml_schema,
             media_type="application/x-yaml",
-            headers={
-                "Content-Disposition": "attachment; filename=openapi.yaml"
-            }
+            headers={"Content-Disposition": "attachment; filename=openapi.yaml"},
         )
 
     return app
