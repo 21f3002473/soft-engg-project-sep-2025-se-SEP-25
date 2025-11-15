@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+from logging import getLogger
 from typing import Optional
 
 from app.config import Config
 from app.database import User, get_session
+from app.utils import current_utc_time
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -13,11 +15,13 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+logger = getLogger(__name__)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 SECRET_KEY = Config.SECRET_KEY
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_DAYS = 7
 
 
 class Token(BaseModel):
@@ -49,9 +53,9 @@ def authenticate_user(email: str, password: str):
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = current_utc_time() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = current_utc_time() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -75,6 +79,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         logger.error(f"Invalid token format. Expected 3 parts, got {len(token_parts)}")
         raise credentials_exception
     
+
+    if not token or len(token.strip()) == 0:
+        logger.error("Empty token received")
+        raise credentials_exception
+
+    token_parts = token.split(".")
+    if len(token_parts) != 3:
+        logger.error(f"Invalid token format. Expected 3 parts, got {len(token_parts)}")
+        raise credentials_exception
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")

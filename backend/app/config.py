@@ -12,7 +12,14 @@ load_dotenv(
 class Config:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
-    SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_hex(32))
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    if not SECRET_KEY:
+        SECRET_KEY = secrets.token_hex(32)
+        logging.warning(
+            "SECRET_KEY not found in environment variables. "
+            "Using temporary key - tokens will be invalidated on restart. "
+            "Set SECRET_KEY in .env file for persistent authentication."
+        )
 
     ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL", "admin@example.com")
     ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD", "admin")
@@ -32,6 +39,7 @@ class Config:
     OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
     if OPENAI_API_KEY is not None:
         os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     MODE = get_key(".env", "MODE")
 

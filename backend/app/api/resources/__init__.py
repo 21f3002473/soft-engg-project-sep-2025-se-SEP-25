@@ -3,14 +3,13 @@ from logging import getLogger
 
 from app.api.validators import UserLoginValidator
 from app.controllers import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ACCESS_TOKEN_EXPIRE_DAYS,
     authenticate_user,
     create_access_token,
     get_current_active_user,
 )
 from app.database import User, get_session
 from app.middleware import (
-    Role,
     can_manage_employees,
     can_manage_products,
     require_employee,
@@ -55,7 +54,7 @@ class UserLoginResource(Resource):
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
 
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token_expires = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
         access_token = create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )

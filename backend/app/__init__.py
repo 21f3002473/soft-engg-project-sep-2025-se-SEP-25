@@ -31,7 +31,7 @@ def make_app():
         max_age=600,
     )
 
-    _ = API(app)
+    API(app)
 
     @app.get("/")
     def index():

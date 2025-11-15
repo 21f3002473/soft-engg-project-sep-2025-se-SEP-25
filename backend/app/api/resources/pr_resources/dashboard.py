@@ -6,6 +6,10 @@ from app.middleware import require_pm
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session, select, func
+from app.middleware import require_pm
+from fastapi import Depends
+from fastapi_restful import Resource
+from sqlmodel import Session
 
 logger = getLogger(__name__)
 
@@ -117,6 +121,19 @@ class PRDashboardResource(Resource):
                         "completed_projects": completed_projects,
                         "pending_projects": pending_projects,
                     },
+            return {
+                "message": "Dashboard data retrieved successfully",
+                "user": {
+                    "id": current_user.id,
+                    "name": current_user.name,
+                    "email": current_user.email,
+                    "role": current_user.role,
+                },
+                "projects": [],
+                "stats": {
+                    "total_projects": 0,
+                    "active_projects": 0,
+                    "completed_projects": 0,
                 },
             }
         except Exception as e:
