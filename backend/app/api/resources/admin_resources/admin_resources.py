@@ -51,6 +51,7 @@ class AccountUpdatePayload(BaseModel):
 # Helpers
 # -----------------------------
 
+
 def _normalize_role(role_in: str) -> str:
     """Map friendly role names to internal Role enum values."""
     value = role_in.strip().lower()

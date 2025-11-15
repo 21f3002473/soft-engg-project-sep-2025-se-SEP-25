@@ -7,6 +7,7 @@ from app.database import create_root_user, get_session, init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()

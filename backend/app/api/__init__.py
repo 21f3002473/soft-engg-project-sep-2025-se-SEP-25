@@ -1,8 +1,8 @@
 from datetime import timedelta
 
 from app.api.resources import ProtectedResource, UserLoginResource
-from app.api.resources.employee import *
 from app.api.resources.admin_resources.admin_resources import *
+from app.api.resources.employee import *
 from app.api.resources.pr_resources.dashboard import PRDashboardResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
@@ -26,7 +26,7 @@ class API:
 
         # Admin
         admin_base_url = "/api/admin"
-        
+
         self.register_router(AdminRegistrationResource, f"{admin_base_url}/register")
         self.register_router(AdminDashboardResource, f"{admin_base_url}/summary")
         self.register_router(AdminEmployeeResource, f"{admin_base_url}/employees")
