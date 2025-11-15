@@ -1,4 +1,7 @@
 from .dashboard import DashboardResource
+from .dashboard import AllToDoResource
+from .dashboard import ToDoResource
+
 from .learning import LearningResource
 
 from .request import LeaveRequestResource
@@ -20,7 +23,11 @@ from .assistant import AIAssistantResource
 
 __all__ = [
     "DashboardResource",
+    "AllToDoResource",
+    "ToDoResource",
+    
     "LearningResource",
+    
     "LeaveRequestResource",
     "ReimbursementRequestResource",
     "TransferRequestResource",

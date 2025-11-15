@@ -3,6 +3,7 @@ from functools import wraps
 from typing import Callable, List
 
 from app.database import User, RoleEnum
+from app.controllers import get_current_user
 from fastapi import Depends, HTTPException, status
 
 

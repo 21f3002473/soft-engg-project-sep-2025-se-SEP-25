@@ -5,6 +5,7 @@ from .employee_models import (
     User,
     Attendance,
     AttendanceStatusEnum,
+    Announcement,
     Course,
     Department,
     Leave,
@@ -15,6 +16,7 @@ from .employee_models import (
     StatusTypeEnum,
     ToDo,
     Transfer,
+    FAQ,
     User,
     UserCourse,
 )
@@ -32,11 +34,11 @@ __all__ = [
     "Log",
     "Backup",
     "BackupTypeEnum",
-
     "RoleEnum",
     "User",
     "Attendance",
     "AttendanceStatusEnum",
+    "Announcement",
     "Department",
     "Request",
     "RequestTypeEnum",

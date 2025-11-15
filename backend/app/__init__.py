@@ -42,6 +42,8 @@ def make_app():
     # Employee
     from app.api.resources.employee import (
         DashboardResource,
+        AllToDoResource,
+        ToDoResource,
         LearningResource,
         LeaveRequestResource,
         ReimbursementRequestResource,
@@ -59,8 +61,12 @@ def make_app():
     )
 
     emp_base_url = "/api/employee"
+    hr_base_url = "/api/hr"
 
     api.register_router(DashboardResource, f"{emp_base_url}/dashboard")
+    api.register_router(AllToDoResource, f"{emp_base_url}/todo")
+    api.register_router(ToDoResource, f"{emp_base_url}/todo/{{task_id}}")
+
     api.register_router(LearningResource, f"{emp_base_url}/learning")
 
     api.register_router(AllLeaveRequestResource, f"{emp_base_url}/requests/leave")
@@ -76,8 +82,8 @@ def make_app():
     api.register_router(TransferRequestResource, f"{emp_base_url}/requests/transfer/{{transfer_id}}")
 
     api.register_router(HRFAQListEmployeeResource, f"{emp_base_url}/hr-faqs")
-    api.register_router(HRFAQCreateResource, "/api/hr/faq")
-    api.register_router(HRFAQDetailResource, "/api/hr/faq/{faq_id}")
+    api.register_router(HRFAQCreateResource, f"{hr_base_url}/faq")
+    api.register_router(HRFAQDetailResource, f"{hr_base_url}/faq/{{faq_id}}")
 
     api.register_router(AllQuickNotesResource, f"{emp_base_url}/writing")
     api.register_router(QuickNotesResource, f"{emp_base_url}/writing/{{note_id}}")
