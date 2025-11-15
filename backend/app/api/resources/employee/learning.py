@@ -369,7 +369,10 @@ class CourseRecommendationResource(Resource):
             ["Machine Learning", "Deep Learning Basics"]
             """
 
-            GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+            GEMINI_URL = (
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                "gemini-2.0-flash:generateContent"
+            )
 
             async with httpx.AsyncClient(timeout=20.0) as client:
                 response = await client.post(
