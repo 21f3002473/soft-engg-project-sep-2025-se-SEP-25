@@ -1,6 +1,6 @@
 from app.config import Config
 from app.database.connection import engine
-from app.database.employee_models import User, RoleEnum
+from app.database.employee_models import RoleEnum, User
 from sqlmodel import Session, select
 
 

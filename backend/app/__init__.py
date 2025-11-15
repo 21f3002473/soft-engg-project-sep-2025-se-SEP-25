@@ -49,13 +49,18 @@ def make_app():
         ReimbursementRequestResource,
         TransferRequestResource,
         AllLeaveRequestResource,
+        AllQuickNotesResource,
         AllReimbursementRequestResource,
         AllTransferRequestResource,
+        DashboardResource,
         HRFAQCreateResource,
         HRFAQDetailResource,
         HRFAQListEmployeeResource,
-        AllQuickNotesResource,
+        LearningResource,
+        LeaveRequestResource,
         QuickNotesResource,
+        ReimbursementRequestResource,
+        TransferRequestResource,
         AccountResource,
         AIAssistantResource,
     )
@@ -74,12 +79,16 @@ def make_app():
         AllReimbursementRequestResource, f"{emp_base_url}/requests/reimbursement"
     )
     api.register_router(AllTransferRequestResource, f"{emp_base_url}/requests/transfer")
-    api.register_router(LeaveRequestResource, f"{emp_base_url}/requests/leave/{{leave_id}}")
+    api.register_router(
+        LeaveRequestResource, f"{emp_base_url}/requests/leave/{{leave_id}}"
+    )
     api.register_router(
         ReimbursementRequestResource,
         f"{emp_base_url}/requests/reimbursement/{{reimbursement_id}}",
     )
-    api.register_router(TransferRequestResource, f"{emp_base_url}/requests/transfer/{{transfer_id}}")
+    api.register_router(
+        TransferRequestResource, f"{emp_base_url}/requests/transfer/{{transfer_id}}"
+    )
 
     api.register_router(HRFAQListEmployeeResource, f"{emp_base_url}/hr-faqs")
     api.register_router(HRFAQCreateResource, f"{hr_base_url}/faq")

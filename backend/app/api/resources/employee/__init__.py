@@ -34,14 +34,11 @@ __all__ = [
     "AllLeaveRequestResource",
     "AllReimbursementRequestResource",
     "AllTransferRequestResource",
-    
     "HRFAQDetailResource",
     "HRFAQCreateResource",
     "HRFAQListEmployeeResource",
-    
     "QuickNotesResource",
     "AllQuickNotesResource",
-    
     "AccountResource",
     "AIAssistantResource",
 ]
