@@ -5,11 +5,7 @@ from app.database.product_manager_models import Client, Project, StatusTypeEnum
 from app.middleware import require_pm
 from fastapi import Depends
 from fastapi_restful import Resource
-from sqlmodel import Session, select, func
-from app.middleware import require_pm
-from fastapi import Depends
-from fastapi_restful import Resource
-from sqlmodel import Session
+from sqlmodel import Session, func, select
 
 logger = getLogger(__name__)
 
@@ -33,30 +29,31 @@ class PRDashboardResource(Resource):
     Methods:
         get(current_user: User, session: Session) -> dict:
             Retrieves dashboard data for the logged-in project manager.
-            
+
             Args:
                 current_user (User): The authenticated project manager user (injected via require_pm() dependency).
                 session (Session): Database session for executing queries (injected via get_session dependency).
-            
+
             Returns:
                 dict: A dictionary containing:
                     - message (str): Status message
                     - data (dict): Dashboard data including:
                         - user (dict): Current user details (id, name, email, role)
                         - ClientList (list[dict]): List of clients with id, clientname, and description
-                        - projects (list[dict]): List of projects with id, project_id, project_name, 
+                        - projects (list[dict]): List of projects with id, project_id, project_name,
                                                 description, status, client_id, manager_id
-                        - stats (dict): Project statistics with counts of total, active, completed, 
+                        - stats (dict): Project statistics with counts of total, active, completed,
                                        and pending projects
                 - On error, returns (dict, int): Error message with 500 status code
-            
+
             Raises:
                 None (Exceptions are caught and logged internally)
-            
+
             Logs:
                 - Info: Dashboard access by user email
                 - Error: Any exceptions encountered during execution with full traceback
     """
+
     def get(
         self,
         current_user: User = Depends(require_pm()),
@@ -75,7 +72,8 @@ class PRDashboardResource(Resource):
                 {
                     "id": client.id,
                     "clientname": client.client_name,
-                    "description": client.detail_base64 or f"Details about {client.client_name}",
+                    "description": client.detail_base64
+                    or f"Details about {client.client_name}",
                 }
                 for client in clients
             ]
@@ -100,9 +98,15 @@ class PRDashboardResource(Resource):
 
             # Calculate project statistics
             total_projects = len(projects)
-            active_projects = sum(1 for p in projects if p.status == StatusTypeEnum.IN_PROGRESS)
-            completed_projects = sum(1 for p in projects if p.status == StatusTypeEnum.COMPLETED)
-            pending_projects = sum(1 for p in projects if p.status == StatusTypeEnum.PENDING)
+            active_projects = sum(
+                1 for p in projects if p.status == StatusTypeEnum.IN_PROGRESS
+            )
+            completed_projects = sum(
+                1 for p in projects if p.status == StatusTypeEnum.COMPLETED
+            )
+            pending_projects = sum(
+                1 for p in projects if p.status == StatusTypeEnum.PENDING
+            )
 
             return {
                 "message": "Dashboard data retrieved successfully",
@@ -130,5 +134,3 @@ class PRDashboardResource(Resource):
                 "error": str(e),
                 "status": "error",
             }, 500
-
-

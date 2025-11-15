@@ -4,7 +4,6 @@ from typing import List
 from app.database import RoleEnum, User
 from fastapi import Depends, HTTPException, status
 
-
 ROLE_HIERARCHY = {
     RoleEnum.ROOT: [
         RoleEnum.ROOT,

@@ -10,8 +10,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlmodel import Session, select
-from logging import getLogger
-
 
 logger = getLogger(__name__)
 
@@ -67,18 +65,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
-    
+
     if not token or len(token.strip()) == 0:
         logger.error("Empty token received")
         raise credentials_exception
-    
-    
-    token_parts = token.split('.')
+
+    token_parts = token.split(".")
     if len(token_parts) != 3:
         logger.error(f"Invalid token format. Expected 3 parts, got {len(token_parts)}")
         raise credentials_exception
-    
 
     if not token or len(token.strip()) == 0:
         logger.error("Empty token received")

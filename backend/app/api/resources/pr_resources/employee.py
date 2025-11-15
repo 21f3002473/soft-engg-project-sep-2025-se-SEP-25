@@ -5,7 +5,7 @@ from app.database.product_manager_models import EmpTodo, StatusTypeEnum
 from app.middleware import require_pm
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session, select, func
+from sqlmodel import Session, func, select
 
 logger = getLogger(__name__)
 
@@ -23,6 +23,7 @@ class EmployeesResource(Resource):
     Methods:
         get: Retrieve all employees in the system with their basic information.
     """
+
     def get(
         self,
         current_user: User = Depends(require_pm()),
@@ -33,7 +34,7 @@ class EmployeesResource(Resource):
             logger.info(f"Fetching all employees by {current_user.email}")
 
             # Query all users (employees)
-            statement = select(User).where(User.role == 'employee')
+            statement = select(User).where(User.role == "employee")
             employees = session.exec(statement).all()
 
             # Format employee data
@@ -75,6 +76,7 @@ class EmployeePerformanceResource(Resource):
     Methods:
         get(employee_id, current_user, session): Retrieves performance data for a specific employee
     """
+
     def get(
         self,
         employee_id: int,
@@ -83,7 +85,9 @@ class EmployeePerformanceResource(Resource):
     ):
         """Get performance data for a specific employee"""
         try:
-            logger.info(f"Fetching performance for employee {employee_id} by {current_user.email}")
+            logger.info(
+                f"Fetching performance for employee {employee_id} by {current_user.email}"
+            )
 
             # Query employee
             employee_statement = select(User).where(User.id == employee_id)
@@ -98,14 +102,24 @@ class EmployeePerformanceResource(Resource):
 
             # Calculate current stats
             total_tasks = len(todos)
-            completed_tasks = sum(1 for t in todos if t.status == StatusTypeEnum.COMPLETED)
-            in_progress_tasks = sum(1 for t in todos if t.status == StatusTypeEnum.PENDING)
+            completed_tasks = sum(
+                1 for t in todos if t.status == StatusTypeEnum.COMPLETED
+            )
+            in_progress_tasks = sum(
+                1 for t in todos if t.status == StatusTypeEnum.PENDING
+            )
             pending_tasks = total_tasks - completed_tasks - in_progress_tasks
 
             # Calculate percentages for pie chart
-            completed_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
-            in_progress_percentage = (in_progress_tasks / total_tasks * 100) if total_tasks > 0 else 0
-            pending_percentage = (pending_tasks / total_tasks * 100) if total_tasks > 0 else 0
+            completed_percentage = (
+                (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+            )
+            in_progress_percentage = (
+                (in_progress_tasks / total_tasks * 100) if total_tasks > 0 else 0
+            )
+            pending_percentage = (
+                (pending_tasks / total_tasks * 100) if total_tasks > 0 else 0
+            )
 
             # Mock performance trend data (you can replace this with actual data from database)
             performance_trends = [
@@ -142,5 +156,7 @@ class EmployeePerformanceResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Error fetching employee performance: {str(e)}", exc_info=True)
+            logger.error(
+                f"Error fetching employee performance: {str(e)}", exc_info=True
+            )
             raise HTTPException(status_code=500, detail="Internal server error")

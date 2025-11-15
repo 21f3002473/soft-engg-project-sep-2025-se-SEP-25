@@ -3,7 +3,17 @@ from datetime import timedelta
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.admin_resources.admin_resources import *
 from app.api.resources.employee import *
+from app.api.resources.pr_resources.clients import (
+    ClientRequirementResource,
+    ClientsResource,
+    ClientUpdatesResource,
+)
 from app.api.resources.pr_resources.dashboard import PRDashboardResource
+from app.api.resources.pr_resources.employee import (
+    EmployeePerformanceResource,
+    EmployeesResource,
+)
+from app.api.resources.pr_resources.project import ProjectsResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -13,11 +23,6 @@ from app.controllers import (
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_restful import Api, Resource
-
-from app.api.resources.pr_resources.dashboard import PRDashboardResource
-from app.api.resources.pr_resources.clients import ClientsResource, ClientRequirementResource, ClientUpdatesResource
-from app.api.resources.pr_resources.employee import EmployeesResource, EmployeePerformanceResource
-from app.api.resources.pr_resources.project import ProjectsResource
 
 
 class API:
@@ -32,10 +37,14 @@ class API:
         self.register_router(PRDashboardResource, "/pr/dashboard")
         self.register_router(ClientsResource, "/pr/clients")
 
-        self.register_router(ClientRequirementResource, "/pr/client/requirements/{client_id}")
+        self.register_router(
+            ClientRequirementResource, "/pr/client/requirements/{client_id}"
+        )
         self.register_router(ClientUpdatesResource, "/pr/client/updates/{client_id}")
         self.register_router(EmployeesResource, "/pr/employees")
-        self.register_router(EmployeePerformanceResource, "/pr/employee/performance/{employee_id}")
+        self.register_router(
+            EmployeePerformanceResource, "/pr/employee/performance/{employee_id}"
+        )
         self.register_router(ProjectsResource, "/pr/projects")
 
         # Admin

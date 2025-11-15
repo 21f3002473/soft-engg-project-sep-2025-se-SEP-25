@@ -2,12 +2,12 @@ from logging import getLogger
 from typing import Optional
 
 from app.database import User, get_session
-from app.database.product_manager_models import Project, Client, StatusTypeEnum
+from app.database.product_manager_models import Client, Project, StatusTypeEnum
 from app.middleware import require_pm
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session, select
 from pydantic import BaseModel
+from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 
@@ -43,6 +43,7 @@ class ProjectsResource(Resource):
     All operations require PM (Project Manager) authentication and maintain audit logs
     of actions performed by users.
     """
+
     def get(
         self,
         current_user: User = Depends(require_pm()),
@@ -50,16 +51,16 @@ class ProjectsResource(Resource):
     ):
         """
         Retrieve all projects in the system.
-        
+
         Fetches a complete list of all projects and returns their details along with a total count.
         Only accessible by users with Project Manager (PM) role.
-        
+
         Args:
             current_user (User): The authenticated user making the request, must have PM role.
                 Obtained via dependency injection using `require_pm()`.
             session (Session): Database session for executing queries.
                 Obtained via dependency injection using `get_session()`.
-        
+
         Returns:
             dict: A dictionary containing:
                 - message (str): Success message indicating projects were retrieved.
@@ -73,10 +74,10 @@ class ProjectsResource(Resource):
                         - client_id (str): Associated client identifier
                         - manager_id (str): Associated manager identifier
                     - total_projects (int): Total number of projects retrieved
-        
+
         Raises:
             HTTPException: Status code 500 if an error occurs during project retrieval.
-        
+
         Logs:
             - Info: Logs the user email when fetching projects begins.
             - Error: Logs any exceptions that occur during the retrieval process.
@@ -155,18 +156,24 @@ class ProjectsResource(Resource):
             logger.info(f"Creating project by {current_user.email}")
 
             # Check if project_id already exists
-            existing = session.exec(select(Project).where(Project.project_id == data.project_id)).first()
+            existing = session.exec(
+                select(Project).where(Project.project_id == data.project_id)
+            ).first()
             if existing:
                 raise HTTPException(status_code=400, detail="Project ID already exists")
 
             # Verify client exists
-            client = session.exec(select(Client).where(Client.id == data.client_id)).first()
+            client = session.exec(
+                select(Client).where(Client.id == data.client_id)
+            ).first()
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
             # Verify manager exists if provided
             if data.manager_id:
-                manager = session.exec(select(User).where(User.id == data.manager_id)).first()
+                manager = session.exec(
+                    select(User).where(User.id == data.manager_id)
+                ).first()
                 if not manager:
                     raise HTTPException(status_code=404, detail="Manager not found")
 
@@ -224,10 +231,10 @@ class ProjectsResource(Resource):
         Returns:
             dict: A dictionary containing:
                 - message (str): Success message indicating the project was updated
-                - data (dict): Updated project information including id, project_id, 
+                - data (dict): Updated project information including id, project_id,
                   project_name, status, and description
         Raises:
-            HTTPException: 
+            HTTPException:
                 - 404 if project with given project_id is not found
                 - 404 if manager_id is provided but the manager user is not found
                 - 500 if an internal server error occurs during the update process
@@ -238,7 +245,9 @@ class ProjectsResource(Resource):
         try:
             logger.info(f"Updating project {project_id} by {current_user.email}")
 
-            project = session.exec(select(Project).where(Project.id == project_id)).first()
+            project = session.exec(
+                select(Project).where(Project.id == project_id)
+            ).first()
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
@@ -251,7 +260,9 @@ class ProjectsResource(Resource):
                 project.status = data.status
             if data.manager_id is not None:
                 # Verify manager exists
-                manager = session.exec(select(User).where(User.id == data.manager_id)).first()
+                manager = session.exec(
+                    select(User).where(User.id == data.manager_id)
+                ).first()
                 if not manager:
                     raise HTTPException(status_code=404, detail="Manager not found")
                 project.manager_id = data.manager_id
@@ -298,7 +309,7 @@ class ProjectsResource(Resource):
                 - message (str): Success message indicating the project was deleted.
                 - data (dict): Dictionary containing the deleted project's id.
         Raises:
-            HTTPException: 
+            HTTPException:
                 - status_code 404: If the project with the given project_id does not exist.
                 - status_code 500: If an unexpected error occurs during deletion.
         Note:
@@ -309,7 +320,9 @@ class ProjectsResource(Resource):
         try:
             logger.info(f"Deleting project {project_id} by {current_user.email}")
 
-            project = session.exec(select(Project).where(Project.id == project_id)).first()
+            project = session.exec(
+                select(Project).where(Project.id == project_id)
+            ).first()
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 

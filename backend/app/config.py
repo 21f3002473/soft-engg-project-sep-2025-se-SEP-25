@@ -52,4 +52,3 @@ class Config:
     }
     DATABASE_URL = f"postgresql://{POSTGRES['user']}:{POSTGRES['password']}@{POSTGRES['host']}:{POSTGRES['port']}/{POSTGRES['db']}"
     print("DATABASE_URL:", DATABASE_URL)
-    
