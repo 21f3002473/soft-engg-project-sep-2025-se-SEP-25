@@ -35,7 +35,7 @@ def make_app():
 
     api = API(app)
 
-    # General
+    # General 
     from app.api.resources import UserLoginResource
 
     api.register_router(UserLoginResource, "/api/login")
