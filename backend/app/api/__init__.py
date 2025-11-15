@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from app.api.resources import ProtectedResource, UserLoginResource
+from app.api.resources.pr_resources.dashboard import PRDashboardResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     Token,
@@ -18,6 +19,8 @@ class API:
         self.api = Api(FastAPI)
         self.register_router(UserLoginResource, "/user/login")
         self.register_router(ProtectedResource, "/me")
+        # product manager routes
+        self.register_router(PRDashboardResource, "/pr/dashboard")
 
         @FastAPI.post("/token", response_model=Token)
         async def login_for_access_token(

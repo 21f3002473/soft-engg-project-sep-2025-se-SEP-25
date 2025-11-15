@@ -1,3 +1,5 @@
 .venv/
 __pycache__/
 .env
+admin_api_docs.md
+requests.http
