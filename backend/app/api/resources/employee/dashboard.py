@@ -1,38 +1,55 @@
 from logging import getLogger
+
+from app.database import (
+    Announcement,
+    Request,
+    StatusTypeEnum,
+    ToDo,
+    User,
+    UserCourse,
+    get_session,
+)
+from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session, select, func
-
-from app.database import get_session, User, ToDo, Request, UserCourse, Announcement, StatusTypeEnum
-from app.middleware import require_employee
+from sqlmodel import Session, func, select
 
 logger = getLogger(__name__)
 
+
 class DashboardResource(Resource):
-    def get(self, current_user: User = Depends(require_employee()), session: Session = Depends(get_session),):
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
 
         try:
             user_id = current_user.id
 
             pending_count = session.exec(
-                select(func.count()).select_from(ToDo)
+                select(func.count())
+                .select_from(ToDo)
                 .where(ToDo.user_id == user_id)
                 .where(ToDo.status == StatusTypeEnum.PENDING)
             ).one()
 
             completed_count = session.exec(
-                select(func.count()).select_from(ToDo)
+                select(func.count())
+                .select_from(ToDo)
                 .where(ToDo.user_id == user_id)
                 .where(ToDo.status == StatusTypeEnum.COMPLETED)
             ).one()
 
             req_count = session.exec(
-                select(func.count()).select_from(Request)
+                select(func.count())
+                .select_from(Request)
                 .where(Request.user_id == user_id)
             ).one()
 
             courses_completed = session.exec(
-                select(func.count()).select_from(UserCourse)
+                select(func.count())
+                .select_from(UserCourse)
                 .where(UserCourse.user_id == user_id)
                 .where(UserCourse.status == StatusTypeEnum.COMPLETED)
             ).one()
@@ -55,9 +72,7 @@ class DashboardResource(Resource):
             ]
 
             announcements = session.exec(
-                select(Announcement)
-                .order_by(Announcement.created_at.desc())
-                .limit(10)
+                select(Announcement).order_by(Announcement.created_at.desc()).limit(10)
             ).all()
 
             announcement_list = [
@@ -71,17 +86,14 @@ class DashboardResource(Resource):
 
             return {
                 "message": "Dashboard data retrieved successfully",
-
                 "stats": {
                     "pending_tasks": pending_count,
                     "completed_tasks": completed_count,
                     "requests": req_count,
                     "courses_completed": courses_completed,
                 },
-
                 "tasks": task_list,
                 "announcements": announcement_list,
-
                 "user": {
                     "id": current_user.id,
                     "name": current_user.name,

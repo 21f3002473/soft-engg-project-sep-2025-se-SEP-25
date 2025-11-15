@@ -1,12 +1,11 @@
 from logging import getLogger
+
+from app.api.validators import QuickNoteCreate, QuickNoteOut, QuickNoteUpdate
+from app.database import QuickNote, User, get_session
+from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-
-from app.database import get_session, User
-from app.middleware import require_employee
-from app.database import QuickNote
-from app.api.validators import QuickNoteCreate, QuickNoteUpdate, QuickNoteOut
 
 logger = getLogger(__name__)
 

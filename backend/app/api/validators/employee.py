@@ -1,6 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class LeaveCreate(BaseModel):
@@ -27,12 +28,14 @@ class FAQCreate(BaseModel):
     question: str
     answer: str
 
+
 class FAQOut(BaseModel):
     id: int
     question: str
     answer: str
 
     model_config = {"from_attributes": True}
+
 
 class QuickNoteCreate(BaseModel):
     topic: Optional[str] = "Quick Note"
@@ -50,6 +53,7 @@ class QuickNoteOut(BaseModel):
     notes: str
 
     model_config = {"from_attributes": True}
+
 
 class AccountUpdate(BaseModel):
     name: Optional[str] = None

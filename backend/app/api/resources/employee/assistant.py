@@ -1,13 +1,13 @@
 from logging import getLogger
+
+import httpx
+from app.api.validators import ChatMessage, ChatResponse
+from app.config import Config
+from app.database import User, get_session
+from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session
-import httpx
-
-from app.database import get_session, User
-from app.middleware import require_employee
-from app.api.validators import ChatMessage, ChatResponse
-from app.config import Config
 
 logger = getLogger(__name__)
 

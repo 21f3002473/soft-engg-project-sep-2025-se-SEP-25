@@ -1,12 +1,11 @@
 from logging import getLogger
+
+from app.api.validators import FAQCreate, FAQOut
+from app.database import FAQ, User, get_session
+from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-
-from app.database import get_session, User
-from app.middleware import require_employee, require_hr
-from app.database import FAQ
-from app.api.validators import FAQCreate, FAQOut
 
 logger = getLogger(__name__)
 

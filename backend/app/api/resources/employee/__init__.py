@@ -16,15 +16,11 @@ from .writing import QuickNotesResource
 from .writing import AllQuickNotesResource
 
 from .account import AccountResource
-
 from .assistant import AIAssistantResource
-
 
 __all__ = [
     "DashboardResource",
-    
     "LearningResource",
-    
     "LeaveRequestResource",
     "ReimbursementRequestResource",
     "TransferRequestResource",
@@ -40,6 +36,5 @@ __all__ = [
     "AllQuickNotesResource",
     
     "AccountResource",
-    
     "AIAssistantResource",
 ]

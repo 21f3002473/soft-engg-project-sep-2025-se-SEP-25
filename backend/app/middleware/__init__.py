@@ -4,7 +4,6 @@ from typing import Callable, List
 
 from app.database import User, RoleEnum
 from fastapi import Depends, HTTPException, status
-from app.controllers import get_current_user
 
 
 ROLE_HIERARCHY = {
