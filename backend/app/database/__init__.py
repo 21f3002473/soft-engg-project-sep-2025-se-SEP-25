@@ -1,8 +1,6 @@
 from .admin_models import Backup, BackupTypeEnum, Log
 from .connection import engine, get_session, init_db
 from .employee_models import (
-    RoleEnum,
-    User,
     Attendance,
     AttendanceStatusEnum,
     Course,
@@ -12,6 +10,7 @@ from .employee_models import (
     Reimbursement,
     Request,
     RequestTypeEnum,
+    RoleEnum,
     StatusTypeEnum,
     ToDo,
     Transfer,
@@ -32,7 +31,6 @@ __all__ = [
     "Log",
     "Backup",
     "BackupTypeEnum",
-
     "RoleEnum",
     "User",
     "Attendance",

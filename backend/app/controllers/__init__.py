@@ -3,12 +3,12 @@ from typing import Optional
 
 from app.config import Config
 from app.database import User, get_session
+from app.utils import current_utc_time
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlmodel import Session, select
-from app.utils import current_utc_time
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
