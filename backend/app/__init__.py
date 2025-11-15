@@ -7,8 +7,6 @@ from app.database import create_root_user, get_session, init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from backend.app import api
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,7 +33,7 @@ def make_app():
 
     API(app)
 
-    @app.get("/api")
+    @app.get("/")
     def index():
         return {
             "message": "app_running",
@@ -48,5 +46,4 @@ def make_app():
     return app
 
 
-# Create app instance for uvicorn to reference
 app = make_app()

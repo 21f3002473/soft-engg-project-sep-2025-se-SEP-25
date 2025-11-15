@@ -23,7 +23,7 @@ def create_root_user():
             name="root",
             password_hash=password_hash,
             salt=salt,
-            role=RoleEnum.EMPLOYEE,
+            role=RoleEnum.ROOT,
         )
         session.add(root_user)
         session.commit()

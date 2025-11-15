@@ -6,7 +6,7 @@ from typing import List, Optional
 from app.controllers import get_current_active_user
 from app.database import User, get_session
 from app.database.admin_models import Backup, BackupTypeEnum, Log
-from app.middleware import Role, can_view_system_logs, require_root
+from app.middleware import RoleEnum, can_view_system_logs, require_root
 from fastapi import Depends, HTTPException, Query, status
 from fastapi_restful import Resource
 from pydantic import BaseModel, EmailStr, Field
@@ -56,19 +56,19 @@ def _normalize_role(role_in: str) -> str:
     """Map friendly role names to internal Role enum values."""
     value = role_in.strip().lower()
     mapping = {
-        "hr": Role.HUMAN_RESOURCE.value,
-        "human resource": Role.HUMAN_RESOURCE.value,
-        "human_resource": Role.HUMAN_RESOURCE.value,
-        "product manager": Role.PRODUCT_MANAGER.value,
-        "product_manager": Role.PRODUCT_MANAGER.value,
-        "pm": Role.PRODUCT_MANAGER.value,
-        "employee": Role.EMPLOYEE.value,
-        "root": Role.ROOT.value,
+        "hr": RoleEnum.HUMAN_RESOURCE.value,
+        "human resource": RoleEnum.HUMAN_RESOURCE.value,
+        "human_resource": RoleEnum.HUMAN_RESOURCE.value,
+        "product manager": RoleEnum.PRODUCT_MANAGER.value,
+        "product_manager": RoleEnum.PRODUCT_MANAGER.value,
+        "pm": RoleEnum.PRODUCT_MANAGER.value,
+        "employee": RoleEnum.EMPLOYEE.value,
+        "root": RoleEnum.ROOT.value,
         # allow passing raw values too
-        Role.HUMAN_RESOURCE.value: Role.HUMAN_RESOURCE.value,
-        Role.PRODUCT_MANAGER.value: Role.PRODUCT_MANAGER.value,
-        Role.EMPLOYEE.value: Role.EMPLOYEE.value,
-        Role.ROOT.value: Role.ROOT.value,
+        RoleEnum.HUMAN_RESOURCE.value: RoleEnum.HUMAN_RESOURCE.value,
+        RoleEnum.PRODUCT_MANAGER.value: RoleEnum.PRODUCT_MANAGER.value,
+        RoleEnum.EMPLOYEE.value: RoleEnum.EMPLOYEE.value,
+        RoleEnum.ROOT.value: RoleEnum.ROOT.value,
     }
     if value not in mapping:
         raise HTTPException(
@@ -120,7 +120,7 @@ class AdminRegistrationResource(Resource):
             email=str(payload.email).lower(),
             password_hash=password_hash,
             salt=salt,
-            role=Role.ROOT.value,
+            role=RoleEnum.ROOT.value,
         )
         session.add(user)
         session.commit()

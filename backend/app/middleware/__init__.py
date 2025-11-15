@@ -18,8 +18,6 @@ ROLE_HIERARCHY = {
 }
 
 
-##########################################################
-#  this dummy data access and we dont need it for now
 class Permission(str, Enum):
     """System permissions mapped to roles"""
 
@@ -46,7 +44,6 @@ class Permission(str, Enum):
     SYSTEM_CONFIG = "system_config"
 
 
-# this dummy data access and we dont need it for now
 ROLE_PERMISSIONS = {
     RoleEnum.ROOT: [perm for perm in Permission],
     RoleEnum.HUMAN_RESOURCE: [
@@ -119,6 +116,7 @@ def require_root():
     from app.controllers import get_current_active_user
 
     def check_root(current_user: User = Depends(get_current_active_user)) -> User:
+        print(current_user.role, RoleEnum.ROOT)
         if not check_role_access(current_user.role, [RoleEnum.ROOT]):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
