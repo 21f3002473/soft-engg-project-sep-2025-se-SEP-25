@@ -356,7 +356,7 @@ class CourseRecommendationResource(Resource):
                 for cid in assigned_course_ids
                 if session.get(Course, cid)
             ]
-            
+
             courses = session.exec(select(Course)).all()
 
             all_course_names = [c.course_name for c in courses]
@@ -411,3 +411,38 @@ class CourseRecommendationResource(Resource):
         except Exception as e:
             logger.error(f"Recommendation error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class EmployeeCourseUpdateByCourseIdResource(Resource):
+
+    def put(
+        self,
+        course_id: int,
+        data: dict,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Employee: Update status of an assigned course (using course_id)"""
+
+        uc = session.exec(
+            select(UserCourse)
+            .where(UserCourse.user_id == current_user.id)
+            .where(UserCourse.course_id == course_id)
+        ).first()
+
+        if not uc:
+            raise HTTPException(404, "Course assignment not found")
+
+        if "status" not in data:
+            raise HTTPException(400, "status field is required")
+
+        status = data["status"]
+        if status not in ["pending", "completed"]:
+            raise HTTPException(400, "Invalid status")
+
+        uc.status = StatusTypeEnum(status)
+
+        session.commit()
+        session.refresh(uc)
+
+        return {"message": "Course status updated"}

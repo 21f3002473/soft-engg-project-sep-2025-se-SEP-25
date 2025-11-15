@@ -17,6 +17,7 @@ from .learning import (
     CourseAssignmentDetailResource,
     CourseAssignmentEmployeeResource,
     CourseRecommendationResource,
+    EmployeeCourseUpdateByCourseIdResource,
 )
 
 from .request import (
@@ -48,6 +49,7 @@ __all__ = [
     "CourseAssignmentDetailResource",
     "CourseAssignmentEmployeeResource",
     "CourseRecommendationResource",
+    "EmployeeCourseUpdateByCourseIdResource",
     "LeaveRequestResource",
     "ReimbursementRequestResource",
     "TransferRequestResource",

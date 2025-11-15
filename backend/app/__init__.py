@@ -62,6 +62,7 @@ def make_app():
         CourseAssignmentDetailResource,
         CourseAssignmentEmployeeResource,
         CourseRecommendationResource,
+        EmployeeCourseUpdateByCourseIdResource,
         LeaveRequestResource,
         QuickNotesResource,
         ReimbursementRequestResource,
@@ -79,14 +80,17 @@ def make_app():
     api.register_router(ToDoResource, f"{emp_base_url}/todo/{{task_id}}")
     api.register_router(AnnouncementEmployeeResource, f"{emp_base_url}/annoucements")
     api.register_router(
-        AnnouncementAdminListCreateResource, f"{hr_base_url}/annoucement"
+        AnnouncementAdminListCreateResource, f"{hr_base_url}/annoucement/{{user_id}}"
     )
     api.register_router(
-        AnnouncementAdminDetailResource, f"{hr_base_url}/annoucement/{{ann_id}}"
+        AnnouncementAdminDetailResource, f"{hr_base_url}/annoucement/edit/{{ann_id}}"
     )
 
     api.register_router(LearningResource, f"{emp_base_url}/learning")
     api.register_router(CourseAssignmentEmployeeResource, f"{emp_base_url}/courses")
+    api.register_router(
+        EmployeeCourseUpdateByCourseIdResource, f"{emp_base_url}/course/{{course_id}}"
+    )
     api.register_router(CourseRecommendationResource, f"{emp_base_url}/recommendations")
     api.register_router(CourseAdminListCreateResource, f"{hr_base_url}/course")
     api.register_router(

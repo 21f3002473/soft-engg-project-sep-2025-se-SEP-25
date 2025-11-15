@@ -233,6 +233,7 @@ class AnnouncementAdminListCreateResource(Resource):
 
     def get(
         self,
+        user_id: int,
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
@@ -247,13 +248,14 @@ class AnnouncementAdminListCreateResource(Resource):
                 "id": a.id,
                 "announcement": a.announcement,
                 "created_at": a.created_at,
-                "user_id": a.user_id,
+                "user_id": user_id,
             }
             for a in ann_list
         ]
 
     def post(
         self,
+        user_id: int,
         data: dict,
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
@@ -265,7 +267,7 @@ class AnnouncementAdminListCreateResource(Resource):
             raise HTTPException(400, "announcement field is required")
 
         ann = Announcement(
-            user_id=current_user.id,
+            user_id=user_id,
             announcement=text,
         )
 
