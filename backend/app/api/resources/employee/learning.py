@@ -1,16 +1,13 @@
+import json
 from logging import getLogger
 
 import httpx
-import json
-
-from sqlmodel import Session, select
-
+from app.config import Config
+from app.database import Course, StatusTypeEnum, User, UserCourse, get_session
+from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-
-from app.config import Config
-from app.middleware import require_employee, require_hr
-from app.database import Course, User, UserCourse, get_session, StatusTypeEnum
+from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 
