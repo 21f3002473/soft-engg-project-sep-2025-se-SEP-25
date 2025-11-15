@@ -9,6 +9,7 @@ from .admin_models import (
 )
 
 from .employee_models import (
+    RoleEnum,
     User,
     Attendance,
     AttendanceStatusEnum,
@@ -52,6 +53,7 @@ __all__ = [
     "Backup",
     "BackupTypeEnum",
 
+    "RoleEnum",
     "User",
     "Attendance",
     "AttendanceStatusEnum",

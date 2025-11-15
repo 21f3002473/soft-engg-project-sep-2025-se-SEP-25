@@ -12,6 +12,13 @@ from sqlalchemy import event
 from sqlmodel import Field, Relationship, SQLModel
 
 
+class RoleEnum(str, Enum):
+    ROOT = "root"
+    HUMAN_RESOURCE = "human_resource"
+    PRODUCT_MANAGER = "product_manager"
+    EMPLOYEE = "employee"
+
+
 class User(SQLModel, table=True):
     __tablename__ = "user"
     id: int | None = Field(
@@ -30,16 +37,12 @@ class User(SQLModel, table=True):
         nullable=False,
     )
     salt: str = Field(default_factory=lambda: secrets.token_hex(16), nullable=False)
-    role: str = Field(
-        default="employee",
-        index=True,
-        nullable=False,
-    )
+    role: RoleEnum = Field(default=RoleEnum.EMPLOYEE)
 
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="user.id")
     img_base64: Optional[str] = Field(default=None)
-    
+
     quick_notes: list["QuickNote"] = Relationship(back_populates="user")
 
     attendances: list["Attendance"] = Relationship(back_populates="user")
@@ -258,6 +261,7 @@ class Announcement(SQLModel, table=True):
     created_at: datetime = Field(default_factory=current_utc_time)
 
     user: Optional["User"] = Relationship(back_populates="announcements")
+
 
 class FAQ(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

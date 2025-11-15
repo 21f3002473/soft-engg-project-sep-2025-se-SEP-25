@@ -37,7 +37,7 @@ def make_app():
     # General
     from app.api.resources import UserLoginResource
 
-    api.register_router(UserLoginResource, "/api/user")
+    api.register_router(UserLoginResource, "/api/login")
 
     # Employee
     from app.api.resources.employee import (
@@ -46,28 +46,45 @@ def make_app():
         LeaveRequestResource,
         ReimbursementRequestResource,
         TransferRequestResource,
-        HRFAQResource,
+        AllLeaveRequestResource,
+        AllReimbursementRequestResource,
+        AllTransferRequestResource,
+        HRFAQCreateResource,
+        HRFAQDetailResource,
+        HRFAQListEmployeeResource,
+        AllQuickNotesResource,
         QuickNotesResource,
         AccountResource,
         AIAssistantResource,
     )
 
-    api.register_router(DashboardResource, "/api/employee/dashboard")
-    api.register_router(LearningResource, "/api/employee/learning")
+    emp_base_url = "/api/employee"
 
-    api.register_router(LeaveRequestResource, "/api/employee/requests/leave")
+    api.register_router(DashboardResource, f"{emp_base_url}/dashboard")
+    api.register_router(LearningResource, f"{emp_base_url}/learning")
+
+    api.register_router(AllLeaveRequestResource, f"{emp_base_url}/requests/leave")
     api.register_router(
-        ReimbursementRequestResource, "/api/employee/requests/reimbursement"
+        AllReimbursementRequestResource, f"{emp_base_url}/requests/reimbursement"
     )
-    api.register_router(TransferRequestResource, "/requests/transfer")
+    api.register_router(AllTransferRequestResource, f"{emp_base_url}/requests/transfer")
+    api.register_router(LeaveRequestResource, f"{emp_base_url}/requests/leave/{{leave_id}}")
+    api.register_router(
+        ReimbursementRequestResource,
+        f"{emp_base_url}/requests/reimbursement/{{reimbursement_id}}",
+    )
+    api.register_router(TransferRequestResource, f"{emp_base_url}/requests/transfer/{{transfer_id}}")
 
-    api.register_router(HRFAQResource, "/api/employee/hr-faqs")
+    api.register_router(HRFAQListEmployeeResource, f"{emp_base_url}/hr-faqs")
+    api.register_router(HRFAQCreateResource, "/api/hr/faq")
+    api.register_router(HRFAQDetailResource, "/api/hr/faq/{faq_id}")
 
-    api.register_router(QuickNotesResource, "/api/employee/quick-notes")
+    api.register_router(AllQuickNotesResource, f"{emp_base_url}/writing")
+    api.register_router(QuickNotesResource, f"{emp_base_url}/writing/{{note_id}}")
 
-    api.register_router(AccountResource, "/api/employee/account")
+    api.register_router(AccountResource, f"{emp_base_url}/account")
 
-    api.register_router(AIAssistantResource, "/api/employee/assistant")
+    api.register_router(AIAssistantResource, f"{emp_base_url}/assistant")
 
     @app.get("/api")
     def index():

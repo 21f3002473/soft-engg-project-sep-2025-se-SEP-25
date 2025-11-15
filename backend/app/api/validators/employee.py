@@ -32,8 +32,7 @@ class FAQOut(BaseModel):
     question: str
     answer: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class QuickNoteCreate(BaseModel):
     topic: Optional[str] = "Quick Note"
@@ -50,8 +49,7 @@ class QuickNoteOut(BaseModel):
     topic: str
     notes: str
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class AccountUpdate(BaseModel):
     name: Optional[str] = None
@@ -71,8 +69,7 @@ class AccountOut(BaseModel):
     img_base64: Optional[str]
     department_name: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class ChatMessage(BaseModel):

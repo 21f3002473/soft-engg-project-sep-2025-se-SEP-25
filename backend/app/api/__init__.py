@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.controllers import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
     authenticate_user,
     create_access_token,
@@ -30,7 +30,7 @@ class API:
                     detail="Incorrect email or password",
                     headers={"WWW-Authenticate": "Bearer"},
                 )
-            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token_expires = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
             access_token = create_access_token(
                 data={"sub": user.email}, expires_delta=access_token_expires
             )

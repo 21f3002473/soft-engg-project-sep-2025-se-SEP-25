@@ -11,7 +11,8 @@ from app.api.validators import QuickNoteCreate, QuickNoteUpdate, QuickNoteOut
 logger = getLogger(__name__)
 
 
-class QuickNotesResource(Resource):
+class AllQuickNotesResource(Resource):
+
     def get(
         self,
         current_user: User = Depends(require_employee()),
@@ -22,7 +23,7 @@ class QuickNotesResource(Resource):
             q = select(QuickNote).where(QuickNote.user_id == current_user.id)
             notes = session.exec(q).all()
 
-            return {"notes": [QuickNoteOut.from_orm(n) for n in notes]}
+            return {"notes": [QuickNoteOut.model_validate(n) for n in notes]}
 
         except Exception as e:
             logger.error(e, exc_info=True)
@@ -41,6 +42,7 @@ class QuickNotesResource(Resource):
                 topic=payload.topic,
                 notes=payload.notes,
             )
+
             session.add(note)
             session.commit()
             session.refresh(note)
@@ -50,6 +52,22 @@ class QuickNotesResource(Resource):
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class QuickNotesResource(Resource):
+
+    def get(
+        self,
+        note_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Get a specific quick note"""
+        note = session.get(QuickNote, note_id)
+        if not note or note.user_id != current_user.id:
+            raise HTTPException(404, "Note not found")
+
+        return {"note": QuickNoteOut.model_validate(note)}
 
     def put(
         self,
@@ -71,6 +89,7 @@ class QuickNotesResource(Resource):
 
             session.commit()
             session.refresh(note)
+
             return {"message": "Note updated"}
 
         except HTTPException:

@@ -1,6 +1,6 @@
 from app.config import Config
 from app.database.connection import engine
-from app.database.employee_models import User
+from app.database.employee_models import User, RoleEnum
 from sqlmodel import Session, select
 
 
@@ -23,7 +23,7 @@ def create_root_user():
             name="root",
             password_hash=password_hash,
             salt=salt,
-            role="root",
+            role=RoleEnum.EMPLOYEE,
         )
         session.add(root_user)
         session.commit()
@@ -47,7 +47,7 @@ def create_root_user():
             name="pm",
             password_hash=password_hash,
             salt=salt,
-            role="pm",
+            role=RoleEnum.PRODUCT_MANAGER,
         )
         session.add(pm_user)
         session.commit()
@@ -71,7 +71,7 @@ def create_root_user():
             name="hr",
             password_hash=password_hash,
             salt=salt,
-            role="hr",
+            role=RoleEnum.HUMAN_RESOURCE,
         )
         session.add(hr_user)
         session.commit()
@@ -95,7 +95,7 @@ def create_root_user():
             name="employee",
             password_hash=password_hash,
             salt=salt,
-            role="employee",
+            role=RoleEnum.EMPLOYEE,
         )
         session.add(employee_user)
         session.commit()

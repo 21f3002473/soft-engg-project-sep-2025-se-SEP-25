@@ -2,25 +2,21 @@ from enum import Enum
 from functools import wraps
 from typing import Callable, List
 
-from app.database import User
+from app.database import User, RoleEnum
 from fastapi import Depends, HTTPException, status
 from app.controllers import get_current_user
 
 
-class Role(str, Enum):
-    """User roles in the system"""
-
-    ROOT = "root"
-    HUMAN_RESOURCE = "human_resource"
-    PRODUCT_MANAGER = "product_manager"
-    EMPLOYEE = "employee"
-
-
 ROLE_HIERARCHY = {
-    Role.ROOT: [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.HUMAN_RESOURCE: [Role.HUMAN_RESOURCE, Role.EMPLOYEE],
-    Role.PRODUCT_MANAGER: [Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.EMPLOYEE: [Role.EMPLOYEE],
+    RoleEnum.ROOT: [
+        RoleEnum.ROOT,
+        RoleEnum.HUMAN_RESOURCE,
+        RoleEnum.PRODUCT_MANAGER,
+        RoleEnum.EMPLOYEE,
+    ],
+    RoleEnum.HUMAN_RESOURCE: [RoleEnum.HUMAN_RESOURCE, RoleEnum.EMPLOYEE],
+    RoleEnum.PRODUCT_MANAGER: [RoleEnum.PRODUCT_MANAGER, RoleEnum.EMPLOYEE],
+    RoleEnum.EMPLOYEE: [RoleEnum.EMPLOYEE],
 }
 
 
@@ -54,8 +50,8 @@ class Permission(str, Enum):
 
 # this dummy data access and we dont need it for now
 ROLE_PERMISSIONS = {
-    Role.ROOT: [perm for perm in Permission],
-    Role.HUMAN_RESOURCE: [
+    RoleEnum.ROOT: [perm for perm in Permission],
+    RoleEnum.HUMAN_RESOURCE: [
         Permission.VIEW_ALL_USERS,
         Permission.MANAGE_EMPLOYEES,
         Permission.VIEW_EMPLOYEE_RECORDS,
@@ -65,7 +61,7 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
     ],
-    Role.PRODUCT_MANAGER: [
+    RoleEnum.PRODUCT_MANAGER: [
         Permission.MANAGE_PRODUCTS,
         Permission.VIEW_PRODUCTS,
         Permission.MANAGE_PROJECTS,
@@ -74,7 +70,7 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
     ],
-    Role.EMPLOYEE: [
+    RoleEnum.EMPLOYEE: [
         Permission.VIEW_PRODUCTS,
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
@@ -86,16 +82,16 @@ ROLE_PERMISSIONS = {
 def check_permission(user_role: str, required_permission: Permission) -> bool:
     """Check if a role has a specific permission"""
     try:
-        role = Role(user_role)
+        role = RoleEnum(user_role)
         return required_permission in ROLE_PERMISSIONS.get(role, [])
     except ValueError:
         return False
 
 
-def check_role_access(user_role: str, allowed_roles: List[Role]) -> bool:
+def check_role_access(user_role: str, allowed_roles: List[RoleEnum]) -> bool:
     """Check if user's role is in the allowed roles (considering hierarchy)"""
     try:
-        role = Role(user_role)
+        role = RoleEnum(user_role)
         user_allowed_roles = ROLE_HIERARCHY.get(role, [])
         return any(allowed_role in user_allowed_roles for allowed_role in allowed_roles)
     except ValueError:
@@ -107,10 +103,10 @@ class RoleChecker:
     Dependency class to check if user has required roles.
 
     Usage in routes:
-    @app.get("/admin", dependencies=[Depends(RoleChecker([Role.ROOT]))])
+    @app.get("/admin", dependencies=[Depends(RoleChecker([RoleEnum.ROOT]))])
     """
 
-    def __init__(self, allowed_roles: List[Role]):
+    def __init__(self, allowed_roles: List[RoleEnum]):
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: User = Depends(get_current_user)) -> User:
@@ -145,29 +141,36 @@ class PermissionChecker:
 
 def require_root() -> RoleChecker:
     """Require ROOT role (superuser only)"""
-    return RoleChecker([Role.ROOT])
+    return RoleChecker([RoleEnum.ROOT])
 
 
 def require_hr() -> RoleChecker:
     """Require Human Resource role or higher"""
-    return RoleChecker([Role.ROOT, Role.HUMAN_RESOURCE])
+    return RoleChecker([RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE])
 
 
 def require_pm() -> RoleChecker:
     """Require Product Manager role or higher"""
-    return RoleChecker([Role.ROOT, Role.PRODUCT_MANAGER])
+    return RoleChecker([RoleEnum.ROOT, RoleEnum.PRODUCT_MANAGER])
 
 
 def require_employee() -> RoleChecker:
     """Require any authenticated user (employee or higher)"""
     return RoleChecker(
-        [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE]
+        [
+            RoleEnum.ROOT,
+            RoleEnum.HUMAN_RESOURCE,
+            RoleEnum.PRODUCT_MANAGER,
+            RoleEnum.EMPLOYEE,
+        ]
     )
 
 
 def require_hr_or_pm() -> RoleChecker:
     """Require either HR or PM role"""
-    return RoleChecker([Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER])
+    return RoleChecker(
+        [RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE, RoleEnum.PRODUCT_MANAGER]
+    )
 
 
 def can_manage_employees() -> PermissionChecker:

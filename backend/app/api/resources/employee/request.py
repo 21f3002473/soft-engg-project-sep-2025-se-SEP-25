@@ -19,13 +19,14 @@ from app.api.validators import LeaveCreate, ReimbursementCreate, TransferCreate
 logger = getLogger(__name__)
 
 
-class LeaveRequestResource(Resource):
+class AllLeaveRequestResource(Resource):
+
     def get(
         self,
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Get all leave requests made by the user"""
+        """Get all leave requests for the current user"""
         try:
             q = (
                 select(Leave, Request)
@@ -35,20 +36,19 @@ class LeaveRequestResource(Resource):
             )
             rows = session.exec(q).all()
 
-            data = []
-            for leave, req in rows:
-                data.append(
-                    {
-                        "request_id": req.id,
-                        "leave_id": leave.id,
-                        "leave_type": leave.leave_type,
-                        "from_date": leave.from_date,
-                        "to_date": leave.to_date,
-                        "reason": leave.reason,
-                        "status": req.status.value,
-                        "created_date": req.created_date,
-                    }
-                )
+            data = [
+                {
+                    "request_id": req.id,
+                    "leave_id": leave.id,
+                    "leave_type": leave.leave_type,
+                    "from_date": leave.from_date,
+                    "to_date": leave.to_date,
+                    "reason": leave.reason,
+                    "status": req.status.value,
+                    "created_date": req.created_date,
+                }
+                for leave, req in rows
+            ]
 
             return {"leaves": data}
 
@@ -62,7 +62,7 @@ class LeaveRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Submit new leave request"""
+        """Create a new leave request"""
         try:
             leave = Leave(
                 user_id=current_user.id,
@@ -83,13 +83,38 @@ class LeaveRequestResource(Resource):
             )
             session.add(req)
             session.commit()
-            session.refresh(req)
 
             return {"message": "Leave request submitted", "request_id": req.id}
 
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class LeaveRequestResource(Resource):
+
+    def get(
+        self,
+        leave_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Get a specific leave request"""
+        leave = session.get(Leave, leave_id)
+        if not leave or leave.user_id != current_user.id:
+            raise HTTPException(404, "Leave request not found")
+
+        req = session.exec(select(Request).where(Request.leave_id == leave_id)).first()
+
+        return {
+            "request_id": req.id,
+            "leave_id": leave.id,
+            "leave_type": leave.leave_type,
+            "from_date": leave.from_date,
+            "to_date": leave.to_date,
+            "reason": leave.reason,
+            "status": req.status.value,
+        }
 
     def put(
         self,
@@ -98,8 +123,7 @@ class LeaveRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Update an existing leave request (only if pending)"""
-
+        """Update a leave request (only if PENDING)"""
         try:
             leave = session.get(Leave, leave_id)
             if not leave or leave.user_id != current_user.id:
@@ -117,14 +141,10 @@ class LeaveRequestResource(Resource):
             leave.to_date = payload.to_date
             leave.reason = payload.reason
 
-            session.add(leave)
             session.commit()
-            session.refresh(leave)
 
             return {"message": "Leave request updated"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -135,8 +155,7 @@ class LeaveRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Delete a leave request (only if pending)"""
-
+        """Delete a leave request (only if PENDING)"""
         try:
             leave = session.get(Leave, leave_id)
             if not leave or leave.user_id != current_user.id:
@@ -155,14 +174,12 @@ class LeaveRequestResource(Resource):
 
             return {"message": "Leave request deleted"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
 
 
-class ReimbursementRequestResource(Resource):
+class AllReimbursementRequestResource(Resource):
 
     def get(
         self,
@@ -178,19 +195,18 @@ class ReimbursementRequestResource(Resource):
             )
             rows = session.exec(q).all()
 
-            data = []
-            for rmb, req in rows:
-                data.append(
-                    {
-                        "request_id": req.id,
-                        "reimbursement_id": rmb.id,
-                        "expense_type": rmb.expense_type,
-                        "amount": rmb.amount,
-                        "date_expense": rmb.date_expense,
-                        "remark": rmb.remark,
-                        "status": req.status.value,
-                    }
-                )
+            data = [
+                {
+                    "request_id": req.id,
+                    "reimbursement_id": rmb.id,
+                    "expense_type": rmb.expense_type,
+                    "amount": rmb.amount,
+                    "date_expense": rmb.date_expense,
+                    "remark": rmb.remark,
+                    "status": req.status.value,
+                }
+                for rmb, req in rows
+            ]
 
             return {"reimbursements": data}
 
@@ -204,7 +220,7 @@ class ReimbursementRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Submit reimbursement request"""
+        """Submit reimbursement"""
         try:
             rb = Reimbursement(
                 user_id=current_user.id,
@@ -225,13 +241,40 @@ class ReimbursementRequestResource(Resource):
             )
             session.add(req)
             session.commit()
-            session.refresh(req)
 
-            return {"message": "Reimbursement request submitted"}
+            return {"message": "Reimbursement submitted"}
 
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class ReimbursementRequestResource(Resource):
+
+    def get(
+        self,
+        reimbursement_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Get reimbursement request"""
+        rb = session.get(Reimbursement, reimbursement_id)
+        if not rb or rb.user_id != current_user.id:
+            raise HTTPException(404, "Reimbursement not found")
+
+        req = session.exec(
+            select(Request).where(Request.reimbursement_id == reimbursement_id)
+        ).first()
+
+        return {
+            "request_id": req.id,
+            "reimbursement_id": rb.id,
+            "expense_type": rb.expense_type,
+            "amount": rb.amount,
+            "date_expense": rb.date_expense,
+            "remark": rb.remark,
+            "status": req.status.value,
+        }
 
     def put(
         self,
@@ -240,7 +283,7 @@ class ReimbursementRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Update reimbursement request (only pending)"""
+        """Update reimbursement"""
         try:
             rb = session.get(Reimbursement, reimbursement_id)
             if not rb or rb.user_id != current_user.id:
@@ -262,8 +305,6 @@ class ReimbursementRequestResource(Resource):
 
             return {"message": "Reimbursement updated"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -274,7 +315,7 @@ class ReimbursementRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Delete reimbursement request (only pending)"""
+        """Delete reimbursement"""
         try:
             rb = session.get(Reimbursement, reimbursement_id)
             if not rb or rb.user_id != current_user.id:
@@ -293,14 +334,12 @@ class ReimbursementRequestResource(Resource):
 
             return {"message": "Reimbursement deleted"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
 
 
-class TransferRequestResource(Resource):
+class AllTransferRequestResource(Resource):
 
     def get(
         self,
@@ -316,18 +355,17 @@ class TransferRequestResource(Resource):
             )
             rows = session.exec(q).all()
 
-            data = []
-            for tr, req in rows:
-                data.append(
-                    {
-                        "request_id": req.id,
-                        "transfer_id": tr.id,
-                        "current_department": tr.current_department,
-                        "request_department": tr.request_department,
-                        "reason": tr.reason,
-                        "status": req.status.value,
-                    }
-                )
+            data = [
+                {
+                    "request_id": req.id,
+                    "transfer_id": tr.id,
+                    "current_department": tr.current_department,
+                    "request_department": tr.request_department,
+                    "reason": tr.reason,
+                    "status": req.status.value,
+                }
+                for tr, req in rows
+            ]
 
             return {"transfers": data}
 
@@ -368,6 +406,33 @@ class TransferRequestResource(Resource):
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
 
+
+class TransferRequestResource(Resource):
+
+    def get(
+        self,
+        transfer_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Get a specific transfer request"""
+        tr = session.get(Transfer, transfer_id)
+        if not tr or tr.user_id != current_user.id:
+            raise HTTPException(404, "Transfer request not found")
+
+        req = session.exec(
+            select(Request).where(Request.transfer_id == transfer_id)
+        ).first()
+
+        return {
+            "request_id": req.id,
+            "transfer_id": tr.id,
+            "current_department": tr.current_department,
+            "request_department": tr.request_department,
+            "reason": tr.reason,
+            "status": req.status.value,
+        }
+
     def put(
         self,
         transfer_id: int,
@@ -375,7 +440,7 @@ class TransferRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Update transfer request (only pending)"""
+        """Update a transfer request"""
         try:
             tr = session.get(Transfer, transfer_id)
             if not tr or tr.user_id != current_user.id:
@@ -396,8 +461,6 @@ class TransferRequestResource(Resource):
 
             return {"message": "Transfer request updated"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -408,7 +471,7 @@ class TransferRequestResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Delete transfer request (only pending)"""
+        """Delete a transfer request"""
         try:
             tr = session.get(Transfer, transfer_id)
             if not tr or tr.user_id != current_user.id:
@@ -427,8 +490,6 @@ class TransferRequestResource(Resource):
 
             return {"message": "Transfer request deleted"}
 
-        except HTTPException:
-            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")

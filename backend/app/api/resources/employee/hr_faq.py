@@ -11,20 +11,7 @@ from app.api.validators import FAQCreate, FAQOut
 logger = getLogger(__name__)
 
 
-class HRFAQResource(Resource):
-    def get(
-        self,
-        current_user: User = Depends(require_employee()),
-        session: Session = Depends(get_session),
-    ):
-        """Return all HR FAQs"""
-
-        try:
-            faqs = session.exec(select(FAQ)).all()
-            return {"faqs": [FAQOut.from_orm(faq) for faq in faqs]}
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            raise HTTPException(500, "Internal server error")
+class HRFAQCreateResource(Resource):
 
     def post(
         self,
@@ -32,19 +19,33 @@ class HRFAQResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """Create a new FAQ"""
-
+        """HR: Create FAQ"""
         try:
             faq = FAQ(question=payload.question, answer=payload.answer)
             session.add(faq)
             session.commit()
             session.refresh(faq)
-
             return {"message": "FAQ created successfully", "id": faq.id}
 
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class HRFAQDetailResource(Resource):
+
+    def get(
+        self,
+        faq_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Employee: Get a single FAQ"""
+        faq = session.get(FAQ, faq_id)
+        if not faq:
+            raise HTTPException(404, "FAQ not found")
+
+        return {"faq": FAQOut.model_validate(faq)}
 
     def put(
         self,
@@ -53,8 +54,7 @@ class HRFAQResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """Update an existing FAQ"""
-
+        """HR: Update FAQ"""
         try:
             faq = session.get(FAQ, faq_id)
             if not faq:
@@ -64,8 +64,6 @@ class HRFAQResource(Resource):
             faq.answer = payload.answer
 
             session.commit()
-            session.refresh(faq)
-
             return {"message": "FAQ updated successfully"}
 
         except HTTPException:
@@ -80,8 +78,7 @@ class HRFAQResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """Delete an FAQ"""
-
+        """HR: Delete FAQ"""
         try:
             faq = session.get(FAQ, faq_id)
             if not faq:
@@ -89,11 +86,26 @@ class HRFAQResource(Resource):
 
             session.delete(faq)
             session.commit()
-
             return {"message": "FAQ deleted successfully"}
 
         except HTTPException:
             raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+
+class HRFAQListEmployeeResource(Resource):
+
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """Get all HR FAQs"""
+        try:
+            faqs = session.exec(select(FAQ)).all()
+            return {"faqs": [FAQOut.model_validate(faq) for faq in faqs]}
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
