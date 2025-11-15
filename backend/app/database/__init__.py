@@ -1,9 +1,10 @@
 from .admin_models import Backup, BackupTypeEnum, Log
 from .connection import engine, get_session, init_db
 from .employee_models import (
+    FAQ,
+    Announcement,
     Attendance,
     AttendanceStatusEnum,
-    Announcement,
     Course,
     Department,
     Leave,
@@ -15,7 +16,6 @@ from .employee_models import (
     StatusTypeEnum,
     ToDo,
     Transfer,
-    FAQ,
     User,
     UserCourse,
 )

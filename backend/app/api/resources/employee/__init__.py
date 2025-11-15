@@ -1,33 +1,23 @@
-from .dashboard import DashboardResource
-from .dashboard import AllToDoResource
-from .dashboard import ToDoResource
-
-from .learning import LearningResource
-
-from .request import LeaveRequestResource
-from .request import ReimbursementRequestResource
-from .request import TransferRequestResource
-from .request import AllLeaveRequestResource
-from .request import AllReimbursementRequestResource
-from .request import AllTransferRequestResource
-
-from .hr_faq import HRFAQCreateResource
-from .hr_faq import HRFAQDetailResource
-from .hr_faq import HRFAQListEmployeeResource
-
-from .writing import QuickNotesResource
-from .writing import AllQuickNotesResource
-
 from .account import AccountResource
 from .assistant import AIAssistantResource
+from .dashboard import AllToDoResource, DashboardResource, ToDoResource
+from .hr_faq import HRFAQCreateResource, HRFAQDetailResource, HRFAQListEmployeeResource
+from .learning import LearningResource
+from .request import (
+    AllLeaveRequestResource,
+    AllReimbursementRequestResource,
+    AllTransferRequestResource,
+    LeaveRequestResource,
+    ReimbursementRequestResource,
+    TransferRequestResource,
+)
+from .writing import AllQuickNotesResource, QuickNotesResource
 
 __all__ = [
     "DashboardResource",
     "AllToDoResource",
     "ToDoResource",
-    
     "LearningResource",
-    
     "LeaveRequestResource",
     "ReimbursementRequestResource",
     "TransferRequestResource",

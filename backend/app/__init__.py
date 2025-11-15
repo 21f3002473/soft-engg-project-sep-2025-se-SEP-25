@@ -41,16 +41,12 @@ def make_app():
 
     # Employee
     from app.api.resources.employee import (
-        DashboardResource,
-        AllToDoResource,
-        ToDoResource,
-        LearningResource,
-        LeaveRequestResource,
-        ReimbursementRequestResource,
-        TransferRequestResource,
+        AccountResource,
+        AIAssistantResource,
         AllLeaveRequestResource,
         AllQuickNotesResource,
         AllReimbursementRequestResource,
+        AllToDoResource,
         AllTransferRequestResource,
         DashboardResource,
         HRFAQCreateResource,
@@ -60,9 +56,8 @@ def make_app():
         LeaveRequestResource,
         QuickNotesResource,
         ReimbursementRequestResource,
+        ToDoResource,
         TransferRequestResource,
-        AccountResource,
-        AIAssistantResource,
     )
 
     emp_base_url = "/api/employee"
