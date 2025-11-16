@@ -84,7 +84,8 @@ class API:
         self.register_router(ClientsResource, f"{pm_base_url}/clients")
 
         self.register_router(
-            ClientRequirementResource, f"{pm_base_url}/client/requirements/{{client_id}}"
+            ClientRequirementResource,
+            f"{pm_base_url}/client/requirements/{{client_id}}",
         )
         self.register_router(
             ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
