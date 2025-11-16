@@ -76,7 +76,7 @@ class API:
         self.register_router(AdminEmployeeResource, f"{admin_base_url}/employees")
         self.register_router(AdminBackupResource, f"{admin_base_url}/backup-config")
         self.register_router(AdminUpdatesResource, f"{admin_base_url}/updates")
-        self.register_router(AdminAccountResource, f"{admin_base_url}n/account")
+        self.register_router(AdminAccountResource, f"{admin_base_url}/account")
 
         # Product Manager
         pm_base_url = "/api/pm"

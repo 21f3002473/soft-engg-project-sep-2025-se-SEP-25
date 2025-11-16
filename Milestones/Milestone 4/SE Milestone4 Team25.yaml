@@ -2,6 +2,17 @@ openapi: 3.0.0
 info:
   title: se_server
   version: 0.1.0
+tags:
+- name: Employee
+  description: Endpoints for employee-related operations and interactions.
+- name: Human Resource
+  description: HR-focused endpoints for managing employees and internal processes.
+- name: Product Manager
+  description: PM-related endpoints for overseeing product workflows and updates.
+- name: General
+  description: Common endpoints such as authentication and basic utilities.
+- name: Administration
+  description: Administrative endpoints for managing system-wide configurations.
 paths:
   /user/login:
     get:
@@ -13,6 +24,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - General
     post:
       summary: Userloginresource.Post
       description: "login_function\n\nKeyword arguments:\nUserLoginValidator -- {email:\
@@ -39,6 +52,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - General
   /me:
     get:
       summary: Protectedresource.Get
@@ -52,6 +67,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - General
   /api/hr/reviews:
     get:
       summary: Hrreviewslistresource.Get
@@ -89,6 +106,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
     post:
       summary: Hrreviewslistresource.Post
       description: "Create a new performance review for an employee.\n\nPurpose:\n\
@@ -156,6 +175,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/reviews/{user_id}:
     get:
       summary: Hrreviewsbyuserresource.Get
@@ -209,6 +230,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/review/{review_id}:
     delete:
       summary: Hrreviewdetailresource.Delete
@@ -265,6 +288,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Hrreviewdetailresource.Put
       description: "Update an existing performance review.\n\nPurpose:\nAllows HR\
@@ -338,6 +363,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/policies:
     get:
       summary: Hrpolicycollectionresource.Get
@@ -375,6 +402,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
     post:
       summary: Hrpolicycollectionresource.Post
       description: "Create a new HR policy in the centralized repository.\n\nPurpose:\n\
@@ -435,6 +464,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/policy/{policy_id}:
     delete:
       summary: Hrpolicydetailresource.Delete
@@ -491,6 +522,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Hrpolicydetailresource.Get
       description: "Retrieve a specific HR policy by ID.\n\nPurpose:\nFetches detailed\
@@ -545,6 +578,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Hrpolicydetailresource.Put
       description: "Update an existing HR policy.\n\nPurpose:\nAllows HR managers\
@@ -618,6 +653,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/policy/create:
     get:
       summary: Hrpolicycollectionresource.Get
@@ -655,6 +692,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
     post:
       summary: Hrpolicycollectionresource.Post
       description: "Create a new HR policy in the centralized repository.\n\nPurpose:\n\
@@ -715,6 +754,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/employees:
     get:
       summary: Employeelistresource.Get
@@ -751,6 +792,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/employee/{emp_id}:
     delete:
       summary: Employeedetailresource.Delete
@@ -806,6 +849,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Employeedetailresource.Get
       description: "Retrieve detailed information for a specific employee.\n\nPurpose:\n\
@@ -860,6 +905,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Employeedetailresource.Put
       description: "Update employee information and policy assignments.\n\nPurpose:\n\
@@ -930,6 +977,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/admin/register:
     post:
       summary: Adminregistrationresource.Post
@@ -960,6 +1009,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Administration
   /api/admin/summary:
     get:
       summary: Admindashboardresource.Get
@@ -982,6 +1033,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
   /api/admin/employees:
     get:
       summary: Adminemployeeresource.Get
@@ -1002,6 +1055,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
     post:
       summary: Adminemployeeresource.Post
       description: "Create a new employee/user account.\n\nCreates a new user with\
@@ -1040,6 +1095,8 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
   /api/admin/backup-config:
     get:
       summary: Adminbackupresource.Get
@@ -1060,6 +1117,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
     put:
       summary: Adminbackupresource.Put
       description: "Update backup configuration.\n\nReplaces the entire backup configuration.\
@@ -1094,6 +1153,8 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
   /api/admin/updates:
     get:
       summary: Adminupdatesresource.Get
@@ -1115,7 +1176,9 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
-  /api/adminn/account:
+      tags:
+      - Administration
+  /api/admin/account:
     get:
       summary: Adminaccountresource.Get
       description: "Retrieve current admin account information.\n\nReturns detailed\
@@ -1134,6 +1197,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
     put:
       summary: Adminaccountresource.Put
       description: "Update admin account information.\n\nUpdates admin name and/or\
@@ -1171,6 +1236,8 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Administration
   /api/pm/dashboard:
     get:
       summary: Prdashboardresource.Get
@@ -1184,6 +1251,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Product Manager
   /api/pm/clients:
     delete:
       summary: Clientsresource.Delete
@@ -1210,6 +1279,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     get:
       summary: Clientsresource.Get
       description: Get all clients
@@ -1222,6 +1293,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Product Manager
     post:
       summary: Clientsresource.Post
       description: Create a new client
@@ -1246,6 +1319,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     put:
       summary: Clientsresource.Put
       description: Update a client
@@ -1277,6 +1352,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
   /api/pm/client/requirements/{client_id}:
     delete:
       summary: Clientrequirementresource.Delete
@@ -1309,6 +1386,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     get:
       summary: Clientrequirementresource.Get
       description: Get requirements for a specific client
@@ -1334,6 +1413,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     post:
       summary: Clientrequirementresource.Post
       description: Create a new requirement for a client
@@ -1365,6 +1446,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     put:
       summary: Clientrequirementresource.Put
       description: Update a requirement
@@ -1402,6 +1485,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
   /api/pm/client/updates/{client_id}:
     delete:
       summary: Clientupdatesresource.Delete
@@ -1434,6 +1519,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     get:
       summary: Clientupdatesresource.Get
       description: Get updates for a specific client
@@ -1459,6 +1546,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     post:
       summary: Clientupdatesresource.Post
       description: Create a new update for a client project
@@ -1490,6 +1579,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     put:
       summary: Clientupdatesresource.Put
       description: Update an update
@@ -1527,6 +1618,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
   /api/pm/employees:
     get:
       summary: Employeesresource.Get
@@ -1540,6 +1633,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Product Manager
   /api/pm/employee/performance/{employee_id}:
     get:
       summary: Employeeperformanceresource.Get
@@ -1566,6 +1661,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
   /api/pm/projects:
     delete:
       summary: Projectsresource.Delete
@@ -1606,6 +1703,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     get:
       summary: Projectsresource.Get
       description: "Retrieve all projects in the system.\n\nFetches a complete list\
@@ -1637,6 +1736,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Product Manager
     post:
       summary: Projectsresource.Post
       description: "Create a new project.\n\nThis endpoint creates a new project with\
@@ -1678,6 +1779,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - Product Manager
     put:
       summary: Projectsresource.Put
       description: "Update an existing project with the provided details.\nArgs:\n\
@@ -1736,6 +1839,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Product Manager
   /api/employee/dashboard:
     get:
       summary: Dashboardresource.Get
@@ -1771,6 +1876,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/todo:
     get:
       summary: Alltodoresource.Get
@@ -1798,6 +1905,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     post:
       summary: Alltodoresource.Post
       description: "Create a new to-do item for the employee.\n\nStory Points Supported:\n\
@@ -1844,6 +1953,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/todo/{task_id}:
     delete:
       summary: Todoresource.Delete
@@ -1885,6 +1996,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     get:
       summary: Todoresource.Get
       description: "Retrieve details of a specific to-do item.\n\nArgs:\n    task_id\
@@ -1928,6 +2041,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     put:
       summary: Todoresource.Put
       description: "Update a specific to-do item (task description, status, or deadline).\n\
@@ -1988,6 +2103,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/annoucements:
     get:
       summary: Announcementemployeeresource.Get
@@ -2014,6 +2131,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/hr/annoucement/{user_id}:
     get:
       summary: Announcementadminlistcreateresource.Get
@@ -2054,6 +2173,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     post:
       summary: Announcementadminlistcreateresource.Post
       description: "Create a new announcement (HR only).\n\nStory Points Supported:\n\
@@ -2106,6 +2227,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/annoucement/edit/{ann_id}:
     delete:
       summary: Announcementadmindetailresource.Delete
@@ -2147,6 +2270,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Announcementadmindetailresource.Get
       description: "Retrieve a specific announcement by ID (HR only).\n\nArgs:\n \
@@ -2189,6 +2314,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Announcementadmindetailresource.Put
       description: "Update an existing announcement (HR only).\n\nStory Points Supported:\n\
@@ -2240,6 +2367,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/employee/learning:
     get:
       summary: Learningresource.Get
@@ -2280,6 +2409,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/courses:
     get:
       summary: Courseassignmentemployeeresource.Get
@@ -2306,6 +2437,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/course/{course_id}:
     put:
       summary: Employeecourseupdatebycourseidresource.Put
@@ -2365,6 +2498,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/recommendations:
     get:
       summary: Courserecommendationresource.Get
@@ -2410,6 +2545,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/hr/course:
     get:
       summary: Courseadminlistcreateresource.Get
@@ -2436,6 +2573,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
     post:
       summary: Courseadminlistcreateresource.Post
       description: "Create a new course in the system (HR only).\n\nStory Points Supported:\n\
@@ -2482,6 +2621,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/course/{course_id}:
     delete:
       summary: Courseadmindetailresource.Delete
@@ -2523,6 +2664,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Courseadmindetailresource.Get
       description: "Retrieve details of a specific course (HR only).\n\nArgs:\n  \
@@ -2565,6 +2708,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Courseadmindetailresource.Put
       description: "Update an existing course (HR only).\n\nArgs:\n    course_id (int):\
@@ -2616,6 +2761,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/course/assign/{user_id}:
     get:
       summary: Courseassignmentlistresource.Get
@@ -2654,6 +2801,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     post:
       summary: Courseassignmentlistresource.Post
       description: "Assign a course to an employee (HR only).\n\nStory Points Supported:\n\
@@ -2706,6 +2855,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/hr/course/assign/edit/{assign_id}:
     delete:
       summary: Courseassignmentdetailresource.Delete
@@ -2747,6 +2898,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Courseassignmentdetailresource.Get
       description: "Retrieve details of a specific course assignment (HR only).\n\n\
@@ -2789,6 +2942,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Courseassignmentdetailresource.Put
       description: "Update a course assignment (HR only). Can modify status or course\
@@ -2846,6 +3001,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/employee/requests/leave:
     get:
       summary: Allleaverequestresource.Get
@@ -2886,6 +3043,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     post:
       summary: Allleaverequestresource.Post
       description: "Submit a new leave request.\n\nStory Points Supported:\n- \"As\
@@ -2942,6 +3101,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/requests/reimbursement:
     get:
       summary: Allreimbursementrequestresource.Get
@@ -2981,6 +3142,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     post:
       summary: Allreimbursementrequestresource.Post
       description: "Submit a new reimbursement request.\n\nStory Points Supported:\n\
@@ -3036,6 +3199,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/requests/transfer:
     get:
       summary: Alltransferrequestresource.Get
@@ -3074,6 +3239,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     post:
       summary: Alltransferrequestresource.Post
       description: "Submit a new department transfer request.\n\nStory Points Supported:\n\
@@ -3127,6 +3294,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/requests/leave/{leave_id}:
     delete:
       summary: Leaverequestresource.Delete
@@ -3187,6 +3356,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     get:
       summary: Leaverequestresource.Get
       description: "Retrieve details of a specific leave request.\n\nArgs:\n    leave_id\
@@ -3232,6 +3403,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     put:
       summary: Leaverequestresource.Put
       description: "Update a leave request (only if status is PENDING).\n\nStory Points\
@@ -3300,6 +3473,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/requests/reimbursement/{reimbursement_id}:
     delete:
       summary: Reimbursementrequestresource.Delete
@@ -3359,6 +3534,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     get:
       summary: Reimbursementrequestresource.Get
       description: "Retrieve details of a specific reimbursement request.\n\nArgs:\n\
@@ -3404,6 +3581,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     put:
       summary: Reimbursementrequestresource.Put
       description: "Update a reimbursement request (only if status is PENDING).\n\n\
@@ -3472,6 +3651,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/requests/transfer/{transfer_id}:
     delete:
       summary: Transferrequestresource.Delete
@@ -3531,6 +3712,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     get:
       summary: Transferrequestresource.Get
       description: "Retrieve details of a specific transfer request.\n\nArgs:\n  \
@@ -3576,6 +3759,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     put:
       summary: Transferrequestresource.Put
       description: "Update a transfer request (only if status is PENDING).\n\nStory\
@@ -3643,6 +3828,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/hr-faqs:
     get:
       summary: Hrfaqlistemployeeresource.Get
@@ -3681,6 +3868,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/hr/faq:
     post:
       summary: Hrfaqcreateresource.Post
@@ -3737,6 +3926,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Human Resource
   /api/hr/faq/{faq_id}:
     delete:
       summary: Hrfaqdetailresource.Delete
@@ -3789,6 +3980,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     get:
       summary: Hrfaqdetailresource.Get
       description: "Retrieve a specific FAQ entry by ID (Employee access).\n\nStory\
@@ -3834,6 +4027,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
     put:
       summary: Hrfaqdetailresource.Put
       description: "Update an existing FAQ entry (HR only).\n\nStory Points Supported:\n\
@@ -3900,6 +4095,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Human Resource
   /api/employee/writing:
     get:
       summary: Allquicknotesresource.Get
@@ -3933,6 +4130,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     post:
       summary: Allquicknotesresource.Post
       description: "Create a new quick note.\n\nAllows employees to save quick notes\
@@ -3984,6 +4183,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/writing/{note_id}:
     delete:
       summary: Quicknotesresource.Delete
@@ -4034,6 +4235,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     get:
       summary: Quicknotesresource.Get
       description: "Retrieve a specific quick note by ID.\n\nArgs:\n    note_id (int):\
@@ -4076,6 +4279,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
     put:
       summary: Quicknotesresource.Put
       description: "Update a quick note (topic and/or content).\n\nAllows employees\
@@ -4134,6 +4339,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - Employee
   /api/employee/account:
     get:
       summary: Accountresource.Get
@@ -4174,6 +4381,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     put:
       summary: Accountresource.Put
       description: "Update the logged-in employee's account profile information.\n\
@@ -4230,6 +4439,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
     delete:
       summary: Accountresource.Delete
       description: "Client-side logout endpoint.\n\nThis is a symbolic endpoint for\
@@ -4250,6 +4461,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /api/employee/assistant:
     post:
       summary: Aiassistantresource.Post
@@ -4320,6 +4533,8 @@ paths:
               schema: {}
       security:
       - OAuth2PasswordBearer: []
+      tags:
+      - Employee
   /token:
     post:
       summary: Login For Access Token
@@ -4343,6 +4558,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - General
   /:
     get:
       summary: Index
@@ -4353,6 +4570,8 @@ paths:
           content:
             application/json:
               schema: {}
+      tags:
+      - General
 components:
   schemas:
     AccountUpdate:
