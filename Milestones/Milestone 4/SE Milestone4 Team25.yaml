@@ -1,0 +1,3905 @@
+openapi: 3.1.0
+info:
+  title: se_server
+  version: 0.1.0
+paths:
+  /user/login:
+    get:
+      summary: Userloginresource.Get
+      operationId: UserLoginResource_get_user_login_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    post:
+      summary: Userloginresource.Post
+      description: "login_function\n\nKeyword arguments:\nUserLoginValidator -- {email:\
+        \ str, password: str}\n\n#\n- email: str -- user's email\n- password: str\
+        \ -- user's password\n\n```javascript\n// Example request body\n{\n    \"\
+        email\": \"user@example.com\",\n    \"password\": \"securepassword\"\n}\n\
+        ```\nReturn: A message and token upon successful login"
+      operationId: UserLoginResource_post_user_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginValidator'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /me:
+    get:
+      summary: Protectedresource.Get
+      description: Protected endpoint that requires authentication
+      operationId: ProtectedResource_get_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/reviews:
+    get:
+      summary: Hrreviewslistresource.Get
+      description: "Retrieve all performance reviews from the system.\n\nPurpose:\n\
+        Fetches complete list of performance reviews sorted by creation date.\nEnables\
+        \ HR managers to monitor review cycles, track employee feedback\nhistory,\
+        \ and ensure consistent performance management across organization.\n\nArgs:\n\
+        \    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring HR role\n    session: Database session for query execution\n\
+        \nReturns:\n    dict: {\"reviews\": [review_dict, ...]}\n    Each review includes:\
+        \ id, user_id, comments, rating, created_at, modified_at\n\nError Codes:\n\
+        \    - 401: Authentication failed\n    - 403: Insufficient permissions (HR\
+        \ role required)\n    - 500: Database query error"
+      operationId: HRReviewsListResource_get_api_hr_reviews_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Hrreviewslistresource.Post
+      description: "Create a new performance review for an employee.\n\nPurpose:\n\
+        Records performance feedback and ratings as part of periodic review\ncycles.\
+        \ GenAI can optimize review timing based on employee history\nand suggest\
+        \ constructive feedback tailored to employee role.\n\nArgs:\n    data: Dictionary\
+        \ containing review fields:\n        - user_id (int, required): ID of employee\
+        \ being reviewed\n        - rating (int, required): Numerical rating (1-5\
+        \ scale)\n        - comments (str, optional): Reviewer feedback/notes\n  \
+        \  current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring HR role\n    session: Database session for query execution\n\
+        \nExpected Payload:\n    {\n        \"user_id\": 5,\n        \"rating\": 4,\n\
+        \        \"comments\": \"Strong technical skills, good team collaboration...\"\
+        \n    }\n\nReturns:\n    dict: {\"message\": \"Review created\", \"review\"\
+        : review_dict}\n    Created review includes: id, user_id, comments, rating,\
+        \ created_at\n\nError Codes:\n    - 400: Missing required fields (user_id,\
+        \ rating) or invalid rating (not 1-5)\n    - 401: Authentication failed\n\
+        \    - 403: Insufficient permissions (HR role required)\n    - 404: Target\
+        \ user (employee) not found\n    - 500: Database creation error"
+      operationId: HRReviewsListResource_post_api_hr_reviews_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Data
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/reviews/{user_id}:
+    get:
+      summary: Hrreviewsbyuserresource.Get
+      description: "Retrieve all performance reviews for a specific employee.\n\n\
+        Purpose:\nFetches complete performance history for an employee sorted by\n\
+        review date. Enables HR managers to analyze performance trends,\nprepare for\
+        \ upcoming reviews, and track improvement over time.\n\nArgs:\n    user_id:\
+        \ ID of the employee to retrieve reviews for\n    current_user: Authenticated\
+        \ user making the request\n    _: Authorization check ensuring HR role\n \
+        \   session: Database session for query execution\n\nReturns:\n    dict: {\"\
+        reviews\": [review_dict, ...]}\n    Reviews sorted by created_at descending\
+        \ (newest first)\n    Each review includes: id, user_id, comments, rating,\
+        \ created_at, modified_at\n\nError Codes:\n    - 401: Authentication failed\n\
+        \    - 403: Insufficient permissions (HR role required)\n    - 500: Database\
+        \ query error\n\nNote:\n    Returns empty list if employee has no reviews\
+        \ yet (not an error)."
+      operationId: HRReviewsByUserResource_get_api_hr_reviews__user_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/review/{review_id}:
+    delete:
+      summary: Hrreviewdetailresource.Delete
+      description: "Delete a performance review from the system.\n\nPurpose:\nRemoves\
+        \ reviews from the database (typically in case of data errors\nor test records).\
+        \ Only Root users can delete reviews to maintain\naudit compliance and prevent\
+        \ loss of valid performance history.\n\nArgs:\n    review_id: ID of the review\
+        \ to delete\n    current_user: Authenticated user making the request\n   \
+        \ _: Authorization check ensuring Root role\n    session: Database session\
+        \ for query execution\n\nReturns:\n    dict: {\"message\": \"Review deleted\"\
+        }\n\nError Codes:\n    - 401: Authentication failed\n    - 403: Insufficient\
+        \ permissions (Root role required)\n    - 404: Review with review_id not found\n\
+        \    - 500: Database deletion error\n\nWarning:\n    This operation is irreversible.\
+        \ Deleted reviews cannot be recovered."
+      operationId: HRReviewDetailResource_delete_api_hr_review__review_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: review_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Review Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Hrreviewdetailresource.Put
+      description: "Update an existing performance review.\n\nPurpose:\nAllows HR\
+        \ managers to correct review data or update feedback comments\nas part of\
+        \ the review refinement process. Supports partial updates\nto modify individual\
+        \ fields independently.\n\nArgs:\n    review_id: ID of the review to update\n\
+        \    data: Dictionary containing fields to update (optional):\n        - rating\
+        \ (int): Updated rating (1-5 scale)\n        - comments (str): Updated feedback/notes\n\
+        \    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring HR role\n    session: Database session for query execution\n\
+        \nExpected Payload (partial update allowed):\n    {\n        \"rating\": 5,\n\
+        \        \"comments\": \"Exceptional performance and leadership...\"\n   \
+        \ }\n\nReturns:\n    dict: {\"message\": \"Review updated\", \"review\": review_dict}\n\
+        \    Updated review includes: id, user_id, comments, rating, modified_at\n\
+        \nError Codes:\n    - 400: Invalid rating (not in 1-5 range) or empty payload\n\
+        \    - 401: Authentication failed\n    - 403: Insufficient permissions (HR\
+        \ role required)\n    - 404: Review with review_id not found\n    - 500: Database\
+        \ update error"
+      operationId: HRReviewDetailResource_put_api_hr_review__review_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: review_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Review Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/policies:
+    get:
+      summary: Hrpolicycollectionresource.Get
+      description: "Retrieve all HR policies from the centralized repository.\n\n\
+        Purpose:\nProvides employees consistent access to up-to-date HR policies,\
+        \ ensuring\nall staff members have uniform access to policy information. Supports\
+        \ the\nGenAI-enhanced repository by providing searchable, well-organized policies.\n\
+        \nArgs:\n    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring Employee role\n    session: Database session for query execution\n\
+        \nReturns:\n    dict: {\"policies\": [policy_dict, ...]}\n    Each policy\
+        \ includes: id, title, content, created_at\n\nError Codes:\n    - 401: Authentication\
+        \ failed\n    - 403: Insufficient permissions (Employee role required)\n \
+        \   - 500: Database query error"
+      operationId: HRPolicyCollectionResource_get_api_hr_policies_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Hrpolicycollectionresource.Post
+      description: "Create a new HR policy in the centralized repository.\n\nPurpose:\n\
+        Allows HR managers to add new policies to the repository. GenAI can\nanalyze\
+        \ policy content for clarity, consistency with existing policies,\nand suggest\
+        \ optimal distribution to relevant employee groups.\n\nArgs:\n    data: Dictionary\
+        \ containing policy fields:\n        - title (str, required): Policy name/title\n\
+        \        - content (str, required): Full policy text/description\n    current_user:\
+        \ Authenticated user making the request\n    _: Authorization check ensuring\
+        \ HR role\n    session: Database session for query execution\n\nExpected Payload:\n\
+        \    {\n        \"title\": \"Remote Work Policy\",\n        \"content\": \"\
+        Employees may work remotely up to 2 days per week...\"\n    }\n\nReturns:\n\
+        \    dict: {\"message\": \"Policy created\", \"policy\": policy_dict}\n  \
+        \  Created policy includes: id, title, content, created_at\n\nError Codes:\n\
+        \    - 400: Missing required fields (title, content)\n    - 401: Authentication\
+        \ failed\n    - 403: Insufficient permissions (HR role required)\n    - 500:\
+        \ Database creation error"
+      operationId: HRPolicyCollectionResource_post_api_hr_policies_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Data
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/policy/{policy_id}:
+    delete:
+      summary: Hrpolicydetailresource.Delete
+      description: "Delete a policy from the centralized repository.\n\nPurpose:\n\
+        Enables HR managers to remove outdated or obsolete policies from the\nrepository.\
+        \ Only HR users can perform this action to maintain data\nintegrity and audit\
+        \ compliance. GenAI can suggest policies for archival\nbased on usage and\
+        \ relevance metrics.\n\nArgs:\n    policy_id: ID of the policy to delete\n\
+        \    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring HR role\n    session: Database session for query execution\n\
+        \nReturns:\n    dict: {\"message\": \"Policy deleted\"}\n\nError Codes:\n\
+        \    - 401: Authentication failed\n    - 403: Insufficient permissions (HR\
+        \ role required)\n    - 404: Policy with policy_id not found\n    - 500: Database\
+        \ deletion error"
+      operationId: HRPolicyDetailResource_delete_api_hr_policy__policy_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Hrpolicydetailresource.Get
+      description: "Retrieve a specific HR policy by ID.\n\nPurpose:\nFetches detailed\
+        \ information for a single policy, enabling employees\nto read complete policy\
+        \ documents and HR managers to verify policy\ncontent before distribution\
+        \ or updates.\n\nArgs:\n    policy_id: ID of the policy to retrieve\n    current_user:\
+        \ Authenticated user making the request\n    _: Authorization check ensuring\
+        \ Employee role\n    session: Database session for query execution\n\nReturns:\n\
+        \    dict: {\"policy\": policy_dict}\n    Policy includes: id, title, content,\
+        \ created_at\n\nError Codes:\n    - 401: Authentication failed\n    - 403:\
+        \ Insufficient permissions (Employee role required)\n    - 404: Policy with\
+        \ policy_id not found\n    - 500: Database query error"
+      operationId: HRPolicyDetailResource_get_api_hr_policy__policy_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Hrpolicydetailresource.Put
+      description: "Update an existing HR policy.\n\nPurpose:\nAllows HR managers\
+        \ to modify policy content and titles to keep the\ncentralized repository\
+        \ current. GenAI can highlight changes from\nprevious versions and recommend\
+        \ which employee groups should be\nnotified of policy updates.\n\nArgs:\n\
+        \    policy_id: ID of the policy to update\n    data: Dictionary containing\
+        \ fields to update:\n        - title (str, optional): Updated policy name\n\
+        \        - content (str, optional): Updated policy text\n    current_user:\
+        \ Authenticated user making the request\n    _: Authorization check ensuring\
+        \ HR role\n    session: Database session for query execution\n\nExpected Payload\
+        \ (partial update allowed):\n    {\n        \"title\": \"Updated Remote Work\
+        \ Policy\",\n        \"content\": \"Employees may work remotely up to 3 days\
+        \ per week...\"\n    }\n\nReturns:\n    dict: {\"message\": \"Policy updated\"\
+        , \"policy\": policy_dict}\n    Updated policy includes: id, title, content,\
+        \ created_at\n\nError Codes:\n    - 400: Invalid or empty payload\n    - 401:\
+        \ Authentication failed\n    - 403: Insufficient permissions (HR role required)\n\
+        \    - 404: Policy with policy_id not found\n    - 500: Database update error"
+      operationId: HRPolicyDetailResource_put_api_hr_policy__policy_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Policy Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/policy/create:
+    get:
+      summary: Hrpolicycollectionresource.Get
+      description: "Retrieve all HR policies from the centralized repository.\n\n\
+        Purpose:\nProvides employees consistent access to up-to-date HR policies,\
+        \ ensuring\nall staff members have uniform access to policy information. Supports\
+        \ the\nGenAI-enhanced repository by providing searchable, well-organized policies.\n\
+        \nArgs:\n    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring Employee role\n    session: Database session for query execution\n\
+        \nReturns:\n    dict: {\"policies\": [policy_dict, ...]}\n    Each policy\
+        \ includes: id, title, content, created_at\n\nError Codes:\n    - 401: Authentication\
+        \ failed\n    - 403: Insufficient permissions (Employee role required)\n \
+        \   - 500: Database query error"
+      operationId: HRPolicyCollectionResource_get_api_hr_policy_create_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Hrpolicycollectionresource.Post
+      description: "Create a new HR policy in the centralized repository.\n\nPurpose:\n\
+        Allows HR managers to add new policies to the repository. GenAI can\nanalyze\
+        \ policy content for clarity, consistency with existing policies,\nand suggest\
+        \ optimal distribution to relevant employee groups.\n\nArgs:\n    data: Dictionary\
+        \ containing policy fields:\n        - title (str, required): Policy name/title\n\
+        \        - content (str, required): Full policy text/description\n    current_user:\
+        \ Authenticated user making the request\n    _: Authorization check ensuring\
+        \ HR role\n    session: Database session for query execution\n\nExpected Payload:\n\
+        \    {\n        \"title\": \"Remote Work Policy\",\n        \"content\": \"\
+        Employees may work remotely up to 2 days per week...\"\n    }\n\nReturns:\n\
+        \    dict: {\"message\": \"Policy created\", \"policy\": policy_dict}\n  \
+        \  Created policy includes: id, title, content, created_at\n\nError Codes:\n\
+        \    - 400: Missing required fields (title, content)\n    - 401: Authentication\
+        \ failed\n    - 403: Insufficient permissions (HR role required)\n    - 500:\
+        \ Database creation error"
+      operationId: HRPolicyCollectionResource_post_api_hr_policy_create_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Data
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/employees:
+    get:
+      summary: Employeelistresource.Get
+      description: "Retrieve all employees for HR management and policy/review operations.\n\
+        \nPurpose:\nLists all active employees to support centralized HR policy repository\
+        \ access\nand performance review scheduling. GenAI can analyze this data to\
+        \ recommend\noptimal review timing and policy relevance for each employee.\n\
+        \nArgs:\n    current_user: Authenticated user making the request\n    _: Authorization\
+        \ check ensuring HR role\n    session: Database session for query execution\n\
+        \nReturns:\n    dict: {\"employees\": [employee_dict, ...]}\n\nError Codes:\n\
+        \    - 401: Authentication failed\n    - 403: Insufficient permissions (HR\
+        \ role required)\n    - 500: Database query error"
+      operationId: EmployeeListResource_get_api_hr_employees_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/employee/{emp_id}:
+    delete:
+      summary: Employeedetailresource.Delete
+      description: "Delete an employee record from the system.\n\nPurpose:\nRemoves\
+        \ employee records for resigned, terminated, or test accounts.\nOnly Root\
+        \ users can perform this action to maintain data integrity\nand audit compliance\
+        \ for HR policies and performance reviews.\n\nArgs:\n    emp_id: Employee\
+        \ ID to delete\n    current_user: Authenticated user making the request\n\
+        \    _: Authorization check ensuring Root role\n    session: Database session\
+        \ for query execution\n\nReturns:\n    dict: {\"message\": \"Employee deleted\"\
+        }\n\nError Codes:\n    - 401: Authentication failed\n    - 403: Insufficient\
+        \ permissions (Root role required)\n    - 404: Employee with emp_id not found\n\
+        \    - 500: Database deletion error"
+      operationId: EmployeeDetailResource_delete_api_hr_employee__emp_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: emp_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Emp Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Employeedetailresource.Get
+      description: "Retrieve detailed information for a specific employee.\n\nPurpose:\n\
+        Fetches complete employee record for policy access verification and\nperformance\
+        \ review history retrieval. Enables PMs to review employee\ndetails necessary\
+        \ for policy compliance and review planning.\n\nArgs:\n    emp_id: Employee\
+        \ ID to retrieve\n    current_user: Authenticated user making the request\n\
+        \    _: Authorization check ensuring PM role\n    session: Database session\
+        \ for query execution\n\nReturns:\n    dict: {\"employee\": employee_dict}\n\
+        \nError Codes:\n    - 401: Authentication failed\n    - 403: Insufficient\
+        \ permissions (PM role required)\n    - 404: Employee with emp_id not found\n\
+        \    - 500: Database query error"
+      operationId: EmployeeDetailResource_get_api_hr_employee__emp_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: emp_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Emp Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Employeedetailresource.Put
+      description: "Update employee information and policy assignments.\n\nPurpose:\n\
+        Modifies employee records to reflect policy changes, role updates, and\nstatus\
+        \ changes affecting review schedules. GenAI can suggest optimal\nreview timing\
+        \ adjustments based on role or policy changes.\n\nArgs:\n    emp_id: Employee\
+        \ ID to update\n    data: Dictionary containing fields to update (name, email,\
+        \ role, is_active)\n    current_user: Authenticated user making the request\n\
+        \    _: Authorization check ensuring HR role\n    session: Database session\
+        \ for query execution\n\nAllowed Fields: name, email, role, is_active\n\n\
+        Returns:\n    dict: {\"message\": \"Employee updated\", \"employee\": updated_employee_dict}\n\
+        \nError Codes:\n    - 400: Invalid or disallowed fields in payload\n    -\
+        \ 401: Authentication failed\n    - 403: Insufficient permissions (HR role\
+        \ required)\n    - 404: Employee with emp_id not found\n    - 500: Database\
+        \ update error"
+      operationId: EmployeeDetailResource_put_api_hr_employee__emp_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: emp_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Emp Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/admin/register:
+    post:
+      summary: Adminregistrationresource.Post
+      description: "Register a new admin (ROOT) user.\n\nCreates a new admin account\
+        \ with the provided credentials. Validates that\nno user with the same email\
+        \ already exists in the system.\n\nArgs:\n    payload: AdminRegistrationValidator\
+        \ containing name, email, password\n    session: Database session dependency\n\
+        \nReturns:\n    dict: User summary with keys:\n        - id: User ID\n   \
+        \     - name: User name\n        - email: User email\n        - role: User\
+        \ role (ROOT)\n\nRaises:\n    HTTPException: 409 CONFLICT if email already\
+        \ exists\n        - Detail: \"A user with this email already exists\""
+      operationId: AdminRegistrationResource_post_api_admin_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRegistrationValidator'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/admin/summary:
+    get:
+      summary: Admindashboardresource.Get
+      description: "Retrieve dashboard summary statistics.\n\nAggregates system statistics\
+        \ including total users, system logs, and\nbackup configurations. Returns\
+        \ information about the current admin user.\n\nArgs:\n    current_user: Currently\
+        \ authenticated user dependency\n    _: ROOT role verification dependency\n\
+        \    session: Database session dependency\n\nReturns:\n    dict: Dashboard\
+        \ summary with keys:\n        - userCount: Total number of users in system\n\
+        \        - logsCount: Total number of system logs\n        - backupsCount:\
+        \ Total number of backups configured\n        - currentAdmin: dict with id,\
+        \ name, email of logged-in admin\n\nRaises:\n    HTTPException: 403 FORBIDDEN\
+        \ if user is not ROOT role"
+      operationId: AdminDashboardResource_get_api_admin_summary_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/admin/employees:
+    get:
+      summary: Adminemployeeresource.Get
+      description: "Retrieve list of all employees/users.\n\nReturns a list of all\
+        \ users in the system with their basic information\nincluding id, name, email,\
+        \ and role.\n\nArgs:\n    current_user: Currently authenticated user dependency\n\
+        \    _: ROOT role verification dependency\n    session: Database session dependency\n\
+        \nReturns:\n    list: Array of user objects, each containing:\n        - id:\
+        \ User ID\n        - name: User name\n        - email: User email\n      \
+        \  - role: User role\n\nRaises:\n    HTTPException: 403 FORBIDDEN if user\
+        \ is not ROOT role"
+      operationId: AdminEmployeeResource_get_api_admin_employees_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Adminemployeeresource.Post
+      description: "Create a new employee/user account.\n\nCreates a new user with\
+        \ specified role. If email is not provided, generates\none automatically from\
+        \ the name. Generates a temporary password and returns\nit (only shown once)\
+        \ for the user to change on first login.\n\nArgs:\n    payload: AdminAddEmployeeValidator\
+        \ with name, role, optional email\n    current_user: Currently authenticated\
+        \ user dependency\n    _: ROOT role verification dependency\n    session:\
+        \ Database session dependency\n\nReturns:\n    dict: Created user details\
+        \ with keys:\n        - id: New user ID\n        - name: User name\n     \
+        \   - email: Generated or provided email\n        - role: Assigned user role\n\
+        \        - temporary_password: One-time password for initial login\n\nRaises:\n\
+        \    HTTPException: 422 UNPROCESSABLE_ENTITY if role is invalid\n        -\
+        \ Detail: \"Unknown role '{role}'. Expected one of HR, Product Manager, Employee\"\
+        \n    HTTPException: 409 CONFLICT if email already exists\n        - Detail:\
+        \ \"A user with this email already exists\"\n    HTTPException: 403 FORBIDDEN\
+        \ if user is not ROOT role"
+      operationId: AdminEmployeeResource_post_api_admin_employees_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAddEmployeeValidator'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/admin/backup-config:
+    get:
+      summary: Adminbackupresource.Get
+      description: "Retrieve current backup configuration.\n\nReturns list of all\
+        \ configured backups with their schedule and type.\n\nArgs:\n    current_user:\
+        \ Currently authenticated user dependency\n    _: ROOT role verification dependency\n\
+        \    session: Database session dependency\n\nReturns:\n    list: Array of\
+        \ backup configurations, each containing:\n        - day: Day of backup\n\
+        \        - type: Backup type (full, incremental, differential)\n        -\
+        \ datetime: ISO format datetime of backup\n\nRaises:\n    HTTPException: 403\
+        \ FORBIDDEN if user is not ROOT role"
+      operationId: AdminBackupResource_get_api_admin_backup_config_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    put:
+      summary: Adminbackupresource.Put
+      description: "Update backup configuration.\n\nReplaces the entire backup configuration.\
+        \ Deletes all existing backups\nand creates new ones from the provided payload.\
+        \ Automatically logs each\nbackup creation to the system log.\n\nArgs:\n \
+        \   payload: BackupConfigPayload containing list of backup items\n    current_user:\
+        \ Currently authenticated user dependency\n    _: ROOT role verification dependency\n\
+        \    session: Database session dependency\n\nReturns:\n    dict: Confirmation\
+        \ with keys:\n        - message: Success message\n        - count: Number\
+        \ of backups configured\n\nRaises:\n    HTTPException: 422 UNPROCESSABLE_ENTITY\
+        \ if backup type is invalid\n        - Detail: \"Backup type must be one of:\
+        \ full, incremental, differential\"\n    HTTPException: 403 FORBIDDEN if user\
+        \ is not ROOT role"
+      operationId: AdminBackupResource_put_api_admin_backup_config_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupConfigPayload'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/admin/updates:
+    get:
+      summary: Adminupdatesresource.Get
+      description: "Retrieve software update status.\n\nReturns current software version,\
+        \ update availability, and last check time.\nThis is currently a placeholder\
+        \ endpoint for future implementation.\n\nArgs:\n    current_user: Currently\
+        \ authenticated user dependency\n    _: ROOT role verification dependency\n\
+        \nReturns:\n    dict: Update status with keys:\n        - currentVersion:\
+        \ Current software version\n        - updateAvailable: Boolean indicating\
+        \ if update is available\n        - lastChecked: ISO format timestamp of last\
+        \ update check\n\nRaises:\n    HTTPException: 403 FORBIDDEN if user is not\
+        \ ROOT role"
+      operationId: AdminUpdatesResource_get_api_admin_updates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/adminn/account:
+    get:
+      summary: Adminaccountresource.Get
+      description: "Retrieve current admin account information.\n\nReturns detailed\
+        \ information about the currently authenticated admin account.\n\nArgs:\n\
+        \    current_user: Currently authenticated user dependency\n    _: ROOT role\
+        \ verification dependency\n\nReturns:\n    dict: Admin account details with\
+        \ keys:\n        - id: User ID\n        - name: User name\n        - email:\
+        \ User email\n        - role: User role (ROOT)\n\nRaises:\n    HTTPException:\
+        \ 403 FORBIDDEN if user is not ROOT role"
+      operationId: AdminAccountResource_get_api_adminn_account_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    put:
+      summary: Adminaccountresource.Put
+      description: "Update admin account information.\n\nUpdates admin name and/or\
+        \ password. Password updates require verification\nof the old password. Changes\
+        \ are persisted to database only if at least\none field was actually modified.\n\
+        \nArgs:\n    payload: AccountUpdatePayload with optional name and password\
+        \ fields\n    current_user: Currently authenticated user dependency\n    _:\
+        \ ROOT role verification dependency\n    session: Database session dependency\n\
+        \nReturns:\n    dict: Updated account information with keys:\n        - id:\
+        \ User ID\n        - name: Updated user name\n        - email: User email\n\
+        \        - role: User role\n        - updated: Boolean indicating if any changes\
+        \ were made\n\nRaises:\n    HTTPException: 403 FORBIDDEN if user is not ROOT\
+        \ role\n    HTTPException: 422 UNPROCESSABLE_ENTITY if new password attempted\
+        \ without old password\n        - Detail: \"Old password is required to set\
+        \ a new password\"\n    HTTPException: 403 FORBIDDEN if old password verification\
+        \ fails\n        - Detail: \"Old password is incorrect\""
+      operationId: AdminAccountResource_put_api_adminn_account_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdatePayload'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/pm/dashboard:
+    get:
+      summary: Prdashboardresource.Get
+      description: PM Dashboard - View project manager dashboard data
+      operationId: PRDashboardResource_get_api_pm_dashboard_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/pm/clients:
+    delete:
+      summary: Clientsresource.Delete
+      description: Delete a client
+      operationId: ClientsResource_delete_api_pm_clients_delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Clientsresource.Get
+      description: Get all clients
+      operationId: ClientsResource_get_api_pm_clients_get
+      security:
+      - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    post:
+      summary: Clientsresource.Post
+      description: Create a new client
+      operationId: ClientsResource_post_api_pm_clients_post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Clientsresource.Put
+      description: Update a client
+      operationId: ClientsResource_put_api_pm_clients_put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientUpdateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/pm/client/requirements/{client_id}:
+    delete:
+      summary: Clientrequirementresource.Delete
+      description: Delete a requirement
+      operationId: ClientRequirementResource_delete_api_pm_client_requirements__client_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      - name: requirement_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Requirement Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Clientrequirementresource.Get
+      description: Get requirements for a specific client
+      operationId: ClientRequirementResource_get_api_pm_client_requirements__client_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      summary: Clientrequirementresource.Post
+      description: Create a new requirement for a client
+      operationId: ClientRequirementResource_post_api_pm_client_requirements__client_id__post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequirementCreateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Clientrequirementresource.Put
+      description: Update a requirement
+      operationId: ClientRequirementResource_put_api_pm_client_requirements__client_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      - name: requirement_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Requirement Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequirementUpdateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/pm/client/updates/{client_id}:
+    delete:
+      summary: Clientupdatesresource.Delete
+      description: Delete an update
+      operationId: ClientUpdatesResource_delete_api_pm_client_updates__client_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      - name: update_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Update Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Clientupdatesresource.Get
+      description: Get updates for a specific client
+      operationId: ClientUpdatesResource_get_api_pm_client_updates__client_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      summary: Clientupdatesresource.Post
+      description: Create a new update for a client project
+      operationId: ClientUpdatesResource_post_api_pm_client_updates__client_id__post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCreateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Clientupdatesresource.Put
+      description: Update an update
+      operationId: ClientUpdatesResource_put_api_pm_client_updates__client_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Client Id
+      - name: update_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Update Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUpdateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/pm/employees:
+    get:
+      summary: Employeesresource.Get
+      description: Get all employees
+      operationId: EmployeesResource_get_api_pm_employees_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/pm/employee/performance/{employee_id}:
+    get:
+      summary: Employeeperformanceresource.Get
+      description: Get performance data for a specific employee
+      operationId: EmployeePerformanceResource_get_api_pm_employee_performance__employee_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: employee_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Employee Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/pm/projects:
+    delete:
+      summary: Projectsresource.Delete
+      description: "Delete a project by its ID.\nThis endpoint allows a Project Manager\
+        \ to delete a project from the system.\nThe project must exist in the database,\
+        \ otherwise a 404 error is raised.\nArgs:\n    project_id (int): The unique\
+        \ identifier of the project to be deleted.\n    current_user (User): The authenticated\
+        \ user performing the delete operation.\n                        Must have\
+        \ Project Manager role (verified by require_pm() dependency).\n    session\
+        \ (Session): The database session for executing queries and transactions.\n\
+        Returns:\n    dict: A dictionary containing:\n        - message (str): Success\
+        \ message indicating the project was deleted.\n        - data (dict): Dictionary\
+        \ containing the deleted project's id.\nRaises:\n    HTTPException:\n    \
+        \    - status_code 404: If the project with the given project_id does not\
+        \ exist.\n        - status_code 500: If an unexpected error occurs during\
+        \ deletion.\nNote:\n    - Requires user to have Project Manager privileges.\n\
+        \    - All database changes are rolled back if an error occurs.\n    - Deletion\
+        \ is logged with the PM's email for audit purposes."
+      operationId: ProjectsResource_delete_api_pm_projects_delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: project_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Projectsresource.Get
+      description: "Retrieve all projects in the system.\n\nFetches a complete list\
+        \ of all projects and returns their details along with a total count.\nOnly\
+        \ accessible by users with Project Manager (PM) role.\n\nArgs:\n    current_user\
+        \ (User): The authenticated user making the request, must have PM role.\n\
+        \        Obtained via dependency injection using `require_pm()`.\n    session\
+        \ (Session): Database session for executing queries.\n        Obtained via\
+        \ dependency injection using `get_session()`.\n\nReturns:\n    dict: A dictionary\
+        \ containing:\n        - message (str): Success message indicating projects\
+        \ were retrieved.\n        - data (dict): Contains:\n            - projects\
+        \ (list): List of project dictionaries, each containing:\n               \
+        \ - id (str): Unique project identifier\n                - project_id (str):\
+        \ Project ID\n                - project_name (str): Name of the project\n\
+        \                - description (str): Project description\n              \
+        \  - status (str): Current status of the project\n                - client_id\
+        \ (str): Associated client identifier\n                - manager_id (str):\
+        \ Associated manager identifier\n            - total_projects (int): Total\
+        \ number of projects retrieved\n\nRaises:\n    HTTPException: Status code\
+        \ 500 if an error occurs during project retrieval.\n\nLogs:\n    - Info: Logs\
+        \ the user email when fetching projects begins.\n    - Error: Logs any exceptions\
+        \ that occur during the retrieval process."
+      operationId: ProjectsResource_get_api_pm_projects_get
+      security:
+      - OAuth2PasswordBearer: []
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+    post:
+      summary: Projectsresource.Post
+      description: "Create a new project.\n\nThis endpoint creates a new project with\
+        \ the provided details. Only Project Managers (PM) are authorized to create\
+        \ projects.\n\nArgs:\n    data (ProjectCreateModel): The project creation\
+        \ data containing:\n        - project_id (str): Unique identifier for the\
+        \ project\n        - project_name (str): Name of the project\n        - description\
+        \ (str): Project description\n        - status (str): Initial status of the\
+        \ project\n        - client_id (int): ID of the associated client\n      \
+        \  - manager_id (int, optional): ID of the project manager\n    current_user\
+        \ (User): The authenticated user making the request (must be a PM)\n    session\
+        \ (Session): Database session for ORM operations\n\nReturns:\n    dict: A\
+        \ dictionary containing:\n        - message (str): Success message\n     \
+        \   - data (dict): Created project details including id, project_id, project_name,\
+        \ status, and client_id\n\nRaises:\n    HTTPException (400): If project_id\
+        \ already exists\n    HTTPException (404): If the specified client or manager\
+        \ is not found\n    HTTPException (500): If an unexpected error occurs during\
+        \ project creation\n\nNotes:\n    - Requires PM role authorization\n    -\
+        \ Automatically rolls back transaction on error\n    - Logs project creation\
+        \ activity and any errors"
+      operationId: ProjectsResource_post_api_pm_projects_post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Projectsresource.Put
+      description: "Update an existing project with the provided details.\nArgs:\n\
+        \    project_id (int): The ID of the project to update.\n    data (ProjectUpdateModel):\
+        \ The project data to update containing optional fields:\n        - project_name\
+        \ (str, optional): New project name\n        - description (str, optional):\
+        \ New project description\n        - status (str, optional): New project status\n\
+        \        - manager_id (int, optional): New project manager ID\n    current_user\
+        \ (User): The currently authenticated user (must be a project manager).\n\
+        \        Injected via Depends(require_pm()).\n    session (Session): The database\
+        \ session for executing queries.\n        Injected via Depends(get_session).\n\
+        Returns:\n    dict: A dictionary containing:\n        - message (str): Success\
+        \ message indicating the project was updated\n        - data (dict): Updated\
+        \ project information including id, project_id,\n          project_name, status,\
+        \ and description\nRaises:\n    HTTPException:\n        - 404 if project with\
+        \ given project_id is not found\n        - 404 if manager_id is provided but\
+        \ the manager user is not found\n        - 500 if an internal server error\
+        \ occurs during the update process\nNote:\n    Only fields with non-None values\
+        \ in the request data will be updated.\n    Changes are committed to the database\
+        \ and the updated project is refreshed."
+      operationId: ProjectsResource_put_api_pm_projects_put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: project_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdateModel'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/dashboard:
+    get:
+      summary: Dashboardresource.Get
+      description: "Retrieve complete dashboard data for logged-in employee.\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to browse HR FAQs and documents...\"\
+        \ (announcement section)\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests...\" (request tracking)\n- \"As an Employee, I want to search for\
+        \ and view learning courses...\" (courses_completed count)\n\nArgs:\n    current_user\
+        \ (User): Authenticated employee user object (via require_employee middleware)\n\
+        \    session (Session): Database session for querying\n\nReturns:\n    dict:\
+        \ Dashboard data containing:\n        - message (str): Success confirmation\n\
+        \        - stats (dict): Aggregated counts\n            - pending_tasks (int):\
+        \ Count of pending to-do items\n            - completed_tasks (int): Count\
+        \ of completed to-do items\n            - requests (int): Total requests (leave/reimbursement/transfer)\
+        \ submitted\n            - courses_completed (int): Count of completed courses\n\
+        \        - tasks (list[dict]): Employee's recent to-do items with id, task,\
+        \ status, deadline, date_created\n        - announcements (list[dict]): Latest\
+        \ 10 HR announcements (id, announcement, created_at)\n        - user (dict):\
+        \ Current user profile (id, name, email, role)\n\nError Codes:\n    - 500\
+        \ Internal Server Error: Database query failures, invalid session state\n\n\
+        Raises:\n    HTTPException(500): If any database operation fails during aggregation"
+      operationId: DashboardResource_get_api_employee_dashboard_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/todo:
+    get:
+      summary: Alltodoresource.Get
+      description: "Retrieve all to-do items for the logged-in employee.\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests...\" (task tracking)\n\nArgs:\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session\n\nReturns:\n\
+        \    list[dict]: Array of to-do items, each containing:\n        - id (int):\
+        \ Unique task identifier\n        - task (str): Task description\n       \
+        \ - status (str): Either \"pending\" or \"completed\"\n        - deadline\
+        \ (datetime): Optional task deadline\n        - date_created (datetime): When\
+        \ task was created\n\nError Codes:\n    - 401 Unauthorized: User is not an\
+        \ employee (caught by middleware)"
+      operationId: AllToDoResource_get_api_employee_todo_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Alltodoresource.Post
+      description: "Create a new to-do item for the employee.\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to submit leave and reimbursement requests...\"\
+        \ (task management)\n\nArgs:\n    data (dict): Request payload containing:\n\
+        \        - task (str, required): Description of the task\n        - deadline\
+        \ (datetime, optional): Optional deadline for the task\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Confirmation message with newly created task ID\n  \
+        \      - message (str): \"Task added successfully\"\n        - task_id (int):\
+        \ ID of the newly created to-do item\n\nError Codes:\n    - 400 Bad Request:\
+        \ Missing required \"task\" field\n    - 401 Unauthorized: User is not an\
+        \ employee"
+      operationId: AllToDoResource_post_api_employee_todo_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Data
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/todo/{task_id}:
+    delete:
+      summary: Todoresource.Delete
+      description: "Delete a specific to-do item.\n\nArgs:\n    task_id (int): The\
+        \ ID of the to-do item to delete\n    current_user (User): Authenticated employee\
+        \ user object\n    session (Session): Database session\n\nReturns:\n    dict:\
+        \ Confirmation message\n        - message (str): \"Task deleted successfully\"\
+        \n\nError Codes:\n    - 404 Not Found: Task does not exist or belongs to another\
+        \ user\n    - 401 Unauthorized: User is not an employee"
+      operationId: ToDoResource_delete_api_employee_todo__task_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Todoresource.Get
+      description: "Retrieve details of a specific to-do item.\n\nArgs:\n    task_id\
+        \ (int): The ID of the to-do item to retrieve\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session\n\nReturns:\n\
+        \    dict: To-do item details\n        - id (int): Task identifier\n     \
+        \   - task (str): Task description\n        - status (str): \"pending\" or\
+        \ \"completed\"\n        - deadline (datetime): Optional deadline\n      \
+        \  - date_created (datetime): Creation timestamp\n\nError Codes:\n    - 404\
+        \ Not Found: Task does not exist or belongs to another user\n    - 401 Unauthorized:\
+        \ User is not an employee"
+      operationId: ToDoResource_get_api_employee_todo__task_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Todoresource.Put
+      description: "Update a specific to-do item (task description, status, or deadline).\n\
+        \nStory Points Supported:\n- \"As an Employee, I want to submit leave and\
+        \ reimbursement requests...\" (status tracking)\n\nArgs:\n    task_id (int):\
+        \ The ID of the to-do item to update\n    data (dict): Request payload with\
+        \ optional fields:\n        - task (str, optional): Updated task description\n\
+        \        - status (str, optional): Must be \"pending\" or \"completed\"\n\
+        \        - deadline (datetime, optional): Updated deadline\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session\n\nReturns:\n    dict: Confirmation message\n        - message (str):\
+        \ \"Task updated successfully\"\n\nError Codes:\n    - 404 Not Found: Task\
+        \ does not exist or belongs to another user\n    - 400 Bad Request: Invalid\
+        \ status value (not \"pending\" or \"completed\")\n    - 401 Unauthorized:\
+        \ User is not an employee"
+      operationId: ToDoResource_put_api_employee_todo__task_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/annoucements:
+    get:
+      summary: Announcementemployeeresource.Get
+      description: "Retrieve all announcements for the logged-in employee.\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to browse HR FAQs and documents\
+        \ so that I can find answers without waiting for HR responses.\"\n\nArgs:\n\
+        \    current_user (User): Authenticated employee user object\n    session\
+        \ (Session): Database session\n\nReturns:\n    list[dict]: Array of announcements,\
+        \ each containing:\n        - id (int): Announcement identifier\n        -\
+        \ announcement (str): Announcement content/text\n        - created_at (datetime):\
+        \ When announcement was published\n\nError Codes:\n    - 401 Unauthorized:\
+        \ User is not an employee (caught by middleware)"
+      operationId: AnnouncementEmployeeResource_get_api_employee_annoucements_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/annoucement/{user_id}:
+    get:
+      summary: Announcementadminlistcreateresource.Get
+      description: "Retrieve all announcements (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents...\" (announcement\
+        \ retrieval)\n\nArgs:\n    user_id (int): HR user ID making the request (for\
+        \ audit purposes)\n    current_user (User): Authenticated HR user object\n\
+        \    session (Session): Database session\n\nReturns:\n    list[dict]: Array\
+        \ of all announcements, each containing:\n        - id (int): Announcement\
+        \ identifier\n        - announcement (str): Announcement content/text\n  \
+        \      - created_at (datetime): When announcement was created\n        - user_id\
+        \ (int): HR user who created it\n\nError Codes:\n    - 401 Unauthorized: User\
+        \ is not HR personnel (caught by middleware)"
+      operationId: AnnouncementAdminListCreateResource_get_api_hr_annoucement__user_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      summary: Announcementadminlistcreateresource.Post
+      description: "Create a new announcement (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents...\" (announcement\
+        \ creation)\n\nArgs:\n    user_id (int): HR user ID creating the announcement\n\
+        \    data (dict): Request payload containing:\n        - announcement (str,\
+        \ required): Announcement text/content\n    current_user (User): Authenticated\
+        \ HR user object\n    session (Session): Database session\n\nReturns:\n  \
+        \  dict: Confirmation with announcement details\n        - message (str):\
+        \ \"Announcement created\"\n        - id (int): ID of newly created announcement\n\
+        \nError Codes:\n    - 400 Bad Request: Missing required \"announcement\" field\n\
+        \    - 401 Unauthorized: User is not HR personnel"
+      operationId: AnnouncementAdminListCreateResource_post_api_hr_annoucement__user_id__post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/annoucement/edit/{ann_id}:
+    delete:
+      summary: Announcementadmindetailresource.Delete
+      description: "Delete an announcement (HR only).\n\nArgs:\n    ann_id (int):\
+        \ The ID of the announcement to delete\n    current_user (User): Authenticated\
+        \ HR user object\n    session (Session): Database session\n\nReturns:\n  \
+        \  dict: Confirmation message\n        - message (str): \"Announcement deleted\"\
+        \n\nError Codes:\n    - 404 Not Found: Announcement does not exist\n    -\
+        \ 401 Unauthorized: User is not HR personnel"
+      operationId: AnnouncementAdminDetailResource_delete_api_hr_annoucement_edit__ann_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: ann_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Ann Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Announcementadmindetailresource.Get
+      description: "Retrieve a specific announcement by ID (HR only).\n\nArgs:\n \
+        \   ann_id (int): The ID of the announcement to retrieve\n    current_user\
+        \ (User): Authenticated HR user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Announcement details\n        - id (int): Announcement\
+        \ identifier\n        - announcement (str): Announcement content\n       \
+        \ - created_at (datetime): Creation timestamp\n        - user_id (int): HR\
+        \ user who created it\n\nError Codes:\n    - 404 Not Found: Announcement with\
+        \ given ID does not exist\n    - 401 Unauthorized: User is not HR personnel"
+      operationId: AnnouncementAdminDetailResource_get_api_hr_annoucement_edit__ann_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: ann_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Ann Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Announcementadmindetailresource.Put
+      description: "Update an existing announcement (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents...\" (announcement\
+        \ updates)\n\nArgs:\n    ann_id (int): The ID of the announcement to update\n\
+        \    data (dict): Request payload with optional fields:\n        - announcement\
+        \ (str, optional): Updated announcement text\n    current_user (User): Authenticated\
+        \ HR user object\n    session (Session): Database session\n\nReturns:\n  \
+        \  dict: Confirmation message\n        - message (str): \"Announcement updated\"\
+        \n\nError Codes:\n    - 404 Not Found: Announcement does not exist\n    -\
+        \ 401 Unauthorized: User is not HR personnel"
+      operationId: AnnouncementAdminDetailResource_put_api_hr_annoucement_edit__ann_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: ann_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Ann Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/learning:
+    get:
+      summary: Learningresource.Get
+      description: "Retrieve personalized learning dashboard with enrolled and recommended\
+        \ courses.\n\nStory Points Supported:\n- \"As an Employee, I want to search\
+        \ for and view a list of skill improvement and learning courses so that I\
+        \ can choose the ones that help me grow...\"\n- \"As an Employee, I want GenAI\
+        \ to give me personalised recommendations for skill improvement...\"\n\nAggregates:\n\
+        1. Personalized Courses: Courses the employee is currently enrolled in with\
+        \ their status\n2. Recommended Courses: Courses available but not yet enrolled\
+        \ in\n\nArgs:\n    current_user (User): Authenticated employee user object\n\
+        \    session (Session): Database session for querying\n\nReturns:\n    dict:\
+        \ Learning dashboard data containing:\n        - message (str): \"Learning\
+        \ dashboard loaded successfully\"\n        - personalized (list[dict]): Courses\
+        \ the employee is enrolled in, each containing:\n            - course_id (int):\
+        \ Unique course identifier\n            - course_name (str): Name of the course\n\
+        \            - course_link (str): URL/link to course resources\n         \
+        \   - topics (str): Comma-separated topics covered in course\n           \
+        \ - status (str): \"pending\" (in-progress) or \"completed\"\n        - recommended\
+        \ (list[dict]): Available courses not yet enrolled, each containing:\n   \
+        \         - course_id (int): Unique course identifier\n            - course_name\
+        \ (str): Name of the course\n            - topics (str): Topics covered\n\
+        \            - course_link (str): URL/link to course resources\n\nError Codes:\n\
+        \    - 500 Internal Server Error: Database query failures or session errors\n\
+        \nRaises:\n    HTTPException(500): If any database operation fails during\
+        \ aggregation"
+      operationId: LearningResource_get_api_employee_learning_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/courses:
+    get:
+      summary: Courseassignmentemployeeresource.Get
+      description: "Retrieve all courses assigned to the logged-in employee.\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to search for and view a list\
+        \ of skill improvement and learning courses...\"\n\nArgs:\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session\n\nReturns:\n    list[dict]: Array of assigned courses, each containing:\n\
+        \        - id (int): Assignment ID\n        - course_id (int): Course identifier\n\
+        \        - course_name (str): Name of the assigned course\n        - status\
+        \ (str): \"pending\" (in-progress) or \"completed\"\n\nError Codes:\n    -\
+        \ 401 Unauthorized: User is not an employee (caught by middleware)"
+      operationId: CourseAssignmentEmployeeResource_get_api_employee_courses_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/course/{course_id}:
+    put:
+      summary: Employeecourseupdatebycourseidresource.Put
+      description: "Update the status of an assigned course (using course_id).\n\n\
+        Story Points Supported:\n- \"As an Employee, I want to search for and view\
+        \ a list of skill improvement and learning courses...\"\n\nArgs:\n    course_id\
+        \ (int): The course ID to update status for\n    data (dict): Request payload\
+        \ containing:\n        - status (str, required): Must be \"pending\" or \"\
+        completed\"\n    current_user (User): Authenticated employee user object\n\
+        \    session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"Course status updated\"\n\nError Codes:\n\
+        \    - 404 Not Found: Course assignment does not exist for this employee\n\
+        \    - 400 Bad Request: Missing \"status\" field or invalid status value\n\
+        \    - 401 Unauthorized: User is not an employee"
+      operationId: EmployeeCourseUpdateByCourseIdResource_put_api_employee_course__course_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/recommendations:
+    get:
+      summary: Courserecommendationresource.Get
+      description: "Generate personalized course recommendations using GenAI (Gemini).\n\
+        \nStory Points Supported:\n- \"As an Employee, I want GenAI to give me personalised\
+        \ recommendations for skill improvement...\"\n- \"As an Employee, I want to\
+        \ search for and view a list of skill improvement and learning courses...\"\
+        \n\nWorkflow:\n1. Fetch employee's currently assigned/completed courses\n\
+        2. Send course list and available catalog to Gemini API\n3. Request similar/progressive\
+        \ course recommendations\n4. Parse GenAI response and match to actual courses\
+        \ in database\n5. Return recommendations with full course details\n\nArgs:\n\
+        \    current_user (User): Authenticated employee user object\n    session\
+        \ (Session): Database session\n\nReturns:\n    dict: Recommendations data\
+        \ containing:\n        - assigned_courses (list[str]): Names of courses employee\
+        \ is already taking\n        - recommended_courses (list[dict]): GenAI-recommended\
+        \ courses, each with:\n            - id (int): Course identifier\n       \
+        \     - course_name (str): Name of the course\n            - course_link (str):\
+        \ URL/link to course resources\n            - topics (str): Topics covered\n\
+        \nError Codes:\n    - 500 Internal Server Error: GenAI API failures, database\
+        \ issues, JSON parsing errors\n    - 503 Service Unavailable: GenAI API request\
+        \ timeout or service unavailable\n\nRaises:\n    HTTPException(500): If Gemini\
+        \ API request fails or response parsing fails\n\nGenAI Integration:\n    -\
+        \ Uses Google Gemini 2.0 Flash model for fast, personalized recommendations\n\
+        \    - Sends current course list and full catalog to AI for analysis\n   \
+        \ - Requests course names matching available catalog to ensure valid results\n\
+        \    - Falls back to text-search matching if JSON parsing fails"
+      operationId: CourseRecommendationResource_get_api_employee_recommendations_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/course:
+    get:
+      summary: Courseadminlistcreateresource.Get
+      description: "Retrieve all available courses in the system (HR only).\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to search for and view a list\
+        \ of skill improvement and learning courses...\"\n\nArgs:\n    current_user\
+        \ (User): Authenticated HR user object\n    session (Session): Database session\n\
+        \nReturns:\n    list[dict]: Array of all courses, each containing:\n     \
+        \   - id (int): Course identifier\n        - course_name (str): Name of the\
+        \ course\n        - course_link (str): URL/link to course resources\n    \
+        \    - topics (str): Topics covered in the course\n\nError Codes:\n    - 401\
+        \ Unauthorized: User is not HR personnel (caught by middleware)"
+      operationId: CourseAdminListCreateResource_get_api_hr_course_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Courseadminlistcreateresource.Post
+      description: "Create a new course in the system (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to search for and view a list of skill improvement\
+        \ and learning courses...\"\n\nArgs:\n    data (dict): Request payload containing:\n\
+        \        - course_name (str, required): Name of the course\n        - course_link\
+        \ (str, optional): URL/link to course resources\n        - topics (str, optional):\
+        \ Comma-separated topics covered\n    current_user (User): Authenticated HR\
+        \ user object\n    session (Session): Database session\n\nReturns:\n    dict:\
+        \ Confirmation with new course details\n        - message (str): \"Course\
+        \ created\"\n        - id (int): ID of newly created course\n\nError Codes:\n\
+        \    - 400 Bad Request: Missing required \"course_name\" field\n    - 401\
+        \ Unauthorized: User is not HR personnel"
+      operationId: CourseAdminListCreateResource_post_api_hr_course_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+              title: Data
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/course/{course_id}:
+    delete:
+      summary: Courseadmindetailresource.Delete
+      description: "Delete a course from the system (HR only).\n\nArgs:\n    course_id\
+        \ (int): The ID of the course to delete\n    current_user (User): Authenticated\
+        \ HR user object\n    session (Session): Database session\n\nReturns:\n  \
+        \  dict: Confirmation message\n        - message (str): \"Course deleted\"\
+        \n\nError Codes:\n    - 404 Not Found: Course does not exist\n    - 401 Unauthorized:\
+        \ User is not HR personnel"
+      operationId: CourseAdminDetailResource_delete_api_hr_course__course_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Courseadmindetailresource.Get
+      description: "Retrieve details of a specific course (HR only).\n\nArgs:\n  \
+        \  course_id (int): The ID of the course to retrieve\n    current_user (User):\
+        \ Authenticated HR user object\n    session (Session): Database session\n\n\
+        Returns:\n    dict: Course details\n        - id (int): Course identifier\n\
+        \        - course_name (str): Name of the course\n        - course_link (str):\
+        \ URL/link to course resources\n        - topics (str): Topics covered\n\n\
+        Error Codes:\n    - 404 Not Found: Course with given ID does not exist\n \
+        \   - 401 Unauthorized: User is not HR personnel"
+      operationId: CourseAdminDetailResource_get_api_hr_course__course_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Courseadmindetailresource.Put
+      description: "Update an existing course (HR only).\n\nArgs:\n    course_id (int):\
+        \ The ID of the course to update\n    data (dict): Request payload with optional\
+        \ fields:\n        - course_name (str, optional): Updated course name\n  \
+        \      - course_link (str, optional): Updated course URL\n        - topics\
+        \ (str, optional): Updated topics list\n    current_user (User): Authenticated\
+        \ HR user object\n    session (Session): Database session\n\nReturns:\n  \
+        \  dict: Confirmation message\n        - message (str): \"Course updated\"\
+        \n\nError Codes:\n    - 404 Not Found: Course does not exist\n    - 401 Unauthorized:\
+        \ User is not HR personnel"
+      operationId: CourseAdminDetailResource_put_api_hr_course__course_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: course_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/course/assign/{user_id}:
+    get:
+      summary: Courseassignmentlistresource.Get
+      description: "Retrieve list of courses assigned to a specific employee (HR only).\n\
+        \nArgs:\n    user_id (int): The employee ID to fetch assignments for\n   \
+        \ current_user (User): Authenticated HR user object\n    session (Session):\
+        \ Database session\n\nReturns:\n    list[dict]: Array of course assignments,\
+        \ each containing:\n        - id (int): Assignment ID\n        - course_id\
+        \ (int): Course identifier\n        - course_name (str): Name of the assigned\
+        \ course\n        - status (str): \"pending\" (in-progress) or \"completed\"\
+        \n\nError Codes:\n    - 401 Unauthorized: User is not HR personnel"
+      operationId: CourseAssignmentListResource_get_api_hr_course_assign__user_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      summary: Courseassignmentlistresource.Post
+      description: "Assign a course to an employee (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to search for and view a list of skill improvement\
+        \ and learning courses...\"\n\nArgs:\n    user_id (int): The employee ID to\
+        \ assign course to\n    data (dict): Request payload containing:\n       \
+        \ - course_id (int, required): The course to assign\n    current_user (User):\
+        \ Authenticated HR user object\n    session (Session): Database session\n\n\
+        Returns:\n    dict: Confirmation with assignment details\n        - message\
+        \ (str): \"Course assigned\"\n        - id (int): Assignment ID\n\nError Codes:\n\
+        \    - 400 Bad Request: Missing user_id or course_id, or course already assigned\
+        \ to user\n    - 401 Unauthorized: User is not HR personnel"
+      operationId: CourseAssignmentListResource_post_api_hr_course_assign__user_id__post
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/hr/course/assign/edit/{assign_id}:
+    delete:
+      summary: Courseassignmentdetailresource.Delete
+      description: "Remove a course assignment from an employee (HR only).\n\nArgs:\n\
+        \    assign_id (int): The ID of the assignment to remove\n    current_user\
+        \ (User): Authenticated HR user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Confirmation message\n        - message (str): \"Assignment\
+        \ removed\"\n\nError Codes:\n    - 404 Not Found: Assignment does not exist\n\
+        \    - 401 Unauthorized: User is not HR personnel"
+      operationId: CourseAssignmentDetailResource_delete_api_hr_course_assign_edit__assign_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: assign_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Assign Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Courseassignmentdetailresource.Get
+      description: "Retrieve details of a specific course assignment (HR only).\n\n\
+        Args:\n    assign_id (int): The ID of the assignment to retrieve\n    current_user\
+        \ (User): Authenticated HR user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Assignment details\n        - id (int): Assignment identifier\n\
+        \        - user_id (int): Employee ID\n        - course_id (int): Course identifier\n\
+        \        - course_name (str): Name of the course\n        - status (str):\
+        \ \"pending\" or \"completed\"\n\nError Codes:\n    - 404 Not Found: Assignment\
+        \ does not exist\n    - 401 Unauthorized: User is not HR personnel"
+      operationId: CourseAssignmentDetailResource_get_api_hr_course_assign_edit__assign_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: assign_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Assign Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Courseassignmentdetailresource.Put
+      description: "Update a course assignment (HR only). Can modify status or course\
+        \ assignment.\n\nArgs:\n    assign_id (int): The ID of the assignment to update\n\
+        \    data (dict): Request payload with optional fields:\n        - status\
+        \ (str, optional): Must be \"pending\" or \"completed\"\n        - course_id\
+        \ (int, optional): Reassign to a different course\n    current_user (User):\
+        \ Authenticated HR user object\n    session (Session): Database session\n\n\
+        Returns:\n    dict: Confirmation message\n        - message (str): \"Assignment\
+        \ updated\"\n\nError Codes:\n    - 404 Not Found: Assignment does not exist\n\
+        \    - 400 Bad Request: Invalid status value\n    - 401 Unauthorized: User\
+        \ is not HR personnel"
+      operationId: CourseAssignmentDetailResource_put_api_hr_course_assign_edit__assign_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: assign_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Assign Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Data
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/requests/leave:
+    get:
+      summary: Allleaverequestresource.Get
+      description: "Retrieve all leave requests submitted by the logged-in employee.\n\
+        \nStory Points Supported:\n- \"As an Employee, I want to submit leave and\
+        \ reimbursement requests via forms so that I can track my requests efficiently.\"\
+        \n\nReturns all leave requests (pending and completed) in reverse chronological\
+        \ order\n(newest first). Includes full request details and current status\
+        \ for tracking.\n\nArgs:\n    current_user (User): Authenticated employee\
+        \ user object\n    session (Session): Database session for querying\n\nReturns:\n\
+        \    dict: Collection of leave requests\n        - leaves (list[dict]): Array\
+        \ of leave requests, each containing:\n            - request_id (int): Unique\
+        \ request identifier\n            - leave_id (int): Leave record identifier\n\
+        \            - leave_type (str): Type of leave (e.g., \"Annual\", \"Sick\"\
+        , \"Casual\")\n            - from_date (datetime): Leave start date\n    \
+        \        - to_date (datetime): Leave end date\n            - reason (str,\
+        \ optional): Reason for leave\n            - status (str): \"pending\" or\
+        \ \"completed\"\n            - created_date (datetime): When request was submitted\n\
+        \nError Codes:\n    - 401 Unauthorized: User is not an employee\n    - 500\
+        \ Internal Server Error: Database query failures\n\nRaises:\n    HTTPException(500):\
+        \ If database query fails"
+      operationId: AllLeaveRequestResource_get_api_employee_requests_leave_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Allleaverequestresource.Post
+      description: "Submit a new leave request.\n\nStory Points Supported:\n- \"As\
+        \ an Employee, I want to submit leave and reimbursement requests via forms\
+        \ so that I can track my requests efficiently.\"\n\nCreates a leave request\
+        \ record and initializes it with \"pending\" status. The request\nis now visible\
+        \ in the employee's request tracker and available for HR review/approval.\n\
+        \nArgs:\n    payload (LeaveCreate): Request payload containing:\n        -\
+        \ leave_type (str, required): Type of leave (e.g., \"Annual\", \"Sick\", \"\
+        Casual\")\n        - from_date (datetime, required): Leave start date\n  \
+        \      - to_date (datetime, required): Leave end date\n        - reason (str,\
+        \ optional): Reason for the leave request\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session for persisting\
+        \ request\n\nReturns:\n    dict: Confirmation with request tracking details\n\
+        \        - message (str): \"Leave request submitted\"\n        - request_id\
+        \ (int): ID to track this request\n\nError Codes:\n    - 400 Bad Request:\
+        \ Invalid dates or missing required fields\n    - 401 Unauthorized: User is\
+        \ not an employee\n    - 500 Internal Server Error: Database insertion or\
+        \ commit failures\n\nRaises:\n    HTTPException(500): If leave creation or\
+        \ request creation fails"
+      operationId: AllLeaveRequestResource_post_api_employee_requests_leave_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/requests/reimbursement:
+    get:
+      summary: Allreimbursementrequestresource.Get
+      description: "Retrieve all reimbursement requests submitted by the logged-in\
+        \ employee.\n\nStory Points Supported:\n- \"As an Employee, I want to submit\
+        \ leave and reimbursement requests via forms so that I can track my requests\
+        \ efficiently.\"\n\nReturns all reimbursement requests (pending and completed)\
+        \ with full expense details\nand current approval status.\n\nArgs:\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session for querying\n\nReturns:\n    dict: Collection of reimbursement\
+        \ requests\n        - reimbursements (list[dict]): Array of reimbursement\
+        \ records, each containing:\n            - request_id (int): Unique request\
+        \ identifier\n            - reimbursement_id (int): Reimbursement record identifier\n\
+        \            - expense_type (str): Type of expense (e.g., \"Travel\", \"Meals\"\
+        , \"Hotel\")\n            - amount (float): Reimbursement amount\n       \
+        \     - date_expense (datetime): When the expense occurred\n            -\
+        \ remark (str, optional): Additional notes\n            - status (str): \"\
+        pending\" or \"completed\"\n\nError Codes:\n    - 401 Unauthorized: User is\
+        \ not an employee\n    - 500 Internal Server Error: Database query failures\n\
+        \nRaises:\n    HTTPException(500): If database query fails"
+      operationId: AllReimbursementRequestResource_get_api_employee_requests_reimbursement_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Allreimbursementrequestresource.Post
+      description: "Submit a new reimbursement request.\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to submit leave and reimbursement requests via\
+        \ forms so that I can track my requests efficiently.\"\n\nCreates a reimbursement\
+        \ request record with \"pending\" status. The request is now\ntracked in the\
+        \ system and available for HR/manager review and approval.\n\nArgs:\n    payload\
+        \ (ReimbursementCreate): Request payload containing:\n        - expense_type\
+        \ (str, required): Type of expense (e.g., \"Travel\", \"Meals\", \"Hotel\"\
+        )\n        - amount (float, required): Reimbursement amount claimed\n    \
+        \    - date_expense (datetime, required): When the expense occurred\n    \
+        \    - remark (str, optional): Additional notes/description\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session for persisting request\n\nReturns:\n    dict: Confirmation message\n\
+        \        - message (str): \"Reimbursement submitted\"\n\nError Codes:\n  \
+        \  - 400 Bad Request: Invalid amount or missing required fields\n    - 401\
+        \ Unauthorized: User is not an employee\n    - 500 Internal Server Error:\
+        \ Database insertion or commit failures\n\nRaises:\n    HTTPException(500):\
+        \ If reimbursement creation fails"
+      operationId: AllReimbursementRequestResource_post_api_employee_requests_reimbursement_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReimbursementCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/requests/transfer:
+    get:
+      summary: Alltransferrequestresource.Get
+      description: "Retrieve all transfer requests submitted by the logged-in employee.\n\
+        \nStory Points Supported:\n- \"As an Employee, I want to submit leave and\
+        \ reimbursement requests via forms so that I can track my requests efficiently.\"\
+        \n\nReturns all transfer requests (pending and completed) with department\
+        \ details and\ncurrent status.\n\nArgs:\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session for querying\n\
+        \nReturns:\n    dict: Collection of transfer requests\n        - transfers\
+        \ (list[dict]): Array of transfer requests, each containing:\n           \
+        \ - request_id (int): Unique request identifier\n            - transfer_id\
+        \ (int): Transfer record identifier\n            - current_department (str):\
+        \ Current department name\n            - request_department (str): Requested\
+        \ department name\n            - reason (str, optional): Reason for transfer\n\
+        \            - status (str): \"pending\" or \"completed\"\n\nError Codes:\n\
+        \    - 401 Unauthorized: User is not an employee\n    - 500 Internal Server\
+        \ Error: Database query failures\n\nRaises:\n    HTTPException(500): If database\
+        \ query fails"
+      operationId: AllTransferRequestResource_get_api_employee_requests_transfer_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Alltransferrequestresource.Post
+      description: "Submit a new department transfer request.\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to submit leave and reimbursement requests via\
+        \ forms so that I can track my requests efficiently.\"\n\nCreates a transfer\
+        \ request with \"pending\" status. The request is tracked in the system\n\
+        and available for management/HR review.\n\nArgs:\n    payload (TransferCreate):\
+        \ Request payload containing:\n        - current_department (str, required):\
+        \ Current department name\n        - request_department (str, required): Requested\
+        \ department name\n        - reason (str, optional): Reason for transfer request\n\
+        \    current_user (User): Authenticated employee user object\n    session:\
+        \ Database session for persisting request\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"Transfer request submitted\"\n\nError\
+        \ Codes:\n    - 400 Bad Request: Missing required fields\n    - 401 Unauthorized:\
+        \ User is not an employee\n    - 500 Internal Server Error: Database insertion\
+        \ or commit failures\n\nRaises:\n    HTTPException(500): If transfer creation\
+        \ fails"
+      operationId: AllTransferRequestResource_post_api_employee_requests_transfer_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/requests/leave/{leave_id}:
+    delete:
+      summary: Leaverequestresource.Delete
+      description: "Delete a leave request (only if status is PENDING).\n\nStory Points\
+        \ Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to withdraw pending leave requests. Once approved, requests cannot\n\
+        be deleted and must go through cancellation workflow.\n\nArgs:\n    leave_id\
+        \ (int): The ID of the leave request to delete\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session\n\nReturns:\n\
+        \    dict: Confirmation message\n        - message (str): \"Leave request\
+        \ deleted\"\n\nError Codes:\n    - 404 Not Found: Leave request does not exist\
+        \ or belongs to another employee\n    - 400 Bad Request: Request status is\
+        \ not \"pending\" (cannot delete approved requests)\n    - 401 Unauthorized:\
+        \ User is not an employee\n    - 500 Internal Server Error: Database deletion\
+        \ failures\n\nRaises:\n    HTTPException(400): If request status is not pending\n\
+        \    HTTPException(404): If leave request not found\n    HTTPException(500):\
+        \ If database commit fails"
+      operationId: LeaveRequestResource_delete_api_employee_requests_leave__leave_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: leave_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Leave Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Leaverequestresource.Get
+      description: "Retrieve details of a specific leave request.\n\nArgs:\n    leave_id\
+        \ (int): The ID of the leave request to retrieve\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Leave request details\n        - request_id (int): Unique\
+        \ request identifier\n        - leave_id (int): Leave record identifier\n\
+        \        - leave_type (str): Type of leave\n        - from_date (datetime):\
+        \ Leave start date\n        - to_date (datetime): Leave end date\n       \
+        \ - reason (str, optional): Reason for leave\n        - status (str): \"pending\"\
+        \ or \"completed\"\n\nError Codes:\n    - 404 Not Found: Leave request does\
+        \ not exist or belongs to another employee\n    - 401 Unauthorized: User is\
+        \ not an employee"
+      operationId: LeaveRequestResource_get_api_employee_requests_leave__leave_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: leave_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Leave Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Leaverequestresource.Put
+      description: "Update a leave request (only if status is PENDING).\n\nStory Points\
+        \ Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to modify leave request details before submission/approval. Once\
+        \ a\nrequest is approved (completed), it cannot be modified.\n\nArgs:\n  \
+        \  leave_id (int): The ID of the leave request to update\n    payload (LeaveCreate):\
+        \ Updated request payload with:\n        - leave_type (str): Updated leave\
+        \ type\n        - from_date (datetime): Updated start date\n        - to_date\
+        \ (datetime): Updated end date\n        - reason (str, optional): Updated\
+        \ reason\n    current_user (User): Authenticated employee user object\n  \
+        \  session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"Leave request updated\"\n\nError Codes:\n\
+        \    - 404 Not Found: Leave request does not exist or belongs to another employee\n\
+        \    - 400 Bad Request: Request status is not \"pending\" (cannot modify approved\
+        \ requests)\n    - 401 Unauthorized: User is not an employee\n    - 500 Internal\
+        \ Server Error: Database update failures\n\nRaises:\n    HTTPException(400):\
+        \ If request status is not pending\n    HTTPException(404): If leave request\
+        \ not found\n    HTTPException(500): If database commit fails"
+      operationId: LeaveRequestResource_put_api_employee_requests_leave__leave_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: leave_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Leave Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/requests/reimbursement/{reimbursement_id}:
+    delete:
+      summary: Reimbursementrequestresource.Delete
+      description: "Delete a reimbursement request (only if status is PENDING).\n\n\
+        Story Points Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to withdraw pending reimbursement requests. Once approved, requests\n\
+        cannot be deleted.\n\nArgs:\n    reimbursement_id (int): The ID of the reimbursement\
+        \ request to delete\n    current_user (User): Authenticated employee user\
+        \ object\n    session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"Reimbursement deleted\"\n\nError Codes:\n\
+        \    - 404 Not Found: Reimbursement request does not exist or belongs to another\
+        \ employee\n    - 400 Bad Request: Request status is not \"pending\" (cannot\
+        \ delete approved requests)\n    - 401 Unauthorized: User is not an employee\n\
+        \    - 500 Internal Server Error: Database deletion failures\n\nRaises:\n\
+        \    HTTPException(400): If request status is not pending\n    HTTPException(404):\
+        \ If reimbursement not found\n    HTTPException(500): If database commit fails"
+      operationId: ReimbursementRequestResource_delete_api_employee_requests_reimbursement__reimbursement_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: reimbursement_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Reimbursement Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Reimbursementrequestresource.Get
+      description: "Retrieve details of a specific reimbursement request.\n\nArgs:\n\
+        \    reimbursement_id (int): The ID of the reimbursement request to retrieve\n\
+        \    current_user (User): Authenticated employee user object\n    session:\
+        \ Database session\n\nReturns:\n    dict: Reimbursement request details\n\
+        \        - request_id (int): Unique request identifier\n        - reimbursement_id\
+        \ (int): Reimbursement record identifier\n        - expense_type (str): Type\
+        \ of expense\n        - amount (float): Reimbursement amount\n        - date_expense\
+        \ (datetime): When expense occurred\n        - remark (str, optional): Additional\
+        \ notes\n        - status (str): \"pending\" or \"completed\"\n\nError Codes:\n\
+        \    - 404 Not Found: Reimbursement request does not exist or belongs to another\
+        \ employee\n    - 401 Unauthorized: User is not an employee"
+      operationId: ReimbursementRequestResource_get_api_employee_requests_reimbursement__reimbursement_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: reimbursement_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Reimbursement Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Reimbursementrequestresource.Put
+      description: "Update a reimbursement request (only if status is PENDING).\n\n\
+        Story Points Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to modify reimbursement details before approval. Once approved,\n\
+        requests are locked from modification.\n\nArgs:\n    reimbursement_id (int):\
+        \ The ID of the reimbursement request to update\n    payload (ReimbursementCreate):\
+        \ Updated request payload with:\n        - expense_type (str): Updated expense\
+        \ type\n        - amount (float): Updated amount\n        - date_expense (datetime):\
+        \ Updated expense date\n        - remark (str, optional): Updated notes\n\
+        \    current_user (User): Authenticated employee user object\n    session\
+        \ (Session): Database session\n\nReturns:\n    dict: Confirmation message\n\
+        \        - message (str): \"Reimbursement updated\"\n\nError Codes:\n    -\
+        \ 404 Not Found: Reimbursement request does not exist or belongs to another\
+        \ employee\n    - 400 Bad Request: Request status is not \"pending\" (cannot\
+        \ modify approved requests)\n    - 401 Unauthorized: User is not an employee\n\
+        \    - 500 Internal Server Error: Database update failures\n\nRaises:\n  \
+        \  HTTPException(400): If request status is not pending\n    HTTPException(404):\
+        \ If reimbursement not found\n    HTTPException(500): If database commit fails"
+      operationId: ReimbursementRequestResource_put_api_employee_requests_reimbursement__reimbursement_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: reimbursement_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Reimbursement Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReimbursementCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/requests/transfer/{transfer_id}:
+    delete:
+      summary: Transferrequestresource.Delete
+      description: "Delete a transfer request (only if status is PENDING).\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to withdraw pending transfer requests. Once approved, requests\n\
+        cannot be deleted.\n\nArgs:\n    transfer_id (int): The ID of the transfer\
+        \ request to delete\n    current_user (User): Authenticated employee user\
+        \ object\n    session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"Transfer request deleted\"\n\nError\
+        \ Codes:\n    - 404 Not Found: Transfer request does not exist or belongs\
+        \ to another employee\n    - 400 Bad Request: Request status is not \"pending\"\
+        \n    - 401 Unauthorized: User is not an employee\n    - 500 Internal Server\
+        \ Error: Database deletion failures\n\nRaises:\n    HTTPException(400): If\
+        \ request status is not pending\n    HTTPException(404): If transfer not found\n\
+        \    HTTPException(500): If database commit fails"
+      operationId: TransferRequestResource_delete_api_employee_requests_transfer__transfer_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: transfer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Transfer Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Transferrequestresource.Get
+      description: "Retrieve details of a specific transfer request.\n\nArgs:\n  \
+        \  transfer_id (int): The ID of the transfer request to retrieve\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session\n\nReturns:\n    dict: Transfer request details\n        - request_id\
+        \ (int): Unique request identifier\n        - transfer_id (int): Transfer\
+        \ record identifier\n        - current_department (str): Current department\n\
+        \        - request_department (str): Requested department\n        - reason\
+        \ (str, optional): Reason for transfer\n        - status (str): \"pending\"\
+        \ or \"completed\"\n\nError Codes:\n    - 404 Not Found: Transfer request\
+        \ does not exist or belongs to another employee\n    - 401 Unauthorized: User\
+        \ is not an employee"
+      operationId: TransferRequestResource_get_api_employee_requests_transfer__transfer_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: transfer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Transfer Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Transferrequestresource.Put
+      description: "Update a transfer request (only if status is PENDING).\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to submit leave and reimbursement\
+        \ requests via forms so that I can track my requests efficiently.\"\n\nAllows\
+        \ employees to modify transfer request details before approval. Once approved,\n\
+        requests are locked from modification.\n\nArgs:\n    transfer_id (int): The\
+        \ ID of the transfer request to update\n    payload (TransferCreate): Updated\
+        \ request payload with:\n        - current_department (str): Updated current\
+        \ department\n        - request_department (str): Updated requested department\n\
+        \        - reason (str, optional): Updated reason\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Confirmation message\n        - message (str): \"Transfer\
+        \ request updated\"\n\nError Codes:\n    - 404 Not Found: Transfer request\
+        \ does not exist or belongs to another employee\n    - 400 Bad Request: Request\
+        \ status is not \"pending\"\n    - 401 Unauthorized: User is not an employee\n\
+        \    - 500 Internal Server Error: Database update failures\n\nRaises:\n  \
+        \  HTTPException(400): If request status is not pending\n    HTTPException(404):\
+        \ If transfer not found\n    HTTPException(500): If database commit fails"
+      operationId: TransferRequestResource_put_api_employee_requests_transfer__transfer_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: transfer_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Transfer Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/hr-faqs:
+    get:
+      summary: Hrfaqlistemployeeresource.Get
+      description: "Retrieve all FAQ entries (Employee access).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents so that I can find\
+        \ answers without waiting for HR responses.\"\n\nWorkflow:\n1. Fetch all FAQ\
+        \ entries from database\n2. Validate and serialize to FAQOut format\n3. Return\
+        \ complete FAQ list to employee\n\nThis enables employees to browse the entire\
+        \ FAQ knowledge base, search through questions,\nand find answers to HR-related\
+        \ queries without manager or HR intervention. Supports\nimmediate self-service\
+        \ resolution of common questions about dress code, leave policies,\nWFH guidelines,\
+        \ travel reimbursement, benefits, etc.\n\nArgs:\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Collection of FAQs\n        - faqs (list[FAQOut]): Array\
+        \ of FAQ objects, each containing:\n            - id (int): FAQ identifier\n\
+        \            - question (str): The question text\n            - answer (str):\
+        \ The answer text\n\nError Codes:\n    - 401 Unauthorized: User is not an\
+        \ employee (caught by middleware)\n    - 500 Internal Server Error: Database\
+        \ query failures\n\nRaises:\n    HTTPException(500): If database query fails"
+      operationId: HRFAQListEmployeeResource_get_api_employee_hr_faqs_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/faq:
+    post:
+      summary: Hrfaqcreateresource.Post
+      description: "Create a new FAQ entry (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents so that I can find\
+        \ answers without waiting for HR responses.\"\n\nAllows HR to add new questions\
+        \ and answers to the FAQ database. This builds the\nself-service knowledge\
+        \ base that employees can search and browse to find answers\nindependently,\
+        \ reducing HR support overhead.\n\nArgs:\n    payload (FAQCreate): Request\
+        \ payload containing:\n        - question (str, required): The FAQ question\
+        \ text\n        - answer (str, required): The corresponding answer/response\n\
+        \    current_user (User): Authenticated HR user object (verified by require_hr\
+        \ middleware)\n    session (Session): Database session for storing the FAQ\n\
+        \nReturns:\n    dict: Confirmation with newly created FAQ details\n      \
+        \  - message (str): \"FAQ created successfully\"\n        - id (int): ID of\
+        \ the newly created FAQ entry\n\nError Codes:\n    - 400 Bad Request: Invalid\
+        \ or missing question/answer in payload\n    - 401 Unauthorized: User is not\
+        \ HR personnel (caught by middleware)\n    - 500 Internal Server Error: Database\
+        \ insertion or commit failures\n\nRaises:\n    HTTPException(500): If database\
+        \ operation fails during creation or commit"
+      operationId: HRFAQCreateResource_post_api_hr_faq_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/hr/faq/{faq_id}:
+    delete:
+      summary: Hrfaqdetailresource.Delete
+      description: "Delete an FAQ entry (HR only).\n\nStory Points Supported:\n- \"\
+        As an Employee, I want to browse HR FAQs and documents so that I can find\
+        \ answers without waiting for HR responses.\"\n\nAllows HR to remove outdated,\
+        \ irrelevant, or incorrect FAQs from the knowledge base.\nDeleted FAQs will\
+        \ no longer be visible to employees.\n\nArgs:\n    faq_id (int): The ID of\
+        \ the FAQ to delete\n    current_user (User): Authenticated HR user object\n\
+        \    session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"FAQ deleted successfully\"\n\nError\
+        \ Codes:\n    - 404 Not Found: FAQ with given ID does not exist\n    - 401\
+        \ Unauthorized: User is not HR personnel\n    - 500 Internal Server Error:\
+        \ Database deletion or commit failures\n\nRaises:\n    HTTPException(404):\
+        \ If FAQ ID not found\n    HTTPException(500): If database deletion fails"
+      operationId: HRFAQDetailResource_delete_api_hr_faq__faq_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: faq_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Faq Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Hrfaqdetailresource.Get
+      description: "Retrieve a specific FAQ entry by ID (Employee access).\n\nStory\
+        \ Points Supported:\n- \"As an Employee, I want to browse HR FAQs and documents\
+        \ so that I can find answers without waiting for HR responses.\"\n\nArgs:\n\
+        \    faq_id (int): The ID of the FAQ entry to retrieve\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: FAQ data wrapped in response\n        - faq (FAQOut):\
+        \ FAQ object containing:\n            - id (int): FAQ identifier\n       \
+        \     - question (str): The question text\n            - answer (str): The\
+        \ answer text\n\nError Codes:\n    - 404 Not Found: FAQ with given ID does\
+        \ not exist\n    - 401 Unauthorized: User is not an employee (caught by middleware)\n\
+        \nRaises:\n    HTTPException(404): If FAQ ID is not found in database"
+      operationId: HRFAQDetailResource_get_api_hr_faq__faq_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: faq_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Faq Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Hrfaqdetailresource.Put
+      description: "Update an existing FAQ entry (HR only).\n\nStory Points Supported:\n\
+        - \"As an Employee, I want to browse HR FAQs and documents so that I can find\
+        \ answers without waiting for HR responses.\"\n\nAllows HR to modify FAQ questions\
+        \ or answers when policies change, clarifications are needed,\nor incorrect\
+        \ information needs to be corrected. Updated FAQs are immediately available\n\
+        to all employees browsing the FAQ database.\n\nArgs:\n    faq_id (int): The\
+        \ ID of the FAQ to update\n    payload (FAQCreate): Request payload containing:\n\
+        \        - question (str): Updated question text\n        - answer (str):\
+        \ Updated answer text\n    current_user (User): Authenticated HR user object\n\
+        \    session (Session): Database session\n\nReturns:\n    dict: Confirmation\
+        \ message\n        - message (str): \"FAQ updated successfully\"\n\nError\
+        \ Codes:\n    - 404 Not Found: FAQ with given ID does not exist\n    - 400\
+        \ Bad Request: Invalid or missing question/answer in payload\n    - 401 Unauthorized:\
+        \ User is not HR personnel\n    - 500 Internal Server Error: Database commit\
+        \ failures\n\nRaises:\n    HTTPException(404): If FAQ ID not found\n    HTTPException(500):\
+        \ If database update fails"
+      operationId: HRFAQDetailResource_put_api_hr_faq__faq_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: faq_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Faq Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/writing:
+    get:
+      summary: Allquicknotesresource.Get
+      description: "Retrieve all quick notes for the logged-in employee.\n\nReturns\
+        \ a collection of all personal quick notes created by the employee,\nenabling\
+        \ quick reference and note organization.\n\nArgs:\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\
+        \ for querying\n\nReturns:\n    dict: Collection of quick notes\n        -\
+        \ notes (list[QuickNoteOut]): Array of quick note objects, each containing:\n\
+        \            - id (int): Unique note identifier\n            - topic (str):\
+        \ Note topic/title\n            - notes (str): Note content/body\n\nError\
+        \ Codes:\n    - 401 Unauthorized: User is not an employee (caught by middleware)\n\
+        \    - 500 Internal Server Error: Database query failures\n\nRaises:\n   \
+        \ HTTPException(500): If database query fails"
+      operationId: AllQuickNotesResource_get_api_employee_writing_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    post:
+      summary: Allquicknotesresource.Post
+      description: "Create a new quick note.\n\nAllows employees to save quick notes\
+        \ for personal reference. Notes can have an\noptional topic/title for organization,\
+        \ with the main content in the notes field.\n\nArgs:\n    payload (QuickNoteCreate):\
+        \ Request payload containing:\n        - topic (str, optional): Note topic/title\
+        \ (defaults to \"Quick Note\")\n        - notes (str, required): Note content/body\
+        \ text\n    current_user (User): Authenticated employee user object\n    session\
+        \ (Session): Database session for persisting note\n\nReturns:\n    dict: Confirmation\
+        \ with note tracking details\n        - message (str): \"Note saved successfully\"\
+        \n        - id (int): ID of newly created note\n\nError Codes:\n    - 400\
+        \ Bad Request: Missing required \"notes\" field\n    - 401 Unauthorized: User\
+        \ is not an employee\n    - 500 Internal Server Error: Database insertion\
+        \ or commit failures\n\nRaises:\n    HTTPException(500): If note creation\
+        \ fails"
+      operationId: AllQuickNotesResource_post_api_employee_writing_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuickNoteCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/writing/{note_id}:
+    delete:
+      summary: Quicknotesresource.Delete
+      description: "Delete a quick note.\n\nAllows employees to remove quick notes\
+        \ they no longer need. Once deleted,\nthe note cannot be recovered.\n\nArgs:\n\
+        \    note_id (int): The ID of the quick note to delete\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Confirmation message\n        - message (str): \"Note\
+        \ deleted\"\n\nError Codes:\n    - 404 Not Found: Note does not exist or belongs\
+        \ to another employee\n    - 401 Unauthorized: User is not an employee\n \
+        \   - 500 Internal Server Error: Database deletion or commit failures\n\n\
+        Raises:\n    HTTPException(404): If note not found\n    HTTPException(500):\
+        \ If database commit fails"
+      operationId: QuickNotesResource_delete_api_employee_writing__note_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: note_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Note Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Quicknotesresource.Get
+      description: "Retrieve a specific quick note by ID.\n\nArgs:\n    note_id (int):\
+        \ The ID of the quick note to retrieve\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session\n\nReturns:\n\
+        \    dict: Quick note details\n        - note (QuickNoteOut): Note object\
+        \ containing:\n            - id (int): Note identifier\n            - topic\
+        \ (str): Note topic/title\n            - notes (str): Note content\n\nError\
+        \ Codes:\n    - 404 Not Found: Note does not exist or belongs to another employee\n\
+        \    - 401 Unauthorized: User is not an employee"
+      operationId: QuickNotesResource_get_api_employee_writing__note_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: note_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Note Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Quicknotesresource.Put
+      description: "Update a quick note (topic and/or content).\n\nAllows employees\
+        \ to modify their quick note topic and content. Supports partial\nupdates\
+        \ - only provided fields are updated.\n\nArgs:\n    note_id (int): The ID\
+        \ of the quick note to update\n    payload (QuickNoteUpdate): Update payload\
+        \ with optional fields:\n        - topic (str, optional): Updated note topic/title\n\
+        \        - notes (str, optional): Updated note content\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\n\
+        \nReturns:\n    dict: Confirmation message\n        - message (str): \"Note\
+        \ updated\"\n\nError Codes:\n    - 404 Not Found: Note does not exist or belongs\
+        \ to another employee\n    - 401 Unauthorized: User is not an employee\n \
+        \   - 500 Internal Server Error: Database update or commit failures\n\nRaises:\n\
+        \    HTTPException(404): If note not found\n    HTTPException(500): If database\
+        \ commit fails"
+      operationId: QuickNotesResource_put_api_employee_writing__note_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: note_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Note Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuickNoteUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/employee/account:
+    get:
+      summary: Accountresource.Get
+      description: "Retrieve the logged-in employee's account profile information.\n\
+        \nProvides complete profile details including personal information, role,\
+        \ department\nassignment, and reporting structure. Department name is resolved\
+        \ from department_id\nfor easier frontend consumption.\n\nArgs:\n    current_user\
+        \ (User): Authenticated employee user object\n    session (Session): Database\
+        \ session for querying department information\n\nReturns:\n    AccountOut:\
+        \ Serialized employee account information containing:\n        - id (int):\
+        \ Unique employee identifier\n        - name (str): Employee full name\n \
+        \       - email (str): Employee email address\n        - role (str): Employee\
+        \ role (e.g., \"employee\", \"product_manager\", \"human_resource\")\n   \
+        \     - department_id (int, optional): Department ID if assigned\n       \
+        \ - reporting_manager (int, optional): User ID of reporting manager\n    \
+        \    - img_base64 (str, optional): Base64-encoded profile image\n        -\
+        \ department_name (str, optional): Human-readable department name\n\nError\
+        \ Codes:\n    - 401 Unauthorized: User is not an employee (caught by middleware)\n\
+        \    - 500 Internal Server Error: Database query failures or session errors\n\
+        \nRaises:\n    HTTPException(500): If department lookup fails or database\
+        \ error occurs"
+      operationId: AccountResource_get_api_employee_account_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+    put:
+      summary: Accountresource.Put
+      description: "Update the logged-in employee's account profile information.\n\
+        \nAllows employees to modify their personal profile data. Only fields included\
+        \ in the\nrequest payload are updated (partial updates supported). Employees\
+        \ can update:\n- Name and email address\n- Profile image (base64-encoded)\n\
+        - Department assignment (if available for self-assignment)\n- Reporting manager\
+        \ relationship (if configurable)\n\nArgs:\n    payload (AccountUpdate): Request\
+        \ payload with optional fields:\n        - name (str, optional): Updated employee\
+        \ name\n        - email (str, optional): Updated email address\n        -\
+        \ img_base64 (str, optional): Base64-encoded profile image\n        - department_id\
+        \ (int, optional): Updated department assignment\n        - reporting_manager\
+        \ (int, optional): Updated reporting manager ID\n    current_user (User):\
+        \ Authenticated employee user object\n    session (Session): Database session\
+        \ for persisting updates\n\nReturns:\n    dict: Confirmation message\n   \
+        \     - message (str): \"Account updated successfully\"\n\nError Codes:\n\
+        \    - 400 Bad Request: Invalid field values or constraint violations\n  \
+        \  - 401 Unauthorized: User is not an employee\n    - 500 Internal Server\
+        \ Error: Database update or commit failures\n\nRaises:\n    HTTPException(500):\
+        \ If database commit fails or update operation fails"
+      operationId: AccountResource_put_api_employee_account_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+    delete:
+      summary: Accountresource.Delete
+      description: "Client-side logout endpoint.\n\nThis is a symbolic endpoint for\
+        \ logout workflow. In practice, logout is handled\nclient-side by deleting\
+        \ the authentication token. This endpoint acknowledges the\nlogout request\
+        \ and can be used for server-side cleanup or audit logging if needed.\n\n\
+        Args:\n    current_user (User): Authenticated employee user object\n\nReturns:\n\
+        \    dict: Logout confirmation message\n        - message (str): \"Logged\
+        \ out successfully\"\n\nNote:\n    Authentication token deletion is performed\
+        \ on the client side. This endpoint\n    serves as a confirmation point and\
+        \ potential hook for server-side logging."
+      operationId: AccountResource_delete_api_employee_account_delete
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      security:
+      - OAuth2PasswordBearer: []
+  /api/employee/assistant:
+    post:
+      summary: Aiassistantresource.Post
+      description: "Send a message to the GenAI HR chatbot and receive an instant\
+        \ response.\n\nStory Points Supported:\n- \"As an Employee, I want GenAI chatbot\
+        \ to provide me with instant answers to HR-related queries (e.g., dress code,\
+        \ leave, WFH, travel) so that I don't have to wait for my manager to address\
+        \ trivial questions.\"\n\nWorkflow:\n1. Receive employee query/message\n2.\
+        \ Format message with system prompt identifying this as Sync'em AI Assistant\n\
+        3. Send to Google Gemini 2.0 Flash API with appropriate context\n4. Parse\
+        \ and return AI-generated response\n5. Handle timeouts and API errors gracefully\n\
+        \nArgs:\n    payload (ChatMessage): Request payload containing:\n        -\
+        \ message (str): Employee's HR query or question (e.g., \"What is the dress\
+        \ code?\", \"How do I request WFH?\")\n    current_user (User): Authenticated\
+        \ employee user object\n    session (Session): Database session (passed for\
+        \ consistency, not actively used)\n\nReturns:\n    ChatResponse: AI-generated\
+        \ response containing:\n        - reply (str): Natural language answer to\
+        \ the employee's question from Gemini\n\nError Codes:\n    - 400 Bad Request:\
+        \ Missing or invalid message in payload\n    - 401 Unauthorized: User is not\
+        \ an employee (caught by middleware)\n    - 500 Internal Server Error: GenAI\
+        \ API request failures, timeouts, or response parsing errors\n    - 503 Service\
+        \ Unavailable: GenAI API service down or unreachable\n\nRaises:\n    HTTPException(500):\
+        \ If Gemini API request fails, times out, or response parsing fails\n\nGenAI\
+        \ Integration Details:\n    - Model: Google Gemini 2.0 Flash (fast, cost-efficient)\n\
+        \    - System Role: \"Sync'em AI Assistant\" (branded HR chatbot)\n    - Timeout:\
+        \ 30 seconds for API response\n    - API: Google Generative AI REST endpoint\n\
+        \    - Authentication: Via Config.GEMINI_API_KEY\n\nExample Query/Response:\n\
+        \    Request: {\"message\": \"What is our dress code policy?\"}\n    Response:\
+        \ {\"reply\": \"Our dress code policy is business casual...\"}"
+      operationId: AIAssistantResource_post_api_employee_assistant_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - OAuth2PasswordBearer: []
+  /token:
+    post:
+      summary: Login For Access Token
+      operationId: login_for_access_token_token_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_login_for_access_token_token_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /:
+    get:
+      summary: Index
+      operationId: index__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    AccountUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        img_base64:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Img Base64
+        department_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Department Id
+        reporting_manager:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Reporting Manager
+      type: object
+      title: AccountUpdate
+    AccountUpdatePayload:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        old_password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Old Password
+        new_password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: New Password
+      type: object
+      title: AccountUpdatePayload
+      description: "Validator for admin account update payload.\n\nStory Point: SP-ADM-006\n\
+        \nAttributes:\n    name: Optional new admin name\n    old_password: Optional\
+        \ old password (required when changing password)\n    new_password: Optional\
+        \ new password to set"
+    AdminAddEmployeeValidator:
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Name
+        role:
+          type: string
+          title: Role
+          description: Role name such as 'HR', 'Product Manager', or 'Employee'
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+      type: object
+      required:
+      - name
+      - role
+      title: AdminAddEmployeeValidator
+      description: "Validator for adding new employee payload.\n\nStory Point: SP-ADM-002\n\
+        \nAttributes:\n    name: Employee name (non-empty string)\n    role: Employee\
+        \ role (e.g., 'HR', 'Product Manager', 'Employee')\n    email: Optional employee\
+        \ email address"
+    AdminRegistrationValidator:
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Name
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          minLength: 6
+          title: Password
+      type: object
+      required:
+      - name
+      - email
+      - password
+      title: AdminRegistrationValidator
+      description: "Validator for admin registration payload.\n\nStory Point: SP-ADM-001\n\
+        \nAttributes:\n    name: Admin name (non-empty string)\n    email: Admin email\
+        \ address (must be valid EmailStr)\n    password: Admin password (minimum\
+        \ 6 characters)"
+    BackupConfigPayload:
+      properties:
+        backups:
+          items:
+            $ref: '#/components/schemas/BackupItem'
+          type: array
+          title: Backups
+      type: object
+      required:
+      - backups
+      title: BackupConfigPayload
+      description: "Validator for backup configuration payload.\n\nStory Point: SP-ADM-004\n\
+        \nAttributes:\n    backups: List of backup configuration items"
+    BackupItem:
+      properties:
+        day:
+          type: string
+          title: Day
+        type:
+          type: string
+          pattern: ^(full|incremental|differential)$
+          title: Type
+        datetime:
+          type: string
+          format: date-time
+          title: Datetime
+      type: object
+      required:
+      - day
+      - type
+      - datetime
+      title: BackupItem
+      description: "Validator for individual backup configuration item.\n\nStory Point:\
+        \ SP-ADM-004\n\nAttributes:\n    day: Day of backup (e.g., 'Monday', 'Tuesday')\n\
+        \    type: Backup type - must be 'full', 'incremental', or 'differential'\n\
+        \    datetime: Date and time of backup"
+    Body_login_for_access_token_token_post:
+      properties:
+        grant_type:
+          anyOf:
+          - type: string
+            pattern: ^password$
+          - type: 'null'
+          title: Grant Type
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          format: password
+          title: Password
+        scope:
+          type: string
+          title: Scope
+          default: ''
+        client_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Id
+        client_secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          format: password
+          title: Client Secret
+      type: object
+      required:
+      - username
+      - password
+      title: Body_login_for_access_token_token_post
+    ChatMessage:
+      properties:
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - message
+      title: ChatMessage
+    ClientCreateModel:
+      properties:
+        client_id:
+          type: string
+          title: Client Id
+        client_name:
+          type: string
+          title: Client Name
+        email:
+          type: string
+          title: Email
+        detail_base64:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail Base64
+      type: object
+      required:
+      - client_id
+      - client_name
+      - email
+      title: ClientCreateModel
+    ClientUpdateModel:
+      properties:
+        client_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Name
+        email:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Email
+        detail_base64:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail Base64
+      type: object
+      title: ClientUpdateModel
+    FAQCreate:
+      properties:
+        question:
+          type: string
+          title: Question
+        answer:
+          type: string
+          title: Answer
+      type: object
+      required:
+      - question
+      - answer
+      title: FAQCreate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LeaveCreate:
+      properties:
+        leave_type:
+          type: string
+          title: Leave Type
+        from_date:
+          type: string
+          format: date-time
+          title: From Date
+        to_date:
+          type: string
+          format: date-time
+          title: To Date
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - leave_type
+      - from_date
+      - to_date
+      title: LeaveCreate
+    ProjectCreateModel:
+      properties:
+        project_id:
+          type: string
+          title: Project Id
+        project_name:
+          type: string
+          title: Project Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/StatusTypeEnum'
+          - type: 'null'
+          default: PENDING
+        client_id:
+          type: integer
+          title: Client Id
+        manager_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Manager Id
+      type: object
+      required:
+      - project_id
+      - project_name
+      - client_id
+      title: ProjectCreateModel
+    ProjectUpdateModel:
+      properties:
+        project_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Project Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/StatusTypeEnum'
+          - type: 'null'
+        manager_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Manager Id
+      type: object
+      title: ProjectUpdateModel
+    QuickNoteCreate:
+      properties:
+        topic:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Topic
+          default: Quick Note
+        notes:
+          type: string
+          title: Notes
+      type: object
+      required:
+      - notes
+      title: QuickNoteCreate
+    QuickNoteUpdate:
+      properties:
+        topic:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Topic
+        notes:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Notes
+      type: object
+      title: QuickNoteUpdate
+    ReimbursementCreate:
+      properties:
+        expense_type:
+          type: string
+          title: Expense Type
+        amount:
+          type: number
+          title: Amount
+        date_expense:
+          type: string
+          format: date-time
+          title: Date Expense
+        remark:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Remark
+      type: object
+      required:
+      - expense_type
+      - amount
+      - date_expense
+      title: ReimbursementCreate
+    RequirementCreateModel:
+      properties:
+        requirement_id:
+          type: string
+          title: Requirement Id
+        requirements:
+          type: string
+          title: Requirements
+        project_id:
+          type: integer
+          title: Project Id
+      type: object
+      required:
+      - requirement_id
+      - requirements
+      - project_id
+      title: RequirementCreateModel
+    RequirementUpdateModel:
+      properties:
+        requirements:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requirements
+        project_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Project Id
+      type: object
+      title: RequirementUpdateModel
+    StatusTypeEnum:
+      type: string
+      enum:
+      - PENDING
+      - IN_PROGRESS
+      - COMPLETED
+      title: StatusTypeEnum
+    Token:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+      type: object
+      required:
+      - access_token
+      - token_type
+      title: Token
+    TransferCreate:
+      properties:
+        current_department:
+          type: string
+          title: Current Department
+        request_department:
+          type: string
+          title: Request Department
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - current_department
+      - request_department
+      title: TransferCreate
+    UpdateCreateModel:
+      properties:
+        update_id:
+          type: string
+          title: Update Id
+        project_id:
+          type: integer
+          title: Project Id
+        details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Details
+      type: object
+      required:
+      - update_id
+      - project_id
+      title: UpdateCreateModel
+    UpdateUpdateModel:
+      properties:
+        details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Details
+      type: object
+      title: UpdateUpdateModel
+    UserLoginValidator:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - password
+      title: UserLoginValidator
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /token

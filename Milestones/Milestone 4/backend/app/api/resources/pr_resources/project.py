@@ -1,0 +1,342 @@
+from logging import getLogger
+from typing import Optional
+
+from app.database import User, get_session
+from app.database.product_manager_models import Client, Project, StatusTypeEnum
+from app.middleware import require_pm
+from fastapi import Depends, HTTPException
+from fastapi_restful import Resource
+from pydantic import BaseModel
+from sqlmodel import Session, select
+
+logger = getLogger(__name__)
+
+
+class ProjectCreateModel(BaseModel):
+    project_id: str
+    project_name: str
+    description: Optional[str] = None
+    status: Optional[StatusTypeEnum] = StatusTypeEnum.PENDING
+    client_id: int
+    manager_id: Optional[int] = None
+
+
+class ProjectUpdateModel(BaseModel):
+    project_name: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[StatusTypeEnum] = None
+    manager_id: Optional[int] = None
+
+
+class ProjectsResource(Resource):
+    """
+    ProjectsResource handles CRUD operations for projects.
+
+    This resource provides endpoints for managing projects with the following operations:
+
+    Methods:
+        get: Retrieve all projects accessible to the current user (requires PM role)
+        post: Create a new project with validation of client and manager existence
+        put: Update an existing project's details
+        delete: Delete a project by its ID
+
+    All operations require PM (Project Manager) authentication and maintain audit logs
+    of actions performed by users.
+    """
+
+    def get(
+        self,
+        current_user: User = Depends(require_pm()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Retrieve all projects in the system.
+
+        Fetches a complete list of all projects and returns their details along with a total count.
+        Only accessible by users with Project Manager (PM) role.
+
+        Args:
+            current_user (User): The authenticated user making the request, must have PM role.
+                Obtained via dependency injection using `require_pm()`.
+            session (Session): Database session for executing queries.
+                Obtained via dependency injection using `get_session()`.
+
+        Returns:
+            dict: A dictionary containing:
+                - message (str): Success message indicating projects were retrieved.
+                - data (dict): Contains:
+                    - projects (list): List of project dictionaries, each containing:
+                        - id (str): Unique project identifier
+                        - project_id (str): Project ID
+                        - project_name (str): Name of the project
+                        - description (str): Project description
+                        - status (str): Current status of the project
+                        - client_id (str): Associated client identifier
+                        - manager_id (str): Associated manager identifier
+                    - total_projects (int): Total number of projects retrieved
+
+        Raises:
+            HTTPException: Status code 500 if an error occurs during project retrieval.
+
+        Logs:
+            - Info: Logs the user email when fetching projects begins.
+            - Error: Logs any exceptions that occur during the retrieval process.
+        """
+        try:
+            logger.info(f"Fetching all projects by {current_user.email}")
+
+            # Query all projects
+            statement = select(Project)
+            projects = session.exec(statement).all()
+
+            # Format project data
+            project_list = [
+                {
+                    "id": project.id,
+                    "project_id": project.project_id,
+                    "project_name": project.project_name,
+                    "description": project.description,
+                    "status": project.status,
+                    "client_id": project.client_id,
+                    "manager_id": project.manager_id,
+                }
+                for project in projects
+            ]
+
+            return {
+                "message": "Projects retrieved successfully",
+                "data": {
+                    "projects": project_list,
+                    "total_projects": len(project_list),
+                },
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching projects: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def post(
+        self,
+        data: ProjectCreateModel,
+        current_user: User = Depends(require_pm()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Create a new project.
+
+        This endpoint creates a new project with the provided details. Only Project Managers (PM) are authorized to create projects.
+
+        Args:
+            data (ProjectCreateModel): The project creation data containing:
+                - project_id (str): Unique identifier for the project
+                - project_name (str): Name of the project
+                - description (str): Project description
+                - status (str): Initial status of the project
+                - client_id (int): ID of the associated client
+                - manager_id (int, optional): ID of the project manager
+            current_user (User): The authenticated user making the request (must be a PM)
+            session (Session): Database session for ORM operations
+
+        Returns:
+            dict: A dictionary containing:
+                - message (str): Success message
+                - data (dict): Created project details including id, project_id, project_name, status, and client_id
+
+        Raises:
+            HTTPException (400): If project_id already exists
+            HTTPException (404): If the specified client or manager is not found
+            HTTPException (500): If an unexpected error occurs during project creation
+
+        Notes:
+            - Requires PM role authorization
+            - Automatically rolls back transaction on error
+            - Logs project creation activity and any errors
+        """
+        try:
+            logger.info(f"Creating project by {current_user.email}")
+
+            # Check if project_id already exists
+            existing = session.exec(
+                select(Project).where(Project.project_id == data.project_id)
+            ).first()
+            if existing:
+                raise HTTPException(status_code=400, detail="Project ID already exists")
+
+            # Verify client exists
+            client = session.exec(
+                select(Client).where(Client.id == data.client_id)
+            ).first()
+            if not client:
+                raise HTTPException(status_code=404, detail="Client not found")
+
+            # Verify manager exists if provided
+            if data.manager_id:
+                manager = session.exec(
+                    select(User).where(User.id == data.manager_id)
+                ).first()
+                if not manager:
+                    raise HTTPException(status_code=404, detail="Manager not found")
+
+            # Create new project
+            new_project = Project(
+                project_id=data.project_id,
+                project_name=data.project_name,
+                description=data.description,
+                status=data.status,
+                client_id=data.client_id,
+                manager_id=data.manager_id,
+            )
+            session.add(new_project)
+            session.commit()
+            session.refresh(new_project)
+
+            return {
+                "message": "Project created successfully",
+                "data": {
+                    "id": new_project.id,
+                    "project_id": new_project.project_id,
+                    "project_name": new_project.project_name,
+                    "status": new_project.status,
+                    "client_id": new_project.client_id,
+                },
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error creating project: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def put(
+        self,
+        project_id: int,
+        data: ProjectUpdateModel,
+        current_user: User = Depends(require_pm()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Update an existing project with the provided details.
+        Args:
+            project_id (int): The ID of the project to update.
+            data (ProjectUpdateModel): The project data to update containing optional fields:
+                - project_name (str, optional): New project name
+                - description (str, optional): New project description
+                - status (str, optional): New project status
+                - manager_id (int, optional): New project manager ID
+            current_user (User): The currently authenticated user (must be a project manager).
+                Injected via Depends(require_pm()).
+            session (Session): The database session for executing queries.
+                Injected via Depends(get_session).
+        Returns:
+            dict: A dictionary containing:
+                - message (str): Success message indicating the project was updated
+                - data (dict): Updated project information including id, project_id,
+                  project_name, status, and description
+        Raises:
+            HTTPException:
+                - 404 if project with given project_id is not found
+                - 404 if manager_id is provided but the manager user is not found
+                - 500 if an internal server error occurs during the update process
+        Note:
+            Only fields with non-None values in the request data will be updated.
+            Changes are committed to the database and the updated project is refreshed.
+        """
+        try:
+            logger.info(f"Updating project {project_id} by {current_user.email}")
+
+            project = session.exec(
+                select(Project).where(Project.id == project_id)
+            ).first()
+            if not project:
+                raise HTTPException(status_code=404, detail="Project not found")
+
+            # Update fields if provided
+            if data.project_name is not None:
+                project.project_name = data.project_name
+            if data.description is not None:
+                project.description = data.description
+            if data.status is not None:
+                project.status = data.status
+            if data.manager_id is not None:
+                # Verify manager exists
+                manager = session.exec(
+                    select(User).where(User.id == data.manager_id)
+                ).first()
+                if not manager:
+                    raise HTTPException(status_code=404, detail="Manager not found")
+                project.manager_id = data.manager_id
+
+            session.add(project)
+            session.commit()
+            session.refresh(project)
+
+            return {
+                "message": "Project updated successfully",
+                "data": {
+                    "id": project.id,
+                    "project_id": project.project_id,
+                    "project_name": project.project_name,
+                    "status": project.status,
+                    "description": project.description,
+                },
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error updating project: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def delete(
+        self,
+        project_id: int,
+        current_user: User = Depends(require_pm()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Delete a project by its ID.
+        This endpoint allows a Project Manager to delete a project from the system.
+        The project must exist in the database, otherwise a 404 error is raised.
+        Args:
+            project_id (int): The unique identifier of the project to be deleted.
+            current_user (User): The authenticated user performing the delete operation.
+                                Must have Project Manager role (verified by require_pm() dependency).
+            session (Session): The database session for executing queries and transactions.
+        Returns:
+            dict: A dictionary containing:
+                - message (str): Success message indicating the project was deleted.
+                - data (dict): Dictionary containing the deleted project's id.
+        Raises:
+            HTTPException:
+                - status_code 404: If the project with the given project_id does not exist.
+                - status_code 500: If an unexpected error occurs during deletion.
+        Note:
+            - Requires user to have Project Manager privileges.
+            - All database changes are rolled back if an error occurs.
+            - Deletion is logged with the PM's email for audit purposes.
+        """
+        try:
+            logger.info(f"Deleting project {project_id} by {current_user.email}")
+
+            project = session.exec(
+                select(Project).where(Project.id == project_id)
+            ).first()
+            if not project:
+                raise HTTPException(status_code=404, detail="Project not found")
+
+            session.delete(project)
+            session.commit()
+
+            return {
+                "message": "Project deleted successfully",
+                "data": {"id": project_id},
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error deleting project: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
