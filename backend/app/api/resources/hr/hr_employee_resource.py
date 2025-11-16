@@ -1,24 +1,23 @@
 # app/api/resources/hr/hr_employee_resource.py
+from app.controllers import get_current_active_user
+from app.controllers.hr.hr_employee_controller import (
+    delete_employee,
+    get_employee,
+    list_employees,
+    update_employee,
+)
+from app.database import User, get_session
+from app.middleware import require_hr, require_pm, require_root
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session
-
-from app.controllers.hr.hr_employee_controller import (
-    list_employees,
-    get_employee,
-    update_employee,
-    delete_employee,
-)
-from app.database import get_session
-from app.controllers import get_current_active_user
-from app.database import User
-from app.middleware import require_hr, require_pm, require_root
 
 
 class EmployeeListResource(Resource):
     """
     GET /hr/employees
     """
+
     def get(
         self,
         current_user: User = Depends(get_current_active_user),
@@ -35,6 +34,7 @@ class EmployeeDetailResource(Resource):
     PUT /hr/employee/{emp_id}
     DELETE /hr/employee/{emp_id}
     """
+
     def get(
         self,
         emp_id: int,

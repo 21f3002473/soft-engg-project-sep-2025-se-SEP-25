@@ -1,7 +1,11 @@
 # app/api/resources/hr/__init__.py
-from .hr_review_resource import HRReviewsListResource, HRReviewsByUserResource, HRReviewDetailResource
+from .hr_employee_resource import EmployeeDetailResource, EmployeeListResource
 from .hr_policy_resource import HRPolicyCollectionResource, HRPolicyDetailResource
-from .hr_employee_resource import EmployeeListResource, EmployeeDetailResource
+from .hr_review_resource import (
+    HRReviewDetailResource,
+    HRReviewsByUserResource,
+    HRReviewsListResource,
+)
 
 __all__ = [
     "HRReviewsListResource",

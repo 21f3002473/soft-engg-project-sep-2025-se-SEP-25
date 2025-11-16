@@ -1,9 +1,9 @@
 # app/controllers/hr/hr_policy_controller.py
-from fastapi import HTTPException
-from sqlmodel import Session, select
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from app.database.hr_models import HRPolicy
+from fastapi import HTTPException
+from sqlmodel import Session, select
 
 
 def get_policies(session: Session) -> List[HRPolicy]:
@@ -25,7 +25,9 @@ def create_policy(payload: Dict[str, Any], session: Session) -> HRPolicy:
     return policy
 
 
-def update_policy(policy_id: int, payload: Dict[str, Any], session: Session) -> HRPolicy:
+def update_policy(
+    policy_id: int, payload: Dict[str, Any], session: Session
+) -> HRPolicy:
     policy = session.get(HRPolicy, policy_id)
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")

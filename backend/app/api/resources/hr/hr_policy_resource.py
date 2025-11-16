@@ -1,19 +1,17 @@
 # app/api/resources/hr/hr_policy_resource.py
+from app.controllers import get_current_active_user
+from app.controllers.hr.hr_policy_controller import (
+    create_policy,
+    delete_policy,
+    get_policies,
+    get_policy,
+    update_policy,
+)
+from app.database import User, get_session
+from app.middleware import require_employee, require_hr
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session
-
-from app.controllers.hr.hr_policy_controller import (
-    get_policies,
-    get_policy,
-    create_policy,
-    update_policy,
-    delete_policy,
-)
-from app.database import get_session
-from app.controllers import get_current_active_user
-from app.database import User
-from app.middleware import require_hr, require_employee
 
 
 class HRPolicyCollectionResource(Resource):
@@ -21,6 +19,7 @@ class HRPolicyCollectionResource(Resource):
     GET  /hr/policies
     POST /hr/policy/create
     """
+
     def get(
         self,
         current_user: User = Depends(get_current_active_user),
@@ -47,6 +46,7 @@ class HRPolicyDetailResource(Resource):
     PUT /hr/policy/{policy_id}
     DELETE /hr/policy/{policy_id}
     """
+
     def get(
         self,
         policy_id: int,

@@ -1,9 +1,9 @@
 # app/controllers/hr/hr_employee_controller.py
-from fastapi import HTTPException
-from sqlmodel import Session, select
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from app.database import User
+from fastapi import HTTPException
+from sqlmodel import Session, select
 
 
 def list_employees(session: Session) -> List[User]:

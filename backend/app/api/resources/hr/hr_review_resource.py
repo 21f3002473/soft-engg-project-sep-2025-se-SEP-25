@@ -1,20 +1,19 @@
 # app/api/resources/hr/hr_review_resource.py
+from typing import Any
+
+from app.controllers import get_current_active_user
+from app.controllers.hr.hr_review_controller import (
+    create_review,
+    delete_review,
+    get_all_reviews,
+    get_reviews_by_user,
+    update_review,
+)
+from app.database import User, get_session
+from app.middleware import require_hr, require_root
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session
-from typing import Any
-
-from app.controllers.hr.hr_review_controller import (
-    get_all_reviews,
-    get_reviews_by_user,
-    create_review,
-    update_review,
-    delete_review,
-)
-from app.database import get_session
-from app.controllers import get_current_active_user
-from app.database import User
-from app.middleware import require_hr, require_root
 
 
 class HRReviewsListResource(Resource):
@@ -22,6 +21,7 @@ class HRReviewsListResource(Resource):
     GET  /hr/reviews            -> list all (HR/ROOT)
     POST /hr/review/create     -> create (HR/ROOT)
     """
+
     def get(
         self,
         current_user: User = Depends(get_current_active_user),
@@ -46,6 +46,7 @@ class HRReviewsByUserResource(Resource):
     """
     GET /hr/reviews/{user_id} -> reviews for a given user (HR/ROOT)
     """
+
     def get(
         self,
         user_id: int,
@@ -62,6 +63,7 @@ class HRReviewDetailResource(Resource):
     PUT /hr/review/{review_id}
     DELETE /hr/review/{review_id}
     """
+
     def put(
         self,
         review_id: int,
