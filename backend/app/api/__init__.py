@@ -48,28 +48,16 @@ class API:
         self.register_router(ProtectedResource, "/me")
 
         # HR
-        self.register_router(
-            HRReviewsListResource, "/hr/reviews"
-        )
-        self.register_router(
-            HRReviewsByUserResource, "/hr/reviews/{user_id}"
-        )
-        self.register_router(
-            HRReviewDetailResource, "/hr/review/{review_id}"
-        )
+        self.register_router(HRReviewsListResource, "/hr/reviews")
+        self.register_router(HRReviewsByUserResource, "/hr/reviews/{user_id}")
+        self.register_router(HRReviewDetailResource, "/hr/review/{review_id}")
 
         self.register_router(HRPolicyCollectionResource, "/hr/policies")
-        self.register_router(
-            HRPolicyDetailResource, "/hr/policy/{policy_id}"
-        )
-        self.register_router(
-            HRPolicyCollectionResource, "/hr/policy/create"
-        )
+        self.register_router(HRPolicyDetailResource, "/hr/policy/{policy_id}")
+        self.register_router(HRPolicyCollectionResource, "/hr/policy/create")
 
         self.register_router(EmployeeListResource, "/hr/employees")
-        self.register_router(
-            EmployeeDetailResource, "/hr/employee/{emp_id}"
-        )
+        self.register_router(EmployeeDetailResource, "/hr/employee/{emp_id}")
 
         # Admin
         admin_base_url = "/api/admin"
