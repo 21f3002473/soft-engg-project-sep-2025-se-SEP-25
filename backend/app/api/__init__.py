@@ -3,6 +3,21 @@ from datetime import timedelta
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.admin_resources.admin_resources import *
 from app.api.resources.employee import *
+from app.api.resources.hr.hr_employee_resource import (
+    EmployeeDetailResource,
+    EmployeeListResource,
+)
+from app.api.resources.hr.hr_policy_resource import (
+    HRPolicyCollectionResource,
+    HRPolicyDetailResource,
+)
+
+# near other imports in app/api/__init__.py
+from app.api.resources.hr.hr_review_resource import (
+    HRReviewDetailResource,
+    HRReviewsByUserResource,
+    HRReviewsListResource,
+)
 from app.api.resources.pr_resources.clients import (
     ClientRequirementResource,
     ClientsResource,
@@ -33,6 +48,32 @@ class API:
         # General
         self.register_router(UserLoginResource, "/user/login")
         self.register_router(ProtectedResource, "/me")
+
+        # HR review routes
+        self.register_router(
+            HRReviewsListResource, "/hr/reviews"
+        )  # GET list, POST create
+        self.register_router(
+            HRReviewsByUserResource, "/hr/reviews/{user_id}"
+        )  # GET reviews by user
+        self.register_router(
+            HRReviewDetailResource, "/hr/review/{review_id}"
+        )  # PUT, DELETE
+
+        # HR policy routes
+        self.register_router(HRPolicyCollectionResource, "/hr/policies")  # GET all
+        self.register_router(
+            HRPolicyDetailResource, "/hr/policy/{policy_id}"
+        )  # GET, PUT, DELETE
+        self.register_router(
+            HRPolicyCollectionResource, "/hr/policy/create"
+        )  # POST create (alternative path)
+
+        # Employee routes
+        self.register_router(EmployeeListResource, "/hr/employees")  # GET list
+        self.register_router(
+            EmployeeDetailResource, "/hr/employee/{emp_id}"
+        )  # GET, PUT, DELETE
         # product manager routes
         self.register_router(PRDashboardResource, "/pr/dashboard")
         self.register_router(ClientsResource, "/pr/clients")
