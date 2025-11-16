@@ -79,22 +79,22 @@ class API:
         self.register_router(AdminAccountResource, f"{admin_base_url}n/account")
 
         # Product Manager
-        pr_base_url = "/api/pr"
-        self.register_router(PRDashboardResource, f"{pr_base_url}/dashboard")
-        self.register_router(ClientsResource, f"{pr_base_url}/clients")
+        pm_base_url = "/api/pm"
+        self.register_router(PRDashboardResource, f"{pm_base_url}/dashboard")
+        self.register_router(ClientsResource, f"{pm_base_url}/clients")
 
         self.register_router(
-            ClientRequirementResource, f"{pr_base_url}/client/requirements/{{client_id}}"
+            ClientRequirementResource, f"{pm_base_url}/client/requirements/{{client_id}}"
         )
         self.register_router(
-            ClientUpdatesResource, f"{pr_base_url}/client/updates/{{client_id}}"
+            ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
         )
-        self.register_router(EmployeesResource, f"{pr_base_url}/employees")
+        self.register_router(EmployeesResource, f"{pm_base_url}/employees")
         self.register_router(
             EmployeePerformanceResource,
-            f"{pr_base_url}/employee/performance/{{employee_id}}",
+            f"{pm_base_url}/employee/performance/{{employee_id}}",
         )
-        self.register_router(ProjectsResource, f"{pr_base_url}/projects")
+        self.register_router(ProjectsResource, f"{pm_base_url}/projects")
 
         # Employee
         emp_base_url = "/api/employee"
