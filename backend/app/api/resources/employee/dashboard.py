@@ -18,11 +18,55 @@ logger = getLogger(__name__)
 
 
 class DashboardResource(Resource):
+    """
+    Employee Dashboard Resource - Story Point: "As an Employee, I want to browse HR FAQs and documents...
+
+    Provides a consolidated dashboard view for employees displaying:
+    - Personal task statistics (pending/completed)
+    - Request tracking (leave, reimbursement, transfer)
+    - Course completion progress
+    - Personal to-do items
+    - Recent HR announcements
+
+    This resource aggregates key employee information for quick overview without
+    waiting for individual API calls. Supports performance tracking and proactive improvements.
+    """
+
     def get(
         self,
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
+        """
+        Retrieve complete dashboard data for logged-in employee.
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents..." (announcement section)
+        - "As an Employee, I want to submit leave and reimbursement requests..." (request tracking)
+        - "As an Employee, I want to search for and view learning courses..." (courses_completed count)
+
+        Args:
+            current_user (User): Authenticated employee user object (via require_employee middleware)
+            session (Session): Database session for querying
+
+        Returns:
+            dict: Dashboard data containing:
+                - message (str): Success confirmation
+                - stats (dict): Aggregated counts
+                    - pending_tasks (int): Count of pending to-do items
+                    - completed_tasks (int): Count of completed to-do items
+                    - requests (int): Total requests (leave/reimbursement/transfer) submitted
+                    - courses_completed (int): Count of completed courses
+                - tasks (list[dict]): Employee's recent to-do items with id, task, status, deadline, date_created
+                - announcements (list[dict]): Latest 10 HR announcements (id, announcement, created_at)
+                - user (dict): Current user profile (id, name, email, role)
+
+        Error Codes:
+            - 500 Internal Server Error: Database query failures, invalid session state
+
+        Raises:
+            HTTPException(500): If any database operation fails during aggregation
+        """
 
         try:
             user_id = current_user.id
@@ -108,13 +152,40 @@ class DashboardResource(Resource):
 
 
 class AllToDoResource(Resource):
+    """
+    Employee To-Do Management Resource - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Manages employee personal to-do items. Allows employees to create, retrieve, and track
+    personal tasks and deadlines. This enables employees to organize work priorities and
+    monitor task completion status independently.
+    """
 
     def get(
         self,
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Get all ToDo items of the logged-in user"""
+        """
+        Retrieve all to-do items for the logged-in employee.
+
+        Story Points Supported:
+        - "As an Employee, I want to submit leave and reimbursement requests..." (task tracking)
+
+        Args:
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            list[dict]: Array of to-do items, each containing:
+                - id (int): Unique task identifier
+                - task (str): Task description
+                - status (str): Either "pending" or "completed"
+                - deadline (datetime): Optional task deadline
+                - date_created (datetime): When task was created
+
+        Error Codes:
+            - 401 Unauthorized: User is not an employee (caught by middleware)
+        """
 
         tasks = session.exec(
             select(ToDo)
@@ -139,7 +210,28 @@ class AllToDoResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Create a new ToDo item"""
+        """
+        Create a new to-do item for the employee.
+
+        Story Points Supported:
+        - "As an Employee, I want to submit leave and reimbursement requests..." (task management)
+
+        Args:
+            data (dict): Request payload containing:
+                - task (str, required): Description of the task
+                - deadline (datetime, optional): Optional deadline for the task
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation message with newly created task ID
+                - message (str): "Task added successfully"
+                - task_id (int): ID of the newly created to-do item
+
+        Error Codes:
+            - 400 Bad Request: Missing required "task" field
+            - 401 Unauthorized: User is not an employee
+        """
 
         task_text = data.get("task")
         if not task_text:
@@ -160,6 +252,12 @@ class AllToDoResource(Resource):
 
 
 class ToDoResource(Resource):
+    """
+    Individual To-Do Item Resource - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Handles CRUD operations on individual to-do items. Ensures employees can only modify
+    their own tasks. Supports task status updates and deadline modifications.
+    """
 
     def get(
         self,
@@ -167,7 +265,26 @@ class ToDoResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Get a specific ToDo item"""
+        """
+        Retrieve details of a specific to-do item.
+
+        Args:
+            task_id (int): The ID of the to-do item to retrieve
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            dict: To-do item details
+                - id (int): Task identifier
+                - task (str): Task description
+                - status (str): "pending" or "completed"
+                - deadline (datetime): Optional deadline
+                - date_created (datetime): Creation timestamp
+
+        Error Codes:
+            - 404 Not Found: Task does not exist or belongs to another user
+            - 401 Unauthorized: User is not an employee
+        """
 
         task = session.get(ToDo, task_id)
         if not task or task.user_id != current_user.id:
@@ -188,7 +305,30 @@ class ToDoResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Update a ToDo item"""
+        """
+        Update a specific to-do item (task description, status, or deadline).
+
+        Story Points Supported:
+        - "As an Employee, I want to submit leave and reimbursement requests..." (status tracking)
+
+        Args:
+            task_id (int): The ID of the to-do item to update
+            data (dict): Request payload with optional fields:
+                - task (str, optional): Updated task description
+                - status (str, optional): Must be "pending" or "completed"
+                - deadline (datetime, optional): Updated deadline
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation message
+                - message (str): "Task updated successfully"
+
+        Error Codes:
+            - 404 Not Found: Task does not exist or belongs to another user
+            - 400 Bad Request: Invalid status value (not "pending" or "completed")
+            - 401 Unauthorized: User is not an employee
+        """
 
         task = session.get(ToDo, task_id)
         if not task or task.user_id != current_user.id:
@@ -217,7 +357,22 @@ class ToDoResource(Resource):
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Delete a ToDo item"""
+        """
+        Delete a specific to-do item.
+
+        Args:
+            task_id (int): The ID of the to-do item to delete
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation message
+                - message (str): "Task deleted successfully"
+
+        Error Codes:
+            - 404 Not Found: Task does not exist or belongs to another user
+            - 401 Unauthorized: User is not an employee
+        """
 
         task = session.get(ToDo, task_id)
         if not task or task.user_id != current_user.id:
@@ -230,6 +385,14 @@ class ToDoResource(Resource):
 
 
 class AnnouncementAdminListCreateResource(Resource):
+    """
+    HR Announcement Management (List/Create) - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Allows HR personnel to create and retrieve all announcements. Announcements are
+    broadcast communications to all employees about policies, updates, and HR-related
+    information. This supports the employee story of browsing HR documents and staying
+    informed on organizational changes.
+    """
 
     def get(
         self,
@@ -237,7 +400,27 @@ class AnnouncementAdminListCreateResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """HR: Fetch all announcements"""
+        """
+        Retrieve all announcements (HR only).
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents..." (announcement retrieval)
+
+        Args:
+            user_id (int): HR user ID making the request (for audit purposes)
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            list[dict]: Array of all announcements, each containing:
+                - id (int): Announcement identifier
+                - announcement (str): Announcement content/text
+                - created_at (datetime): When announcement was created
+                - user_id (int): HR user who created it
+
+        Error Codes:
+            - 401 Unauthorized: User is not HR personnel (caught by middleware)
+        """
 
         ann_list = session.exec(
             select(Announcement).order_by(Announcement.created_at.desc())
@@ -260,7 +443,28 @@ class AnnouncementAdminListCreateResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """HR: Create a new announcement"""
+        """
+        Create a new announcement (HR only).
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents..." (announcement creation)
+
+        Args:
+            user_id (int): HR user ID creating the announcement
+            data (dict): Request payload containing:
+                - announcement (str, required): Announcement text/content
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation with announcement details
+                - message (str): "Announcement created"
+                - id (int): ID of newly created announcement
+
+        Error Codes:
+            - 400 Bad Request: Missing required "announcement" field
+            - 401 Unauthorized: User is not HR personnel
+        """
 
         text = data.get("announcement")
         if not text:
@@ -279,6 +483,12 @@ class AnnouncementAdminListCreateResource(Resource):
 
 
 class AnnouncementAdminDetailResource(Resource):
+    """
+    HR Announcement Detail Operations - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Handles retrieval, update, and deletion of individual announcements by HR personnel.
+    Enables HR to manage announcement lifecycle and correct or retract information.
+    """
 
     def get(
         self,
@@ -286,7 +496,25 @@ class AnnouncementAdminDetailResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """HR: Get a specific announcement"""
+        """
+        Retrieve a specific announcement by ID (HR only).
+
+        Args:
+            ann_id (int): The ID of the announcement to retrieve
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            dict: Announcement details
+                - id (int): Announcement identifier
+                - announcement (str): Announcement content
+                - created_at (datetime): Creation timestamp
+                - user_id (int): HR user who created it
+
+        Error Codes:
+            - 404 Not Found: Announcement with given ID does not exist
+            - 401 Unauthorized: User is not HR personnel
+        """
 
         ann = session.get(Announcement, ann_id)
         if not ann:
@@ -306,7 +534,27 @@ class AnnouncementAdminDetailResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """HR: Update an announcement"""
+        """
+        Update an existing announcement (HR only).
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents..." (announcement updates)
+
+        Args:
+            ann_id (int): The ID of the announcement to update
+            data (dict): Request payload with optional fields:
+                - announcement (str, optional): Updated announcement text
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation message
+                - message (str): "Announcement updated"
+
+        Error Codes:
+            - 404 Not Found: Announcement does not exist
+            - 401 Unauthorized: User is not HR personnel
+        """
 
         ann = session.get(Announcement, ann_id)
         if not ann:
@@ -326,7 +574,22 @@ class AnnouncementAdminDetailResource(Resource):
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
-        """HR: Delete an announcement"""
+        """
+        Delete an announcement (HR only).
+
+        Args:
+            ann_id (int): The ID of the announcement to delete
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            dict: Confirmation message
+                - message (str): "Announcement deleted"
+
+        Error Codes:
+            - 404 Not Found: Announcement does not exist
+            - 401 Unauthorized: User is not HR personnel
+        """
 
         ann = session.get(Announcement, ann_id)
         if not ann:
@@ -339,13 +602,38 @@ class AnnouncementAdminDetailResource(Resource):
 
 
 class AnnouncementEmployeeResource(Resource):
+    """
+    Employee Announcement Viewing - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Read-only endpoint for employees to view HR announcements. Enables employees to stay
+    informed about organizational policies, updates, and HR-related information without
+    waiting for manager notifications. Part of the self-service HR information browsing feature.
+    """
 
     def get(
         self,
         current_user: User = Depends(require_employee()),
         session: Session = Depends(get_session),
     ):
-        """Employee: Get their announcements"""
+        """
+        Retrieve all announcements for the logged-in employee.
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents so that I can find answers without waiting for HR responses."
+
+        Args:
+            current_user (User): Authenticated employee user object
+            session (Session): Database session
+
+        Returns:
+            list[dict]: Array of announcements, each containing:
+                - id (int): Announcement identifier
+                - announcement (str): Announcement content/text
+                - created_at (datetime): When announcement was published
+
+        Error Codes:
+            - 401 Unauthorized: User is not an employee (caught by middleware)
+        """
 
         ann_list = session.exec(
             select(Announcement)
