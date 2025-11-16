@@ -48,28 +48,25 @@ class API:
         self.register_router(ProtectedResource, "/me")
 
         # HR
+        hr_base_url = "/api/hr"
         self.register_router(
-            HRReviewsListResource, "/hr/reviews"
+            HRReviewsListResource, f"{hr_base_url}/reviews"
         )
         self.register_router(
-            HRReviewsByUserResource, "/hr/reviews/{user_id}"
+            HRReviewsByUserResource, f"{hr_base_url}/reviews/{{user_id}}"
         )
         self.register_router(
-            HRReviewDetailResource, "/hr/review/{review_id}"
-        )
-
-        self.register_router(HRPolicyCollectionResource, "/hr/policies")
-        self.register_router(
-            HRPolicyDetailResource, "/hr/policy/{policy_id}"
-        )
-        self.register_router(
-            HRPolicyCollectionResource, "/hr/policy/create"
+            HRReviewDetailResource, f"{hr_base_url}/review/{{review_id}}"
         )
 
-        self.register_router(EmployeeListResource, "/hr/employees")
+        self.register_router(HRPolicyCollectionResource, f"{hr_base_url}/policies")
         self.register_router(
-            EmployeeDetailResource, "/hr/employee/{emp_id}"
+            HRPolicyDetailResource, f"{hr_base_url}/policy/{{policy_id}}"
         )
+        self.register_router(HRPolicyCollectionResource, f"{hr_base_url}/policy/create")
+
+        self.register_router(EmployeeListResource, f"{hr_base_url}/employees")
+        self.register_router(EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}")
 
         # Admin
         admin_base_url = "/api/admin"
@@ -82,18 +79,22 @@ class API:
         self.register_router(AdminAccountResource, f"{admin_base_url}n/account")
 
         # Product Manager
-        self.register_router(PRDashboardResource, "/pr/dashboard")
-        self.register_router(ClientsResource, "/pr/clients")
+        pr_base_url = "/api/pr"
+        self.register_router(PRDashboardResource, f"{pr_base_url}/dashboard")
+        self.register_router(ClientsResource, f"{pr_base_url}/clients")
 
         self.register_router(
-            ClientRequirementResource, "/pr/client/requirements/{client_id}"
+            ClientRequirementResource, f"{pr_base_url}/client/requirements/{{client_id}}"
         )
-        self.register_router(ClientUpdatesResource, "/pr/client/updates/{client_id}")
-        self.register_router(EmployeesResource, "/pr/employees")
         self.register_router(
-            EmployeePerformanceResource, "/pr/employee/performance/{employee_id}"
+            ClientUpdatesResource, f"{pr_base_url}/client/updates/{{client_id}}"
         )
-        self.register_router(ProjectsResource, "/pr/projects")
+        self.register_router(EmployeesResource, f"{pr_base_url}/employees")
+        self.register_router(
+            EmployeePerformanceResource,
+            f"{pr_base_url}/employee/performance/{{employee_id}}",
+        )
+        self.register_router(ProjectsResource, f"{pr_base_url}/projects")
 
         # Employee
         emp_base_url = "/api/employee"
