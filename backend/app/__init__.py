@@ -20,7 +20,6 @@ def make_app():
 
     allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
     if not allowed_origins or allowed_origins == [""]:
-
         allowed_origins = ["http://localhost:8080"]
 
     app.add_middleware(
@@ -32,7 +31,7 @@ def make_app():
         max_age=600,
     )
 
-    _ = API(app)
+    API(app)
 
     @app.get("/")
     def index():
@@ -44,4 +43,27 @@ def make_app():
             ),
         }
 
+    # get api yaml file as download
+    @app.get("/openapi.yaml", include_in_schema=False)
+    def get_openapi_yaml():
+        from fastapi.openapi.utils import get_openapi
+        from fastapi.responses import Response
+        from yaml import dump
+
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            routes=app.routes,
+        )
+        yaml_schema = dump(openapi_schema, sort_keys=False, default_flow_style=False)
+        return Response(
+            content=yaml_schema,
+            media_type="application/x-yaml",
+            headers={"Content-Disposition": "attachment; filename=openapi.yaml"},
+        )
+
     return app
+
+
+# Create app instance for uvicorn to reference
+app = make_app()

@@ -39,6 +39,7 @@ class Config:
     OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
     if OPENAI_API_KEY is not None:
         os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     MODE = get_key(".env", "MODE")
 
@@ -50,3 +51,4 @@ class Config:
         "db": get_key(".env", "POSTGRES_DB"),
     }
     DATABASE_URL = f"postgresql://{POSTGRES['user']}:{POSTGRES['password']}@{POSTGRES['host']}:{POSTGRES['port']}/{POSTGRES['db']}"
+    print("DATABASE_URL:", DATABASE_URL)

@@ -1,5 +1,5 @@
 import store from "@/store/store.js";
-import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
+// import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
 
 export async function submitLogin(params = {}, router) {
   const { email, password } = params || {};
@@ -10,44 +10,44 @@ export async function submitLogin(params = {}, router) {
   }
 
 // remove the below block to disable local login after backend integration is done
-  const localUser = PREDEF_USERS[email];
-  if (localUser && localUser.password === password) {
+  // const localUser = PREDEF_USERS[email];
+  // if (localUser && localUser.password === password) {
     
-    const data = {
-      email: localUser.email,
-      role: localUser.role,
-      name: localUser.name,
-      access_token: localUser.token,
-    };
+  //   const data = {
+  //     email: localUser.email,
+  //     role: localUser.role,
+  //     name: localUser.name,
+  //     access_token: localUser.token,
+  //   };
 
     
-    localStorage.setItem("token", localUser.token);
-    localStorage.setItem("user", JSON.stringify(data));
+  //   localStorage.setItem("token", localUser.token);
+  //   localStorage.setItem("user", JSON.stringify(data));
 
-    if (store?.dispatch) {
-      store.dispatch("updateToken", localUser.token);
-      if (store._actions?.updateUser) {
-        store.dispatch("updateUser", data);
-      }
-    }
+  //   if (store?.dispatch) {
+  //     store.dispatch("updateToken", localUser.token);
+  //     if (store._actions?.updateUser) {
+  //       store.dispatch("updateUser", data);
+  //     }
+  //   }
 
-    var role = data.role;
-    if (role == "root") {
-      role = "admin";
-    } else if (role == "pm") {
-      role = "productmanager";
-    } else if (role == "hr") {
-      role = "hr";
-    } else if (role == "employee") {
-      role = "employee";
-    } else {
-      throw new Error("Invalid user role");
-    }
-    const targetRoute = `/${role}/dashboard`;
-    router.replace(targetRoute);
+  //   var role = data.role;
+  //   if (role == "root") {
+  //     role = "admin";
+  //   } else if (role == "pm") {
+  //     role = "productmanager";
+  //   } else if (role == "hr") {
+  //     role = "hr";
+  //   } else if (role == "employee") {
+  //     role = "employee";
+  //   } else {
+  //     throw new Error("Invalid user role");
+  //   }
+  //   const targetRoute = `/${role}/dashboard`;
+  //   router.replace(targetRoute);
 
-    return { ok: true, data };
-  }
+  //   return { ok: true, data };
+  // }
  // remove above block to disable local login after backend integration is done
   
   try {
@@ -90,7 +90,7 @@ export async function submitLogin(params = {}, router) {
         store.dispatch("updateUser", data);
       }
     }
-    // var role = data.role; // removed for time being 
+    var role = data.role; 
     if (role == "root") {
       role = "admin";
     }else if (role == "pm") {
@@ -118,11 +118,14 @@ export async function make_getrequest(url, params = {}) {
         ? "?" + new URLSearchParams(params).toString()
         : "";
 
+    const token = localStorage.getItem("token") || store.state.TOKEN;
+    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
+
     const response = await fetch(`${store.state.BASEURL}${url}${queryString}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${store.state.TOKEN}`,
+            Authorization: `Bearer ${cleanToken}`,
         },
     });
     if (!response.ok) {
@@ -133,58 +136,65 @@ export async function make_getrequest(url, params = {}) {
     return data;
 }
 
-// export async function make_postrequest(url, data = {}) {
-//     const token = localStorage.getItem("token") || store.state.TOKEN;
-//     const response = await fetch(`${store.state.BASEURL}${url}`, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify(data),
-//     });
-//     if (!response.ok) {
-//         throw new Error("Network response was not ok", await response.json());
-//     }
+export async function make_postrequest(url, data = {}) {
+    const token = localStorage.getItem("token") || store.state.TOKEN;
+    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
 
-//     const responseData = await response.json();
-//     return responseData;
-// }
+    const response = await fetch(`${store.state.BASEURL}${url}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanToken}`,
+        },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || "Network response was not ok");
+    }
 
-// export async function make_putrequest(url, data = {}) {
-//     const token = localStorage.getItem("token") || store.state.TOKEN;
-//     const response = await fetch(`${store.state.BASEURL}${url}`, {
-//         method: "PUT",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify(data),
-//     });
+    const responseData = await response.json();
+    return responseData;
+}
 
-//     if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//     }
+export async function make_putrequest(url, data = {}) {
+    const token = localStorage.getItem("token") || store.state.TOKEN;
+    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
 
-//     const responseData = await response.json();
-//     return responseData;
-// }
+    const response = await fetch(`${store.state.BASEURL}${url}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanToken}`,
+        },
+        body: JSON.stringify(data),
+    });
 
-// export async function make_deleterequest(url, data = {}) {
-//     const token = localStorage.getItem("token") || store.state.TOKEN;
-//     const response = await fetch(`${store.state.BASEURL}${url}`, {
-//         method: "DELETE",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//         },
-//     });
-//     if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//     }
-//     const responseData = await response.json();
-//     return responseData;
-// }
+    if (!response.ok) {
+        throw new Error("Network response was not ok");
+    }
+
+    const responseData = await response.json();
+    return responseData;
+}
+
+export async function make_deleterequest(url) {
+    const token = localStorage.getItem("token") || store.state.TOKEN;
+    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
+
+    const response = await fetch(`${store.state.BASEURL}${url}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cleanToken}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error("Network response was not ok");
+    }
+    const responseData = await response.json();
+    return responseData;
+}
 
 // export function returnStoreData() {
 //     return {

@@ -3,13 +3,15 @@ from enum import Enum
 from typing import List, Optional
 
 from app.utils import current_utc_time
+from sqlalchemy import Column
+from sqlalchemy import Enum as SQLEnum
 from sqlmodel import Field, Relationship, SQLModel
 
 
 class StatusTypeEnum(str, Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
 
 
 class Client(SQLModel, table=True):
@@ -30,7 +32,10 @@ class Project(SQLModel, table=True):
     project_id: str = Field(index=True, unique=True, nullable=False)
     project_name: str = Field(nullable=False)
     description: Optional[str] = Field(default=None)
-    status: StatusTypeEnum = Field(default=StatusTypeEnum.IN_PROGRESS)
+    status: StatusTypeEnum = Field(
+        default=StatusTypeEnum.PENDING,
+        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20)),
+    )
     client_id: int = Field(foreign_key="client.id", nullable=False)
     manager_id: Optional[int] = Field(foreign_key="user.id")
 
@@ -83,7 +88,10 @@ class EmpTodo(SQLModel, table=True):
     requirement_id: int = Field(foreign_key="requirement.id", nullable=False)
     project_id: int = Field(foreign_key="project.id", nullable=False)
     client_id: Optional[int] = Field(foreign_key="client.id", nullable=True)
-    status: StatusTypeEnum = Field(default=StatusTypeEnum.PENDING)
+    status: StatusTypeEnum = Field(
+        default=StatusTypeEnum.PENDING,
+        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20)),
+    )
     weightage: float = Field(default=0.0)
     user_id: Optional[int] = Field(foreign_key="user.id")
 

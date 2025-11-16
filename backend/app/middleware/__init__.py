@@ -1,30 +1,22 @@
 from enum import Enum
-from functools import wraps
-from typing import Callable, List
+from typing import List
 
-from app.database import User
+from app.database import RoleEnum, User
 from fastapi import Depends, HTTPException, status
 
-
-class Role(str, Enum):
-    """User roles in the system"""
-
-    ROOT = "root"
-    HUMAN_RESOURCE = "human_resource"
-    PRODUCT_MANAGER = "product_manager"
-    EMPLOYEE = "employee"
-
-
 ROLE_HIERARCHY = {
-    Role.ROOT: [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.HUMAN_RESOURCE: [Role.HUMAN_RESOURCE, Role.EMPLOYEE],
-    Role.PRODUCT_MANAGER: [Role.PRODUCT_MANAGER, Role.EMPLOYEE],
-    Role.EMPLOYEE: [Role.EMPLOYEE],
+    RoleEnum.ROOT: [
+        RoleEnum.ROOT,
+        RoleEnum.HUMAN_RESOURCE,
+        RoleEnum.PRODUCT_MANAGER,
+        RoleEnum.EMPLOYEE,
+    ],
+    RoleEnum.HUMAN_RESOURCE: [RoleEnum.HUMAN_RESOURCE, RoleEnum.EMPLOYEE],
+    RoleEnum.PRODUCT_MANAGER: [RoleEnum.PRODUCT_MANAGER, RoleEnum.EMPLOYEE],
+    RoleEnum.EMPLOYEE: [RoleEnum.EMPLOYEE],
 }
 
 
-##########################################################
-#  this dummy data access and we dont need it for now
 class Permission(str, Enum):
     """System permissions mapped to roles"""
 
@@ -51,10 +43,9 @@ class Permission(str, Enum):
     SYSTEM_CONFIG = "system_config"
 
 
-# this dummy data access and we dont need it for now
 ROLE_PERMISSIONS = {
-    Role.ROOT: [perm for perm in Permission],
-    Role.HUMAN_RESOURCE: [
+    RoleEnum.ROOT: [perm for perm in Permission],
+    RoleEnum.HUMAN_RESOURCE: [
         Permission.VIEW_ALL_USERS,
         Permission.MANAGE_EMPLOYEES,
         Permission.VIEW_EMPLOYEE_RECORDS,
@@ -64,7 +55,7 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
     ],
-    Role.PRODUCT_MANAGER: [
+    RoleEnum.PRODUCT_MANAGER: [
         Permission.MANAGE_PRODUCTS,
         Permission.VIEW_PRODUCTS,
         Permission.MANAGE_PROJECTS,
@@ -73,112 +64,124 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
     ],
-    Role.EMPLOYEE: [
+    RoleEnum.EMPLOYEE: [
         Permission.VIEW_PRODUCTS,
         Permission.VIEW_OWN_PROFILE,
         Permission.UPDATE_OWN_PROFILE,
     ],
 }
-###############################################################
 
 
-def check_permission(user_role: str, required_permission: Permission) -> bool:
-    """Check if a role has a specific permission"""
-    try:
-        role = Role(user_role)
-        return required_permission in ROLE_PERMISSIONS.get(role, [])
-    except ValueError:
-        return False
-
-
-def check_role_access(user_role: str, allowed_roles: List[Role]) -> bool:
+def check_role_access(user_role: str, allowed_roles: List[RoleEnum]) -> bool:
     """Check if user's role is in the allowed roles (considering hierarchy)"""
     try:
-        role = Role(user_role)
+        role = RoleEnum(user_role)
         user_allowed_roles = ROLE_HIERARCHY.get(role, [])
         return any(allowed_role in user_allowed_roles for allowed_role in allowed_roles)
     except ValueError:
         return False
 
 
-class RoleChecker:
-    """
-    Dependency class to check if user has required roles.
+def require_root():
+    """Require ROOT role (superuser only)"""
+    from app.controllers import get_current_active_user
 
-    Usage in routes:
-    @app.get("/admin", dependencies=[Depends(RoleChecker([Role.ROOT]))])
-    """
-
-    def __init__(self, allowed_roles: List[Role]):
-        self.allowed_roles = allowed_roles
-
-    def __call__(self, current_user: User) -> User:
-        if not check_role_access(current_user.role, self.allowed_roles):
+    def check_root(current_user: User = Depends(get_current_active_user)) -> User:
+        if not check_role_access(current_user.role, [RoleEnum.ROOT]):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required roles: {[r.value for r in self.allowed_roles]}. Your role: {current_user.role}",
+                detail=f"Access denied. Required role: ROOT. Your role: {current_user.role}",
             )
         return current_user
 
+    return check_root
 
-class PermissionChecker:
-    """
-    Dependency class to check if user has required permissions.
 
-    Usage in routes:
-    @app.get("/users", dependencies=[Depends(PermissionChecker([Permission.VIEW_ALL_USERS]))])
-    """
+def require_hr():
+    """Require Human Resource role or higher"""
+    from app.controllers import get_current_active_user
 
-    def __init__(self, required_permissions: List[Permission]):
-        self.required_permissions = required_permissions
-
-    def __call__(self, current_user: User) -> User:
-        for permission in self.required_permissions:
-            if not check_permission(current_user.role, permission):
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Missing required permission: {permission.value}. Your role: {current_user.role}",
-                )
+    def check_hr(current_user: User = Depends(get_current_active_user)) -> User:
+        if not check_role_access(
+            current_user.role, [RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE]
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Required roles: ROOT or HR. Your role: {current_user.role}",
+            )
         return current_user
 
-
-def require_root() -> RoleChecker:
-    """Require ROOT role (superuser only)"""
-    return RoleChecker([Role.ROOT])
+    return check_hr
 
 
-def require_hr() -> RoleChecker:
-    """Require Human Resource role or higher"""
-    return RoleChecker([Role.ROOT, Role.HUMAN_RESOURCE])
-
-
-def require_pm() -> RoleChecker:
+def require_pm():
     """Require Product Manager role or higher"""
-    return RoleChecker([Role.ROOT, Role.PRODUCT_MANAGER])
+    from app.controllers import get_current_active_user
+
+    def check_pm(current_user: User = Depends(get_current_active_user)) -> User:
+        if not check_role_access(
+            current_user.role, [RoleEnum.ROOT, RoleEnum.PRODUCT_MANAGER]
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Required roles: ROOT or PM. Your role: {current_user.role}",
+            )
+        return current_user
+
+    return check_pm
 
 
-def require_employee() -> RoleChecker:
+def require_employee():
     """Require any authenticated user (employee or higher)"""
-    return RoleChecker(
-        [Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER, Role.EMPLOYEE]
-    )
+    from app.controllers import get_current_active_user
+
+    def check_employee(current_user: User = Depends(get_current_active_user)) -> User:
+        if not check_role_access(
+            current_user.role,
+            [
+                RoleEnum.ROOT,
+                RoleEnum.HUMAN_RESOURCE,
+                RoleEnum.PRODUCT_MANAGER,
+                RoleEnum.EMPLOYEE,
+            ],
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Your role: {current_user.role}",
+            )
+        return current_user
+
+    return check_employee
 
 
-def require_hr_or_pm() -> RoleChecker:
+def require_hr_or_pm():
     """Require either HR or PM role"""
-    return RoleChecker([Role.ROOT, Role.HUMAN_RESOURCE, Role.PRODUCT_MANAGER])
+    from app.controllers import get_current_active_user
+
+    def check_hr_or_pm(current_user: User = Depends(get_current_active_user)) -> User:
+        if not check_role_access(
+            current_user.role,
+            [RoleEnum.ROOT, RoleEnum.HUMAN_RESOURCE, RoleEnum.PRODUCT_MANAGER],
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Required roles: ROOT, HR or PM. Your role: {current_user.role}",
+            )
+        return current_user
+
+    return check_hr_or_pm
 
 
-def can_manage_employees() -> PermissionChecker:
-    """Check if user can manage employees"""
-    return PermissionChecker([Permission.MANAGE_EMPLOYEES])
+def can_manage_employees():
+    """Check if user can manage employees (HR or ROOT)"""
+    return require_hr()
 
 
-def can_manage_products() -> PermissionChecker:
-    """Check if user can manage products"""
-    return PermissionChecker([Permission.MANAGE_PRODUCTS])
+def can_manage_products():
+    """Check if user can manage products (PM or ROOT)"""
+    return require_pm()
 
 
-def can_view_system_logs() -> PermissionChecker:
-    """Check if user can view system logs"""
-    return PermissionChecker([Permission.VIEW_SYSTEM_LOGS])
+def can_view_system_logs():
+    """Check if user can view system logs (ROOT only)"""
+    return require_root()

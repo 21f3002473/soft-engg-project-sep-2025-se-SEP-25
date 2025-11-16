@@ -1,17 +1,5 @@
 <template>
   <div class="dashboard">
-    <!-- <header class="dashboard-header">
-      <div class="nav-links">
-        <router-link to="/admin/dashboard">Home</router-link>
-        <router-link to="/systemStatus">System Status</router-link>
-        <router-link to="/logs">Logs</router-link>
-        <router-link to="/updates">Updates</router-link>
-        <router-link to="/admin/dashboard/backups" class="router-link-exact-active">Backups</router-link>
-      </div>
-      <div class="account-link">
-        <router-link to="/account">Account</router-link>
-      </div>
-    </header> -->
 
     <main class="dashboard-content">
       

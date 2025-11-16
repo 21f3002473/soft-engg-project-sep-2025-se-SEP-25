@@ -8,8 +8,17 @@ from typing import List, Optional
 
 from app.config import Config
 from app.utils import current_utc_time
+from sqlalchemy import Column
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import event
 from sqlmodel import Field, Relationship, SQLModel
+
+
+class RoleEnum(str, Enum):
+    ROOT = "root"
+    HUMAN_RESOURCE = "human_resource"
+    PRODUCT_MANAGER = "product_manager"
+    EMPLOYEE = "employee"
 
 
 class User(SQLModel, table=True):
@@ -30,15 +39,16 @@ class User(SQLModel, table=True):
         nullable=False,
     )
     salt: str = Field(default_factory=lambda: secrets.token_hex(16), nullable=False)
-    role: str = Field(
-        default="employee",
-        index=True,
-        nullable=False,
+    role: RoleEnum = Field(
+        default=RoleEnum.EMPLOYEE,
+        sa_column=Column(SQLEnum(RoleEnum, native_enum=False, length=30)),
     )
 
     department_id: Optional[int] = Field(default=None, foreign_key="department.id")
     reporting_manager: Optional[int] = Field(default=None, foreign_key="user.id")
     img_base64: Optional[str] = Field(default=None)
+
+    quick_notes: list["QuickNote"] = Relationship(back_populates="user")
 
     attendances: list["Attendance"] = Relationship(back_populates="user")
 
@@ -54,7 +64,7 @@ class User(SQLModel, table=True):
     requests: list["Request"] = Relationship(back_populates="user")
     leaves: list["Leave"] = Relationship(back_populates="user")
     reimbursements: list["Reimbursement"] = Relationship(back_populates="user")
-    transfer_requests: list["TransferRequest"] = Relationship(back_populates="user")
+    transfer_requests: list["Transfer"] = Relationship(back_populates="user")
     todos: list["ToDo"] = Relationship(back_populates="user")
     user_courses: list["UserCourse"] = Relationship(back_populates="user")
     announcements: list["Announcement"] = Relationship(back_populates="user")
@@ -101,7 +111,10 @@ class Attendance(SQLModel, table=True):
     date: datetime = Field(default_factory=lambda: current_utc_time().date())
     check_in: Optional[datetime] = Field(default=None)
     check_out: Optional[datetime] = Field(default=None)
-    status: AttendanceStatusEnum = Field(default=AttendanceStatusEnum.PRESENT)
+    status: AttendanceStatusEnum = Field(
+        default=AttendanceStatusEnum.PRESENT,
+        sa_column=Column(SQLEnum(AttendanceStatusEnum, native_enum=False, length=20)),
+    )
     worked_hours: Optional[float] = Field(default=None)
     remarks: Optional[str] = Field(default=None)
 
@@ -136,8 +149,16 @@ class StatusTypeEnum(str, Enum):
 
 class Request(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    request_type: RequestTypeEnum = Field(nullable=False)
-    status: StatusTypeEnum = Field(nullable=False)
+    request_type: RequestTypeEnum = Field(
+        sa_column=Column(
+            SQLEnum(RequestTypeEnum, native_enum=False, length=20), nullable=False
+        )
+    )
+    status: StatusTypeEnum = Field(
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
+    )
     user_id: int = Field(foreign_key="user.id")
 
     created_date: datetime = Field(default_factory=current_utc_time)
@@ -147,12 +168,12 @@ class Request(SQLModel, table=True):
     reimbursement_id: Optional[int] = Field(
         default=None, foreign_key="reimbursement.id"
     )
-    transfer_id: Optional[int] = Field(default=None, foreign_key="transferrequest.id")
+    transfer_id: Optional[int] = Field(default=None, foreign_key="transfer.id")
 
     user: "User" = Relationship(back_populates="requests")
     leave: Optional["Leave"] = Relationship(back_populates="request")
     reimbursement: Optional["Reimbursement"] = Relationship(back_populates="request")
-    transfer: Optional["TransferRequest"] = Relationship(back_populates="request")
+    transfer: Optional["Transfer"] = Relationship(back_populates="request")
 
 
 @event.listens_for(Request, "before_update", propagate=True)
@@ -193,7 +214,7 @@ class Reimbursement(SQLModel, table=True):
     )
 
 
-class TransferRequest(SQLModel, table=True):
+class Transfer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     current_department: str = Field(nullable=False)
@@ -212,8 +233,11 @@ class TransferRequest(SQLModel, table=True):
 
 class QuickNote(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
     topic: str = Field(nullable=False)
     notes: str = Field(nullable=False)
+
+    user: Optional["User"] = Relationship(back_populates="quick_notes")
 
 
 class Course(SQLModel, table=True):
@@ -229,7 +253,11 @@ class UserCourse(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     course_id: int = Field(foreign_key="course.id")
-    status: StatusTypeEnum = Field(nullable=False)
+    status: StatusTypeEnum = Field(
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
+    )
 
     user: Optional["User"] = Relationship(back_populates="user_courses")
     course: Optional["Course"] = Relationship(back_populates="user_courses")
@@ -239,7 +267,11 @@ class ToDo(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     task: str = Field(nullable=False)
-    status: StatusTypeEnum = Field(nullable=False)
+    status: StatusTypeEnum = Field(
+        sa_column=Column(
+            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+        )
+    )
     date_created: datetime = Field(default_factory=current_utc_time)
     deadline: Optional[datetime] = Field(default=None)
 
@@ -253,3 +285,9 @@ class Announcement(SQLModel, table=True):
     created_at: datetime = Field(default_factory=current_utc_time)
 
     user: Optional["User"] = Relationship(back_populates="announcements")
+
+
+class FAQ(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    question: str = Field(nullable=False)
+    answer: str = Field(nullable=False)

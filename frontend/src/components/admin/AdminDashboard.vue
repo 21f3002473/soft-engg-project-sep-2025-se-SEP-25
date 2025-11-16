@@ -4,14 +4,17 @@
       <div class="content-header">
         <h1>{{ title }}</h1>
         <div class="search-bar">
-          <input type="text" placeholder="Search" v-model="searchQuery"/>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2a9 9 0 1 0 5.293 16.293l4.707 4.707-1.414 1.414-4.707-4.707A9 9 0 0 0 11 2z" />
+          </svg>
+          <input class="search-input" type="text" placeholder="Search" v-model="searchQuery" aria-label="Search employees by name" />
           </div>
       </div>
 
   <div class="main-area">
         
         <div class="employee-list">
-          <div class="employee-item" v-for="emp in employees" :key="emp.id">
+          <div class="employee-item" v-for="emp in filteredEmployees" :key="emp.id">
             <span class="emp-name">{{ emp.name }}</span>
             <span class="emp-status" :class="emp.status.toLowerCase().replace('!', '')">
               {{ emp.status }}
@@ -223,6 +226,44 @@ a:hover {
   margin: 0;
   font-size: 28px;
   font-weight: 600;
+}
+
+/* Search Bar */
+.search-bar {
+  position: relative;
+  width: 260px;
+  display: flex;
+  align-items: center;
+}
+.search-bar .icon {
+  position: absolute;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  fill: #6b7280; /* gray-500 */
+  pointer-events: none;
+}
+.search-bar .search-input {
+  width: 100%;
+  padding: 10px 14px 10px 40px;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #1f2937; /* gray-800 */
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.25s ease;
+}
+.search-bar .search-input::placeholder {
+  color: #9ca3af; /* gray-400 */
+}
+.search-bar .search-input:focus {
+  outline: none;
+  border-color: #2563eb; /* blue-600 */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  background: #f8fafc; /* slate-50 */
+}
+.search-bar .search-input:hover:not(:focus) {
+  border-color: #9ca3af; /* gray-400 */
 }
 
 /* 2b. Main Area (List + Chat) */
