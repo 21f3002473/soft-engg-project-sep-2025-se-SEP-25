@@ -49,9 +49,7 @@ class API:
 
         # HR
         hr_base_url = "/api/hr"
-        self.register_router(
-            HRReviewsListResource, f"{hr_base_url}/reviews"
-        )
+        self.register_router(HRReviewsListResource, f"{hr_base_url}/reviews")
         self.register_router(
             HRReviewsByUserResource, f"{hr_base_url}/reviews/{{user_id}}"
         )
@@ -66,7 +64,9 @@ class API:
         self.register_router(HRPolicyCollectionResource, f"{hr_base_url}/policy/create")
 
         self.register_router(EmployeeListResource, f"{hr_base_url}/employees")
-        self.register_router(EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}")
+        self.register_router(
+            EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}"
+        )
 
         # Admin
         admin_base_url = "/api/admin"
@@ -84,7 +84,8 @@ class API:
         self.register_router(ClientsResource, f"{pr_base_url}/clients")
 
         self.register_router(
-            ClientRequirementResource, f"{pr_base_url}/client/requirements/{{client_id}}"
+            ClientRequirementResource,
+            f"{pr_base_url}/client/requirements/{{client_id}}",
         )
         self.register_router(
             ClientUpdatesResource, f"{pr_base_url}/client/updates/{{client_id}}"
