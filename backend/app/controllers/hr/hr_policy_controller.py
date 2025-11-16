@@ -1,4 +1,3 @@
-# app/controllers/hr/hr_policy_controller.py
 from typing import Any, Dict, List
 
 from app.database.hr_models import HRPolicy

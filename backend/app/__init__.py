@@ -43,7 +43,6 @@ def make_app():
             ),
         }
 
-    # get api yaml file as download
     @app.get("/openapi.yaml", include_in_schema=False)
     def get_openapi_yaml():
         from fastapi.openapi.utils import get_openapi
@@ -65,5 +64,4 @@ def make_app():
     return app
 
 
-# Create app instance for uvicorn to reference
 app = make_app()

@@ -1,4 +1,3 @@
-# app/controllers/hr/hr_employee_controller.py
 from typing import Any, Dict, List
 
 from app.database import User
@@ -22,7 +21,6 @@ def update_employee(emp_id: int, payload: Dict[str, Any], session: Session) -> U
     if not emp:
         raise HTTPException(status_code=404, detail="Employee not found")
 
-    # Only update allowed fields (add more if needed)
     allowed = {"name", "email", "role", "is_active"}
     for k, v in payload.items():
         if k in allowed:

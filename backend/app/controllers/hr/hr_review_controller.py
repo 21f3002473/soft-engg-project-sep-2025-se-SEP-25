@@ -1,4 +1,3 @@
-# app/controllers/hr/hr_review_controller.py
 from typing import Any, Dict, List
 
 from app.database import User
@@ -22,8 +21,6 @@ def get_reviews_by_user(user_id: int, session: Session) -> List[PerformanceRevie
 
 
 def create_review(payload: Dict[str, Any], session: Session) -> PerformanceReview:
-    # payload: {'user_id': int, 'comments': str (opt), 'rating': int}
-    # validate target user exists:
     user = session.get(User, payload.get("user_id"))
     if not user:
         raise HTTPException(status_code=404, detail="Target user not found")
