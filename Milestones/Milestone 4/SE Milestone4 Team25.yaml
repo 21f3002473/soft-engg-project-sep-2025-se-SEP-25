@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: se_server
   version: 0.1.0
@@ -72,6 +72,21 @@ paths:
           content:
             application/json:
               schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
     post:
@@ -114,6 +129,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/reviews/{user_id}:
@@ -154,6 +194,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
   /api/hr/review/{review_id}:
     delete:
       summary: Hrreviewdetailresource.Delete
@@ -190,6 +245,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Hrreviewdetailresource.Put
       description: "Update an existing performance review.\n\nPurpose:\nAllows HR\
@@ -238,6 +313,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/hr/policies:
     get:
       summary: Hrpolicycollectionresource.Get
@@ -255,6 +355,21 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema: {}
@@ -298,6 +413,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/policy/{policy_id}:
@@ -336,6 +471,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Hrpolicydetailresource.Get
       description: "Retrieve a specific HR policy by ID.\n\nPurpose:\nFetches detailed\
@@ -370,6 +525,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Hrpolicydetailresource.Put
       description: "Update an existing HR policy.\n\nPurpose:\nAllows HR managers\
@@ -418,6 +593,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/hr/policy/create:
     get:
       summary: Hrpolicycollectionresource.Get
@@ -435,6 +635,21 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema: {}
@@ -478,6 +693,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/employees:
@@ -496,6 +731,21 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema: {}
@@ -536,6 +786,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Employeedetailresource.Get
       description: "Retrieve detailed information for a specific employee.\n\nPurpose:\n\
@@ -570,6 +840,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Employeedetailresource.Put
       description: "Update employee information and policy assignments.\n\nPurpose:\n\
@@ -615,6 +905,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/admin/register:
     post:
       summary: Adminregistrationresource.Post
@@ -1411,6 +1726,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/dashboard:
     get:
       summary: Dashboardresource.Get
@@ -1439,6 +1764,11 @@ paths:
           content:
             application/json:
               schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/todo:
@@ -1458,6 +1788,11 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -1497,6 +1832,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/todo/{task_id}:
@@ -1530,6 +1875,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Todoresource.Get
       description: "Retrieve details of a specific to-do item.\n\nArgs:\n    task_id\
@@ -1563,6 +1918,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Todoresource.Put
       description: "Update a specific to-do item (task description, status, or deadline).\n\
@@ -1608,6 +1973,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/annoucements:
     get:
       summary: Announcementemployeeresource.Get
@@ -1624,6 +2004,11 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -1664,6 +2049,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
     post:
       summary: Announcementadminlistcreateresource.Post
       description: "Create a new announcement (HR only).\n\nStory Points Supported:\n\
@@ -1706,6 +2096,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
   /api/hr/annoucement/edit/{ann_id}:
     delete:
       summary: Announcementadmindetailresource.Delete
@@ -1737,6 +2137,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Announcementadmindetailresource.Get
       description: "Retrieve a specific announcement by ID (HR only).\n\nArgs:\n \
@@ -1769,6 +2179,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Announcementadmindetailresource.Put
       description: "Update an existing announcement (HR only).\n\nStory Points Supported:\n\
@@ -1810,6 +2230,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/learning:
     get:
       summary: Learningresource.Get
@@ -1843,6 +2273,11 @@ paths:
           content:
             application/json:
               schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/courses:
@@ -1861,6 +2296,11 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -1910,6 +2350,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/recommendations:
     get:
       summary: Courserecommendationresource.Get
@@ -1943,6 +2398,16 @@ paths:
           content:
             application/json:
               schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/course:
@@ -1961,6 +2426,11 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -2000,6 +2470,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/course/{course_id}:
@@ -2033,6 +2513,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Courseadmindetailresource.Get
       description: "Retrieve details of a specific course (HR only).\n\nArgs:\n  \
@@ -2065,6 +2555,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Courseadmindetailresource.Put
       description: "Update an existing course (HR only).\n\nArgs:\n    course_id (int):\
@@ -2106,6 +2606,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/hr/course/assign/{user_id}:
     get:
       summary: Courseassignmentlistresource.Get
@@ -2139,6 +2649,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
     post:
       summary: Courseassignmentlistresource.Post
       description: "Assign a course to an employee (HR only).\n\nStory Points Supported:\n\
@@ -2181,6 +2696,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
   /api/hr/course/assign/edit/{assign_id}:
     delete:
       summary: Courseassignmentdetailresource.Delete
@@ -2212,6 +2737,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Courseassignmentdetailresource.Get
       description: "Retrieve details of a specific course assignment (HR only).\n\n\
@@ -2244,6 +2779,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Courseassignmentdetailresource.Put
       description: "Update a course assignment (HR only). Can modify status or course\
@@ -2286,6 +2831,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/requests/leave:
     get:
       summary: Allleaverequestresource.Get
@@ -2311,6 +2871,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -2355,6 +2925,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/requests/reimbursement:
@@ -2381,6 +2966,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -2424,6 +3019,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/requests/transfer:
@@ -2449,6 +3059,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -2490,6 +3110,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/requests/leave/{leave_id}:
@@ -2532,6 +3167,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Leaverequestresource.Get
       description: "Retrieve details of a specific leave request.\n\nArgs:\n    leave_id\
@@ -2567,6 +3222,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Leaverequestresource.Put
       description: "Update a leave request (only if status is PENDING).\n\nStory Points\
@@ -2615,6 +3280,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/requests/reimbursement/{reimbursement_id}:
     delete:
       summary: Reimbursementrequestresource.Delete
@@ -2654,6 +3339,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Reimbursementrequestresource.Get
       description: "Retrieve details of a specific reimbursement request.\n\nArgs:\n\
@@ -2689,6 +3394,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Reimbursementrequestresource.Put
       description: "Update a reimbursement request (only if status is PENDING).\n\n\
@@ -2737,6 +3452,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/requests/transfer/{transfer_id}:
     delete:
       summary: Transferrequestresource.Delete
@@ -2776,6 +3511,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Transferrequestresource.Get
       description: "Retrieve details of a specific transfer request.\n\nArgs:\n  \
@@ -2811,6 +3566,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Transferrequestresource.Put
       description: "Update a transfer request (only if status is PENDING).\n\nStory\
@@ -2858,6 +3623,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/hr-faqs:
     get:
       summary: Hrfaqlistemployeeresource.Get
@@ -2881,6 +3666,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -2925,6 +3720,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/hr/faq/{faq_id}:
@@ -2964,6 +3774,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Hrfaqdetailresource.Get
       description: "Retrieve a specific FAQ entry by ID (Employee access).\n\nStory\
@@ -2999,6 +3824,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Hrfaqdetailresource.Put
       description: "Update an existing FAQ entry (HR only).\n\nStory Points Supported:\n\
@@ -3045,6 +3880,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/writing:
     get:
       summary: Allquicknotesresource.Get
@@ -3063,6 +3918,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -3102,6 +3967,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /api/employee/writing/{note_id}:
@@ -3139,6 +4019,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     get:
       summary: Quicknotesresource.Get
       description: "Retrieve a specific quick note by ID.\n\nArgs:\n    note_id (int):\
@@ -3171,6 +4066,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
     put:
       summary: Quicknotesresource.Put
       description: "Update a quick note (topic and/or content).\n\nAllows employees\
@@ -3214,6 +4119,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: {}
   /api/employee/account:
     get:
       summary: Accountresource.Get
@@ -3239,6 +4159,16 @@ paths:
       responses:
         '200':
           description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema: {}
@@ -3283,6 +4213,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
     delete:
@@ -3353,6 +4298,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: {}
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema: {}
       security:
       - OAuth2PasswordBearer: []
   /token:
@@ -3395,27 +4360,22 @@ components:
         name:
           anyOf:
           - type: string
-          - type: 'null'
           title: Name
         email:
           anyOf:
           - type: string
-          - type: 'null'
           title: Email
         img_base64:
           anyOf:
           - type: string
-          - type: 'null'
           title: Img Base64
         department_id:
           anyOf:
           - type: integer
-          - type: 'null'
           title: Department Id
         reporting_manager:
           anyOf:
           - type: integer
-          - type: 'null'
           title: Reporting Manager
       type: object
       title: AccountUpdate
@@ -3424,17 +4384,14 @@ components:
         name:
           anyOf:
           - type: string
-          - type: 'null'
           title: Name
         old_password:
           anyOf:
           - type: string
-          - type: 'null'
           title: Old Password
         new_password:
           anyOf:
           - type: string
-          - type: 'null'
           title: New Password
       type: object
       title: AccountUpdatePayload
@@ -3456,7 +4413,6 @@ components:
           anyOf:
           - type: string
             format: email
-          - type: 'null'
           title: Email
       type: object
       required:
@@ -3533,7 +4489,6 @@ components:
           anyOf:
           - type: string
             pattern: ^password$
-          - type: 'null'
           title: Grant Type
         username:
           type: string
@@ -3549,12 +4504,10 @@ components:
         client_id:
           anyOf:
           - type: string
-          - type: 'null'
           title: Client Id
         client_secret:
           anyOf:
           - type: string
-          - type: 'null'
           format: password
           title: Client Secret
       type: object
@@ -3585,7 +4538,6 @@ components:
         detail_base64:
           anyOf:
           - type: string
-          - type: 'null'
           title: Detail Base64
       type: object
       required:
@@ -3598,17 +4550,14 @@ components:
         client_name:
           anyOf:
           - type: string
-          - type: 'null'
           title: Client Name
         email:
           anyOf:
           - type: string
-          - type: 'null'
           title: Email
         detail_base64:
           anyOf:
           - type: string
-          - type: 'null'
           title: Detail Base64
       type: object
       title: ClientUpdateModel
@@ -3650,7 +4599,6 @@ components:
         reason:
           anyOf:
           - type: string
-          - type: 'null'
           title: Reason
       type: object
       required:
@@ -3669,12 +4617,10 @@ components:
         description:
           anyOf:
           - type: string
-          - type: 'null'
           title: Description
         status:
           anyOf:
           - $ref: '#/components/schemas/StatusTypeEnum'
-          - type: 'null'
           default: PENDING
         client_id:
           type: integer
@@ -3682,7 +4628,6 @@ components:
         manager_id:
           anyOf:
           - type: integer
-          - type: 'null'
           title: Manager Id
       type: object
       required:
@@ -3695,21 +4640,17 @@ components:
         project_name:
           anyOf:
           - type: string
-          - type: 'null'
           title: Project Name
         description:
           anyOf:
           - type: string
-          - type: 'null'
           title: Description
         status:
           anyOf:
           - $ref: '#/components/schemas/StatusTypeEnum'
-          - type: 'null'
         manager_id:
           anyOf:
           - type: integer
-          - type: 'null'
           title: Manager Id
       type: object
       title: ProjectUpdateModel
@@ -3718,7 +4659,6 @@ components:
         topic:
           anyOf:
           - type: string
-          - type: 'null'
           title: Topic
           default: Quick Note
         notes:
@@ -3733,12 +4673,10 @@ components:
         topic:
           anyOf:
           - type: string
-          - type: 'null'
           title: Topic
         notes:
           anyOf:
           - type: string
-          - type: 'null'
           title: Notes
       type: object
       title: QuickNoteUpdate
@@ -3757,7 +4695,6 @@ components:
         remark:
           anyOf:
           - type: string
-          - type: 'null'
           title: Remark
       type: object
       required:
@@ -3787,12 +4724,10 @@ components:
         requirements:
           anyOf:
           - type: string
-          - type: 'null'
           title: Requirements
         project_id:
           anyOf:
           - type: integer
-          - type: 'null'
           title: Project Id
       type: object
       title: RequirementUpdateModel
@@ -3827,7 +4762,6 @@ components:
         reason:
           anyOf:
           - type: string
-          - type: 'null'
           title: Reason
       type: object
       required:
@@ -3845,7 +4779,6 @@ components:
         details:
           anyOf:
           - type: string
-          - type: 'null'
           title: Details
       type: object
       required:
@@ -3857,7 +4790,6 @@ components:
         details:
           anyOf:
           - type: string
-          - type: 'null'
           title: Details
       type: object
       title: UpdateUpdateModel
