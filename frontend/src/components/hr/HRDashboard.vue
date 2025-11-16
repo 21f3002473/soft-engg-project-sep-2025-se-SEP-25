@@ -127,7 +127,7 @@
 export default {
   name: "HRDashboard",
 };
-Data = {
+let Data = {
   return: {},
   chartData: {},
   chartOptions: {},
