@@ -127,11 +127,6 @@
 export default {
   name: "HRDashboard",
 };
-let Data = {
-  return: {},
-  chartData: {},
-  chartOptions: {},
-};
 </script>
 
 <!-- <style scoped>
