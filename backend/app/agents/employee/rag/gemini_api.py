@@ -10,7 +10,6 @@ genai.configure(api_key=GEMINI_API_KEY)
 _chat_session = None
 _chat_history = []
 
-
 def query_gemini(prompt):
     try:
         return _extracted_from_query_gemini_7(prompt)
@@ -73,13 +72,11 @@ Be concise, factual, and format every response exactly as instructed.
 
     return response.text
 
-
 def reset_chat():
     global _chat_session, _chat_history
     _chat_session = None
     _chat_history = []
     return {"message": "Chat history cleared", "history": []}
-
 
 def get_chat_history():
     global _chat_history
