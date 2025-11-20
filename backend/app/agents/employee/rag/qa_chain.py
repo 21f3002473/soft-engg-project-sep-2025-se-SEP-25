@@ -1,18 +1,18 @@
 import os
 import pickle
+
 from langchain.chains import RetrievalQA
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
 from .gemini_llm import GeminiLLM
 
 
 def load_schemes_data():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-    data_path = os.path.join(
-        project_root, "app", "static", "employee", "data.txt"
-    )
+    data_path = os.path.join(project_root, "app", "static", "employee", "data.txt")
     with open(data_path, "r") as file:
         return file.read()
 

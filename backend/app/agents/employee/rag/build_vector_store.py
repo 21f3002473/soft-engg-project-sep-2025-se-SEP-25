@@ -1,7 +1,8 @@
 import pickle
-from langchain.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
+
 from data_loader import load_schemes_data
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
 
 
 def build_faiss_index():
