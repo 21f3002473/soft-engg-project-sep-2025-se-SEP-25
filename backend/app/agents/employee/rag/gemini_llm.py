@@ -1,5 +1,7 @@
+from typing import List, Optional
+
 from langchain.llms.base import LLM
-from typing import Optional, List
+
 from .gemini_api import query_gemini
 
 

@@ -1,5 +1,6 @@
-import google.generativeai as genai
 import os
+
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,6 +10,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 _chat_session = None
 _chat_history = []
 
+
 def query_gemini(prompt):
     try:
         return _extracted_from_query_gemini_7(prompt)
@@ -17,9 +19,10 @@ def query_gemini(prompt):
         _chat_history = []
         return f"API Error: {e}"
 
+
 def _extracted_from_query_gemini_7(prompt):
     global _chat_session, _chat_history
-    model = genai.GenerativeModel('gemini-2.0-flash-exp')
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
 
     safety_settings = {
         "HARASSMENT": "block_none",
@@ -70,11 +73,13 @@ Be concise, factual, and format every response exactly as instructed.
 
     return response.text
 
+
 def reset_chat():
     global _chat_session, _chat_history
     _chat_session = None
     _chat_history = []
     return {"message": "Chat history cleared", "history": []}
+
 
 def get_chat_history():
     global _chat_history
