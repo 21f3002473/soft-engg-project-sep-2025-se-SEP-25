@@ -1,30 +1,21 @@
-import pytest
-import requests
-
-BASE_URL = "http://localhost:8000/api"
+import httpx
 
 
-@pytest.fixture
-def client():
-    return requests
-
-
-def assert_json(response):
-    assert "application/json" in response.headers.get("Content-Type", "")
-    return response.json()
+def assert_json(resp):
+    assert "application/json" in resp.headers.get("content-type", "").lower()
+    return resp.json()
 
 
 # HR FAQ CREATE  (POST /hr/faq)
 
 
-def test_hr_faq_create_success(client):
-    headers = {"Authorization": "Bearer hr_token"}
+def test_hr_faq_create_success(base_url, auth_hr):
     payload = {
         "question": "What is the leave policy?",
         "answer": "Employees get 20 days of leave.",
     }
 
-    r = client.post(f"{BASE_URL}/hr/faq", json=payload, headers=headers)
+    r = httpx.post(f"{base_url}/hr/faq", json=payload, headers=auth_hr)
 
     assert r.status_code in [200, 201]
     data = assert_json(r)
@@ -32,45 +23,41 @@ def test_hr_faq_create_success(client):
     assert "id" in data
 
 
-def test_hr_faq_create_missing_field(client):
-    headers = {"Authorization": "Bearer hr_token"}
-    payload = {"question": "Missing answer"}
+def test_hr_faq_create_missing_field(base_url, auth_hr):
+    payload = {"question": "Missing answer"}  # Missing required 'answer' field
 
-    r = client.post(f"{BASE_URL}/hr/faq", json=payload, headers=headers)
+    r = httpx.post(f"{base_url}/hr/faq", json=payload, headers=auth_hr)
 
-    assert r.status_code == 422  # Pydantic validation
-    # FastAPI returns validation error in standard format
+    assert r.status_code == 422  # FastAPI validation
 
 
-def test_hr_faq_create_unauthorized(client):
+def test_hr_faq_create_unauthorized(base_url):
     payload = {"question": "Test?", "answer": "Test!"}
 
-    r = client.post(f"{BASE_URL}/hr/faq", json=payload)
+    r = httpx.post(f"{base_url}/hr/faq", json=payload)
 
     assert r.status_code in [401, 403]
 
 
-def test_hr_faq_create_internal_error(client, monkeypatch):
-    def bad_add(*a, **kw):
-        raise Exception("DB FAIL")
+def test_hr_faq_create_internal_error(base_url, auth_hr, monkeypatch):
+    monkeypatch.setattr(
+        "sqlmodel.Session.add",
+        lambda *a, **kw: (_ for _ in ()).throw(Exception("DB FAIL")),
+    )
 
-    monkeypatch.setattr("sqlmodel.Session.add", bad_add)
-
-    headers = {"Authorization": "Bearer hr_token"}
     payload = {"question": "Q?", "answer": "A"}
 
-    r = client.post(f"{BASE_URL}/hr/faq", json=payload, headers=headers)
+    r = httpx.post(f"{base_url}/hr/faq", json=payload, headers=auth_hr)
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"
 
 
-# FAQ DETAIL GET (GET /hr/faq/{id})  – Employee allowed
+# FAQ DETAIL GET (GET /hr/faq/{id}) — Employee allowed
 
 
-def test_faq_detail_get_success(client):
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.get(f"{BASE_URL}/hr/faq/1", headers=headers)
+def test_faq_detail_get_success(base_url, auth_employee):
+    r = httpx.get(f"{base_url}/hr/faq/1", headers=auth_employee)
 
     assert r.status_code in [200, 404]
     if r.status_code == 200:
@@ -79,60 +66,56 @@ def test_faq_detail_get_success(client):
         assert {"id", "question", "answer"}.issubset(data["faq"].keys())
 
 
-def test_faq_detail_not_found(client):
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.get(f"{BASE_URL}/hr/faq/999999", headers=headers)
+def test_faq_detail_not_found(base_url, auth_employee):
+    r = httpx.get(f"{base_url}/hr/faq/999999", headers=auth_employee)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "FAQ not found"
 
 
-def test_faq_detail_unauthorized(client):
-    r = client.get(f"{BASE_URL}/hr/faq/1")
+def test_faq_detail_unauthorized(base_url):
+    r = httpx.get(f"{base_url}/hr/faq/1")
     assert r.status_code in [401, 403]
 
 
 # UPDATE FAQ (PUT /hr/faq/{id})
 
 
-def test_faq_update_success(client):
-    headers = {"Authorization": "Bearer hr_token"}
+def test_faq_update_success(base_url, auth_hr):
     payload = {"question": "Updated Q?", "answer": "Updated A."}
 
-    r = client.put(f"{BASE_URL}/hr/faq/1", json=payload, headers=headers)
+    r = httpx.put(f"{base_url}/hr/faq/1", json=payload, headers=auth_hr)
 
     assert r.status_code in [200, 404]
     if r.status_code == 200:
         assert assert_json(r)["message"] == "FAQ updated successfully"
 
 
-def test_faq_update_not_found(client):
-    headers = {"Authorization": "Bearer hr_token"}
+def test_faq_update_not_found(base_url, auth_hr):
     payload = {"question": "Anything?", "answer": "Anything!"}
 
-    r = client.put(f"{BASE_URL}/hr/faq/999999", json=payload, headers=headers)
+    r = httpx.put(f"{base_url}/hr/faq/999999", json=payload, headers=auth_hr)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "FAQ not found"
 
 
-def test_faq_update_unauthorized(client):
+def test_faq_update_unauthorized(base_url):
     payload = {"question": "No auth", "answer": "No auth answer"}
 
-    r = client.put(f"{BASE_URL}/hr/faq/1", json=payload)
+    r = httpx.put(f"{base_url}/hr/faq/1", json=payload)
     assert r.status_code in [401, 403]
 
 
-def test_faq_update_internal_error(client, monkeypatch):
-    def bad_commit(*a, **kw):
-        raise Exception("Commit fail")
+def test_faq_update_internal_error(base_url, auth_hr, monkeypatch):
+    monkeypatch.setattr(
+        "sqlmodel.Session.commit",
+        lambda *a, **kw: (_ for _ in ()).throw(Exception("Commit fail")),
+    )
 
-    monkeypatch.setattr("sqlmodel.Session.commit", bad_commit)
-
-    headers = {"Authorization": "Bearer hr_token"}
     payload = {"question": "Q", "answer": "A"}
 
-    r = client.put(f"{BASE_URL}/hr/faq/1", json=payload, headers=headers)
+    r = httpx.put(f"{base_url}/hr/faq/1", json=payload, headers=auth_hr)
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"
@@ -141,36 +124,33 @@ def test_faq_update_internal_error(client, monkeypatch):
 # DELETE FAQ (DELETE /hr/faq/{id})
 
 
-def test_faq_delete_success(client):
-    headers = {"Authorization": "Bearer hr_token"}
-    r = client.delete(f"{BASE_URL}/hr/faq/1", headers=headers)
+def test_faq_delete_success(base_url, auth_hr):
+    r = httpx.delete(f"{base_url}/hr/faq/1", headers=auth_hr)
 
     assert r.status_code in [200, 404]
     if r.status_code == 200:
         assert assert_json(r)["message"] == "FAQ deleted successfully"
 
 
-def test_faq_delete_not_found(client):
-    headers = {"Authorization": "Bearer hr_token"}
-    r = client.delete(f"{BASE_URL}/hr/faq/999999", headers=headers)
+def test_faq_delete_not_found(base_url, auth_hr):
+    r = httpx.delete(f"{base_url}/hr/faq/999999", headers=auth_hr)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "FAQ not found"
 
 
-def test_faq_delete_unauthorized(client):
-    r = client.delete(f"{BASE_URL}/hr/faq/1")
+def test_faq_delete_unauthorized(base_url):
+    r = httpx.delete(f"{base_url}/hr/faq/1")
     assert r.status_code in [401, 403]
 
 
-def test_faq_delete_internal_error(client, monkeypatch):
-    def bad_delete(*a, **kw):
-        raise Exception("Delete failed")
+def test_faq_delete_internal_error(base_url, auth_hr, monkeypatch):
+    monkeypatch.setattr(
+        "sqlmodel.Session.delete",
+        lambda *a, **kw: (_ for _ in ()).throw(Exception("Delete failed")),
+    )
 
-    monkeypatch.setattr("sqlmodel.Session.delete", bad_delete)
-
-    headers = {"Authorization": "Bearer hr_token"}
-    r = client.delete(f"{BASE_URL}/hr/faq/1", headers=headers)
+    r = httpx.delete(f"{base_url}/hr/faq/1", headers=auth_hr)
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"
@@ -179,9 +159,8 @@ def test_faq_delete_internal_error(client, monkeypatch):
 # LIST ALL FAQS (GET /employee/hr-faqs)
 
 
-def test_employee_list_faqs_success(client):
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.get(f"{BASE_URL}/employee/hr-faqs", headers=headers)
+def test_employee_list_faqs_success(base_url, auth_employee):
+    r = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
 
     assert r.status_code == 200
     data = assert_json(r)
@@ -189,19 +168,18 @@ def test_employee_list_faqs_success(client):
     assert isinstance(data["faqs"], list)
 
 
-def test_employee_list_faqs_unauthorized(client):
-    r = client.get(f"{BASE_URL}/employee/hr-faqs")
+def test_employee_list_faqs_unauthorized(base_url):
+    r = httpx.get(f"{base_url}/employee/hr-faqs")
     assert r.status_code in [401, 403]
 
 
-def test_employee_list_faqs_internal_error(client, monkeypatch):
+def test_employee_list_faqs_internal_error(base_url, auth_employee, monkeypatch):
     monkeypatch.setattr(
         "sqlmodel.Session.exec",
         lambda *a, **b: (_ for _ in ()).throw(Exception("DB error")),
     )
 
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.get(f"{BASE_URL}/employee/hr-faqs", headers=headers)
+    r = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"

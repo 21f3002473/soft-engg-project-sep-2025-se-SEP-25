@@ -1,158 +1,107 @@
-import pytest
-import requests
-
-BASE_URL = "http://localhost:8000/api"
-
-
-@pytest.fixture
-def client():
-    return requests
+import httpx
 
 
 def assert_json(resp):
-    assert "application/json" in resp.headers.get("Content-Type", "")
+    assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
 
 
-# GET /employee/account
+#   GET /employee/account
 
 
-def test_account_get_success(monkeypatch, client):
-    """Return account info successfully."""
-
-    class MockUser:
-        id = 1
-        name = "Alice"
-        email = "alice@example.com"
-        role = "employee"
-        department_id = None
-        reporting_manager = None
-        img_base64 = None
-
-    def mock_require_employee():
-        return lambda: MockUser()
-
-    monkeypatch.setattr("app.middleware.require_employee", mock_require_employee)
-
-    headers = {"Authorization": "Bearer employee_token"}
-
-    r = client.get(f"{BASE_URL}/employee/account", headers=headers)
+def test_account_get_success(base_url, auth_employee):
+    r = httpx.get(f"{base_url}/employee/account", headers=auth_employee)
 
     assert r.status_code == 200
     data = assert_json(r)
 
-    assert data["id"] == 1
-    assert data["name"] == "Alice"
-    assert data["email"] == "alice@example.com"
-    assert data["role"] == "employee"
+    # Basic fields expected in AccountOut
+    assert "id" in data
+    assert "name" in data
+    assert "email" in data
+    assert "role" in data
 
 
-def test_account_get_unauthorized(client):
-    r = client.get(f"{BASE_URL}/employee/account")
+def test_account_get_unauthorized(base_url):
+    r = httpx.get(f"{base_url}/employee/account")
     assert r.status_code in (401, 403)
 
 
-def test_account_get_failure(monkeypatch, client):
-    """Simulate database error -> return 500."""
-
+def test_account_get_failure(base_url, auth_employee, monkeypatch):
     def boom(*a, **k):
         raise Exception("DB error")
 
     monkeypatch.setattr("sqlmodel.Session.get", boom)
 
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.get(f"{BASE_URL}/employee/account", headers=headers)
+    r = httpx.get(f"{base_url}/employee/account", headers=auth_employee)
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"
 
 
-# PUT /employee/account
+#   PUT /employee/account
 
 
-def test_account_update_success(monkeypatch, client):
-    """Successfully update partial account fields."""
+def test_account_update_success(base_url, auth_employee):
+    payload = {"name": "New Automated Test Name"}
 
-    class MockUser:
-        id = 1
-        name = "Old Name"
-        email = "old@example.com"
-        role = "employee"
-        department_id = None
-        reporting_manager = None
-        img_base64 = None
-
-    def mock_require_employee():
-        return lambda: MockUser()
-
-    class FakeSession:
-        def merge(self, u):
-            return u
-
-        def commit(self): ...
-        def refresh(self, u): ...
-
-    monkeypatch.setattr("app.middleware.require_employee", mock_require_employee)
-    monkeypatch.setattr("app.database.get_session", lambda: FakeSession())
-
-    headers = {"Authorization": "Bearer employee_token"}
-    payload = {"name": "New Name"}
-
-    r = client.put(f"{BASE_URL}/employee/account", json=payload, headers=headers)
+    r = httpx.put(
+        f"{base_url}/employee/account",
+        json=payload,
+        headers=auth_employee,
+    )
 
     assert r.status_code == 200
     assert assert_json(r)["message"] == "Account updated successfully"
 
 
-def test_account_update_validation_error(client):
-    """Missing required format leads to 422 (Pydantic)."""
+def test_account_update_validation_error(base_url, auth_employee):
+    # Invalid email type triggers FastAPI validation (422)
+    payload = {"email": 12345}
 
-    headers = {"Authorization": "Bearer employee_token"}
-    payload = {"email": 12345}  # invalid format
-
-    r = client.put(f"{BASE_URL}/employee/account", json=payload, headers=headers)
+    r = httpx.put(
+        f"{base_url}/employee/account",
+        json=payload,
+        headers=auth_employee,
+    )
 
     assert r.status_code == 422
 
 
-def test_account_update_unauthorized(client):
-    payload = {"name": "xyz"}
-    r = client.put(f"{BASE_URL}/employee/account", json=payload)
+def test_account_update_unauthorized(base_url):
+    payload = {"name": "Not allowed"}
+    r = httpx.put(f"{base_url}/employee/account", json=payload)
     assert r.status_code in (401, 403)
 
 
-def test_account_update_failure(monkeypatch, client):
-    """Any exception → return 500."""
+def test_account_update_failure(base_url, auth_employee, monkeypatch):
+    def bad_commit(*a, **k):
+        raise Exception("DB fail")
 
-    class FakeSession:
-        def merge(self, u):
-            return u
+    monkeypatch.setattr("sqlmodel.Session.commit", bad_commit)
 
-        def commit(self):
-            raise Exception("Update fail")
+    payload = {"name": "Cause crash"}
 
-    monkeypatch.setattr("app.database.get_session", lambda: FakeSession())
-
-    headers = {"Authorization": "Bearer employee_token"}
-    payload = {"name": "Crash Test"}
-
-    r = client.put(f"{BASE_URL}/employee/account", json=payload, headers=headers)
+    r = httpx.put(
+        f"{base_url}/employee/account",
+        json=payload,
+        headers=auth_employee,
+    )
 
     assert r.status_code == 500
     assert assert_json(r)["detail"] == "Internal server error"
 
 
-# DELETE /employee/account
+#   DELETE /employee/account
 
 
-def test_account_logout_success(client):
-    headers = {"Authorization": "Bearer employee_token"}
-    r = client.delete(f"{BASE_URL}/employee/account", headers=headers)
+def test_account_logout_success(base_url, auth_employee):
+    r = httpx.delete(f"{base_url}/employee/account", headers=auth_employee)
 
     assert r.status_code == 200
     assert assert_json(r)["message"] == "Logged out successfully"
 
 
-def test_account_logout_unauthorized(client):
-    r = client.delete(f"{BASE_URL}/employee/account")
+def test_account_logout_unauthorized(base_url):
+    r = httpx.delete(f"{base_url}/employee/account")
     assert r.status_code in (401, 403)
