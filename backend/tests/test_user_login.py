@@ -1,7 +1,29 @@
 import pytest
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_URL = "http://localhost:8000"
+ROOT_USER_EMAIL = ROOT_USER_PASSWORD = "root@gmail.com"
+PM_USER_EMAIL = PM_USER_PASSWORD = "pm@gmail.com"
+HR_USER_EMAIL = HR_USER_PASSWORD = "hr@gmail.com"
+EMPLOYEE_USER_EMAIL = EMPLOYEE_USER_PASSWORD = "emp@gmail.com"
+
+# BASE_URL = os.getenv("BASE_URL")
+
+# ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL")
+# ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
+
+# PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
+# PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
+
+# HR_USER_EMAIL = os.getenv("HR_USER_EMAIL")
+# HR_USER_PASSWORD = os.getenv("HR_USER_PASSWORD")
+
+# EMPLOYEE_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
+# EMPLOYEE_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
 
 @pytest.fixture
 def client():
@@ -33,7 +55,7 @@ def test_get_user_login(client):
 # --------------------------
 
 def test_post_admin_login(client):
-    payload = {"email": "root@gmail.com", "password": "root@gmail.com"}
+    payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
@@ -54,7 +76,7 @@ def test_post_admin_login(client):
 # --------------------------
 
 def test_post_pm_login(client):
-    payload = {"email": "pm@gmail.com", "password": "pm@gmail.com"}
+    payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
@@ -75,7 +97,7 @@ def test_post_pm_login(client):
 # --------------------------
 
 def test_post_hr_login(client):
-    payload = {"email": "hr@gmail.com", "password": "hr@gmail.com"}
+    payload = {"email": HR_USER_EMAIL, "password": HR_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
@@ -96,7 +118,8 @@ def test_post_hr_login(client):
 # --------------------------
 
 def test_post_employee_login(client):
-    payload = {"email": "emp@gmail.com", "password": "emp@gmail.com"}
+    payload = {"email": EMPLOYEE_USER_EMAIL,
+               "password": EMPLOYEE_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
