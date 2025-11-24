@@ -1,6 +1,7 @@
 import os
-import pytest
+
 import httpx
+import pytest
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,6 +13,7 @@ EMPLOYEE_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
 
 HR_EMAIL = os.getenv("HR_USER_EMAIL")
 HR_PASSWORD = os.getenv("HR_USER_PASSWORD")
+
 
 @pytest.fixture(scope="session")
 def employee_token():
