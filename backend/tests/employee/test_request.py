@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import pytest
 import requests
-from datetime import datetime
 
 BASE_URL = "http://localhost:8000/api"
 
