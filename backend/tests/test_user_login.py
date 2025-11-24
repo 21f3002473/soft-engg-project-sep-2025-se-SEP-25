@@ -3,17 +3,21 @@ import requests
 
 BASE_URL = "http://localhost:8000"
 
+
 @pytest.fixture
 def client():
     return requests
+
 
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # --------------------------
 #  /api/user/login (GET)
 # --------------------------
+
 
 def test_get_user_login(client):
     response = client.get(f"{BASE_URL}/user/login")
@@ -28,9 +32,11 @@ def test_get_user_login(client):
 
     assert data.get("message") == "User login endpoint"
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_admin_login(client):
     payload = {"email": "root@gmail.com", "password": "root@gmail.com"}
@@ -49,9 +55,11 @@ def test_post_admin_login(client):
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "root"
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_pm_login(client):
     payload = {"email": "pm@gmail.com", "password": "pm@gmail.com"}
@@ -70,9 +78,11 @@ def test_post_pm_login(client):
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "product_manager"
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_hr_login(client):
     payload = {"email": "hr@gmail.com", "password": "hr@gmail.com"}
@@ -91,9 +101,11 @@ def test_post_hr_login(client):
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "human_resource"
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_employee_login(client):
     payload = {"email": "emp@gmail.com", "password": "emp@gmail.com"}
@@ -112,9 +124,11 @@ def test_post_employee_login(client):
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "employee"
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_bad_login(client):
     payload = {"email": "root@gmail.com", "password": "root1@gmail.com"}
