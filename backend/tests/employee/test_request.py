@@ -2,7 +2,7 @@ import pytest
 import requests
 from datetime import datetime
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:8000/api"
 
 
 @pytest.fixture
@@ -16,6 +16,7 @@ def assert_json(response):
 
 
 # LEAVE REQUESTS
+
 
 # GET /employee/requests/leave
 def test_get_all_leave_requests_success(client):
@@ -195,6 +196,7 @@ def test_delete_leave_request_not_found(client):
 
 # REIMBURSEMENT REQUESTS
 
+
 # GET /employee/requests/reimbursement
 def test_get_all_reimbursements_success(client):
     headers = {"Authorization": "Bearer employee_token"}
@@ -347,6 +349,7 @@ def test_delete_reimbursement_not_found(client):
 
 
 # TRANSFER REQUESTS
+
 
 # GET /employee/requests/transfer
 def test_get_all_transfer_requests_success(client):

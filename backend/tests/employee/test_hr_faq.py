@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:8000/api"
 
 
 @pytest.fixture
@@ -15,6 +15,7 @@ def assert_json(response):
 
 
 # HR FAQ CREATE  (POST /hr/faq)
+
 
 def test_hr_faq_create_success(client):
     headers = {"Authorization": "Bearer hr_token"}
@@ -66,6 +67,7 @@ def test_hr_faq_create_internal_error(client, monkeypatch):
 
 # FAQ DETAIL GET (GET /hr/faq/{id})  – Employee allowed
 
+
 def test_faq_detail_get_success(client):
     headers = {"Authorization": "Bearer employee_token"}
     r = client.get(f"{BASE_URL}/hr/faq/1", headers=headers)
@@ -91,6 +93,7 @@ def test_faq_detail_unauthorized(client):
 
 
 # UPDATE FAQ (PUT /hr/faq/{id})
+
 
 def test_faq_update_success(client):
     headers = {"Authorization": "Bearer hr_token"}
@@ -137,6 +140,7 @@ def test_faq_update_internal_error(client, monkeypatch):
 
 # DELETE FAQ (DELETE /hr/faq/{id})
 
+
 def test_faq_delete_success(client):
     headers = {"Authorization": "Bearer hr_token"}
     r = client.delete(f"{BASE_URL}/hr/faq/1", headers=headers)
@@ -173,6 +177,7 @@ def test_faq_delete_internal_error(client, monkeypatch):
 
 
 # LIST ALL FAQS (GET /employee/hr-faqs)
+
 
 def test_employee_list_faqs_success(client):
     headers = {"Authorization": "Bearer employee_token"}
