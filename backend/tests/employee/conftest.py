@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
+BASE_URL2 = os.getenv("BASE_URL2")
 
 EMPLOYEE_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
 EMPLOYEE_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
@@ -16,7 +17,7 @@ HR_PASSWORD = os.getenv("HR_USER_PASSWORD")
 @pytest.fixture(scope="session")
 def employee_token():
     """Automatically logs in employee & returns token"""
-    login_url = f"{BASE_URL}/user/login"
+    login_url = f"{BASE_URL2}/user/login"
     payload = {"email": EMPLOYEE_EMAIL, "password": EMPLOYEE_PASSWORD}
 
     with httpx.Client() as client:
@@ -24,13 +25,13 @@ def employee_token():
 
     assert res.status_code == 200, "Employee login failed"
 
-    return res.json()["token"]
+    return res.json()["access_token"]
 
 
 @pytest.fixture(scope="session")
 def hr_token():
     """Automatically logs in HR & returns token"""
-    login_url = f"{BASE_URL}/user/login"
+    login_url = f"{BASE_URL2}/user/login"
     payload = {"email": HR_EMAIL, "password": HR_PASSWORD}
 
     with httpx.Client() as client:
@@ -38,7 +39,7 @@ def hr_token():
 
     assert res.status_code == 200, "HR login failed"
 
-    return res.json()["token"]
+    return res.json()["access_token"]
 
 
 @pytest.fixture(scope="session")

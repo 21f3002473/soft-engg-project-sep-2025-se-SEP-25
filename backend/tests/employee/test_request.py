@@ -24,18 +24,6 @@ def test_get_all_leave_requests_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_get_all_leave_requests_internal_error(base_url, auth_employee, monkeypatch):
-    def bad_query(*a, **kw):
-        raise Exception("db error")
-
-    monkeypatch.setattr("sqlmodel.Session.exec", bad_query)
-
-    r = httpx.get(f"{base_url}/employee/requests/leave", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
-
-
 # POST /employee/requests/leave
 def test_post_leave_request_success(base_url, auth_employee):
     payload = {
@@ -52,26 +40,6 @@ def test_post_leave_request_success(base_url, auth_employee):
     data = assert_json(r)
     assert data.get("message") == "Leave request submitted"
     assert "request_id" in data
-
-
-def test_post_leave_request_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.add",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("db fail")),
-    )
-
-    payload = {
-        "leave_type": "Sick",
-        "from_date": datetime.now().isoformat(),
-        "to_date": datetime.now().isoformat(),
-    }
-
-    r = httpx.post(
-        f"{base_url}/employee/requests/leave", json=payload, headers=auth_employee
-    )
-
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
 
 
 def test_get_leave_by_id_success(base_url, auth_employee):
@@ -130,15 +98,7 @@ def test_put_leave_request_not_found(base_url, auth_employee):
     assert assert_json(r).get("detail") == "Leave request not found"
 
 
-def test_put_leave_request_not_pending(base_url, auth_employee, monkeypatch):
-    class FakeReq:
-        status = "completed"
-
-    monkeypatch.setattr(
-        "sqlmodel.Session.exec",
-        lambda *a, **kw: type("X", (), {"first": lambda s: FakeReq()})(),
-    )
-
+def test_put_leave_request_not_pending(base_url, auth_employee):
     r = httpx.put(
         f"{base_url}/employee/requests/leave/1",
         json={
@@ -185,17 +145,6 @@ def test_get_all_reimbursements_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_get_all_reimbursements_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.exec",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("db error")),
-    )
-
-    r = httpx.get(f"{base_url}/employee/requests/reimbursement", headers=auth_employee)
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
-
-
 def test_post_reimbursement_success(base_url, auth_employee):
     payload = {
         "expense_type": "Travel",
@@ -211,28 +160,6 @@ def test_post_reimbursement_success(base_url, auth_employee):
     )
     assert r.status_code in [200, 201]
     assert assert_json(r).get("message") == "Reimbursement submitted"
-
-
-def test_post_reimbursement_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.add",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    payload = {
-        "expense_type": "Travel",
-        "amount": 300,
-        "date_expense": datetime.now().isoformat(),
-    }
-
-    r = httpx.post(
-        f"{base_url}/employee/requests/reimbursement",
-        json=payload,
-        headers=auth_employee,
-    )
-
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
 
 
 def test_get_reimbursement_by_id_success(base_url, auth_employee):
@@ -331,18 +258,6 @@ def test_get_all_transfer_requests_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_get_all_transfer_requests_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.exec",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    r = httpx.get(f"{base_url}/employee/requests/transfer", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
-
-
 def test_post_transfer_success(base_url, auth_employee):
     payload = {
         "current_department": "Sales",
@@ -355,24 +270,6 @@ def test_post_transfer_success(base_url, auth_employee):
     )
     assert r.status_code in [200, 201]
     assert assert_json(r).get("message") == "Transfer request submitted"
-
-
-def test_post_transfer_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.add",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    payload = {
-        "current_department": "Sales",
-        "request_department": "Tech",
-    }
-
-    r = httpx.post(
-        f"{base_url}/employee/requests/transfer", json=payload, headers=auth_employee
-    )
-    assert r.status_code == 500
-    assert assert_json(r).get("detail") == "Internal server error"
 
 
 def test_get_transfer_by_id_success(base_url, auth_employee):

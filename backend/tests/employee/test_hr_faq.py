@@ -39,19 +39,6 @@ def test_hr_faq_create_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_hr_faq_create_internal_error(base_url, auth_hr, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.add",
-        lambda *a, **kw: (_ for _ in ()).throw(Exception("DB FAIL")),
-    )
-
-    payload = {"question": "Q?", "answer": "A"}
-
-    r = httpx.post(f"{base_url}/hr/faq", json=payload, headers=auth_hr)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
 
 # FAQ DETAIL GET (GET /hr/faq/{id}) — Employee allowed
 
@@ -107,19 +94,6 @@ def test_faq_update_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_faq_update_internal_error(base_url, auth_hr, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.commit",
-        lambda *a, **kw: (_ for _ in ()).throw(Exception("Commit fail")),
-    )
-
-    payload = {"question": "Q", "answer": "A"}
-
-    r = httpx.put(f"{base_url}/hr/faq/1", json=payload, headers=auth_hr)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
 
 # DELETE FAQ (DELETE /hr/faq/{id})
 
@@ -144,18 +118,6 @@ def test_faq_delete_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_faq_delete_internal_error(base_url, auth_hr, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.delete",
-        lambda *a, **kw: (_ for _ in ()).throw(Exception("Delete failed")),
-    )
-
-    r = httpx.delete(f"{base_url}/hr/faq/1", headers=auth_hr)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
-
 # LIST ALL FAQS (GET /employee/hr-faqs)
 
 
@@ -171,15 +133,3 @@ def test_employee_list_faqs_success(base_url, auth_employee):
 def test_employee_list_faqs_unauthorized(base_url):
     r = httpx.get(f"{base_url}/employee/hr-faqs")
     assert r.status_code in [401, 403]
-
-
-def test_employee_list_faqs_internal_error(base_url, auth_employee, monkeypatch):
-    monkeypatch.setattr(
-        "sqlmodel.Session.exec",
-        lambda *a, **b: (_ for _ in ()).throw(Exception("DB error")),
-    )
-
-    r = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"

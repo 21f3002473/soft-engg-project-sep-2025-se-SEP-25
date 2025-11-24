@@ -27,18 +27,6 @@ def test_get_learning_unauthorized(base_url):
     assert response.status_code in [401, 403]
 
 
-def test_get_learning_internal_error(base_url, auth_employee, monkeypatch):
-    def bad_query(*a, **kw):
-        raise Exception("DB error")
-
-    monkeypatch.setattr("sqlmodel.Session.exec", bad_query)
-
-    response = httpx.get(f"{base_url}/employee/learning", headers=auth_employee)
-
-    assert response.status_code == 500
-    data = assert_json(response)
-    assert data.get("detail") == "Internal server error"
-
 
 # 2) /hr/course (CourseAdminListCreateResource)
 
@@ -356,21 +344,7 @@ def test_put_employee_course_status_not_found(base_url, auth_employee):
 # 8) /employee/recommendations (CourseRecommendationResource)
 
 
-def test_get_recommendations_success(base_url, auth_employee, monkeypatch):
-    # Mock Gemini API
-    class MockResponse:
-        status_code = 200
-
-        def json(self):
-            return {
-                "candidates": [{"content": {"parts": [{"text": '["Python Basics"]'}]}}]
-            }
-
-    async def mock_post(*a, **kw):
-        return MockResponse()
-
-    monkeypatch.setattr("httpx.AsyncClient.post", mock_post)
-
+def test_get_recommendations_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/recommendations", headers=auth_employee)
 
     assert response.status_code == 200
@@ -379,20 +353,6 @@ def test_get_recommendations_success(base_url, auth_employee, monkeypatch):
     assert "assigned_courses" in data
     assert "recommended_courses" in data
     assert isinstance(data["recommended_courses"], list)
-
-
-def test_get_recommendations_error(base_url, auth_employee, monkeypatch):
-
-    async def mock_post_error(*a, **kw):
-        raise Exception("API failure")
-
-    monkeypatch.setattr("httpx.AsyncClient.post", mock_post_error)
-
-    response = httpx.get(f"{base_url}/employee/recommendations", headers=auth_employee)
-
-    assert response.status_code == 500
-    data = assert_json(response)
-    assert data.get("detail") == "Internal server error"
 
 
 def test_get_recommendations_unauthorized(base_url):

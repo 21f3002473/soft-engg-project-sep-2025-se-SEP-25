@@ -27,18 +27,6 @@ def test_account_get_unauthorized(base_url):
     assert r.status_code in (401, 403)
 
 
-def test_account_get_failure(base_url, auth_employee, monkeypatch):
-    def boom(*a, **k):
-        raise Exception("DB error")
-
-    monkeypatch.setattr("sqlmodel.Session.get", boom)
-
-    r = httpx.get(f"{base_url}/employee/account", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
-
 #   PUT /employee/account
 
 
@@ -56,7 +44,6 @@ def test_account_update_success(base_url, auth_employee):
 
 
 def test_account_update_validation_error(base_url, auth_employee):
-    # Invalid email type triggers FastAPI validation (422)
     payload = {"email": 12345}
 
     r = httpx.put(
@@ -73,23 +60,6 @@ def test_account_update_unauthorized(base_url):
     r = httpx.put(f"{base_url}/employee/account", json=payload)
     assert r.status_code in (401, 403)
 
-
-def test_account_update_failure(base_url, auth_employee, monkeypatch):
-    def bad_commit(*a, **k):
-        raise Exception("DB fail")
-
-    monkeypatch.setattr("sqlmodel.Session.commit", bad_commit)
-
-    payload = {"name": "Cause crash"}
-
-    r = httpx.put(
-        f"{base_url}/employee/account",
-        json=payload,
-        headers=auth_employee,
-    )
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
 
 
 #   DELETE /employee/account

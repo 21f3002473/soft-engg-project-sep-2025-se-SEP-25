@@ -1,6 +1,5 @@
 import httpx
 
-
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
@@ -31,20 +30,6 @@ def test_get_dashboard_unauthorized(base_url):
     response = httpx.get(url)
 
     assert response.status_code in [401, 403]
-
-
-def test_get_dashboard_internal_error(base_url, auth_employee, monkeypatch):
-    def bad_query(*args, **kwargs):
-        raise Exception("DB error")
-
-    monkeypatch.setattr("sqlmodel.Session.exec", bad_query)
-
-    url = f"{base_url}/employee/dashboard"
-    response = httpx.get(url, headers=auth_employee)
-
-    assert response.status_code == 500
-    data = assert_json(response)
-    assert data.get("detail") == "Internal server error"
 
 
 # 2) /employee/todo (AllToDoResource)

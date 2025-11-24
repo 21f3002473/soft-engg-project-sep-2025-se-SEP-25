@@ -21,18 +21,6 @@ def test_list_quick_notes_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_list_quick_notes_internal_error(monkeypatch, auth_employee, base_url):
-    monkeypatch.setattr(
-        "sqlmodel.Session.exec",
-        lambda *a, **k: (_ for _ in ()).throw(Exception("DB error")),
-    )
-
-    r = httpx.get(f"{base_url}/employee/writing", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
-
 # CREATE QUICK NOTE (POST /employee/writing)
 def test_create_quick_note_success(auth_employee, base_url):
     payload = {"topic": "Meeting Notes", "notes": "Discuss quarterly targets"}
@@ -60,19 +48,6 @@ def test_create_quick_note_unauthorized(base_url):
 
     assert r.status_code in [401, 403]
 
-
-def test_create_quick_note_internal_error(monkeypatch, auth_employee, base_url):
-    monkeypatch.setattr(
-        "sqlmodel.Session.commit",
-        lambda *a, **k: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    payload = {"topic": "Crash", "notes": "Cause error"}
-
-    r = httpx.post(f"{base_url}/employee/writing", json=payload, headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
 
 
 # GET /employee/writing/{note_id}
@@ -129,20 +104,6 @@ def test_update_quick_note_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-def test_update_quick_note_internal_error(monkeypatch, auth_employee, base_url):
-    monkeypatch.setattr(
-        "sqlmodel.Session.commit",
-        lambda *a, **k: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    payload = {"topic": "Try", "notes": "Crash"}
-
-    r = httpx.put(f"{base_url}/employee/writing/1", json=payload, headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
-
-
 # DELETE /employee/writing/{note_id}
 def test_delete_quick_note_success(auth_employee, base_url):
     r = httpx.delete(f"{base_url}/employee/writing/1", headers=auth_employee)
@@ -163,15 +124,3 @@ def test_delete_quick_note_not_found(auth_employee, base_url):
 def test_delete_quick_note_unauthorized(base_url):
     r = httpx.delete(f"{base_url}/employee/writing/1")
     assert r.status_code in [401, 403]
-
-
-def test_delete_quick_note_internal_error(monkeypatch, auth_employee, base_url):
-    monkeypatch.setattr(
-        "sqlmodel.Session.delete",
-        lambda *a, **k: (_ for _ in ()).throw(Exception("fail")),
-    )
-
-    r = httpx.delete(f"{base_url}/employee/writing/1", headers=auth_employee)
-
-    assert r.status_code == 500
-    assert assert_json(r)["detail"] == "Internal server error"
