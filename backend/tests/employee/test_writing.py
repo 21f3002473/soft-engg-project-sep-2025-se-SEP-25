@@ -16,6 +16,7 @@ def assert_json(response):
 
 # LIST ALL QUICK NOTES (GET /employee/writing)
 
+
 def test_list_quick_notes_success(client):
     headers = {"Authorization": "Bearer employee_token"}
     r = client.get(f"{BASE_URL}/employee/writing", headers=headers)
@@ -45,6 +46,7 @@ def test_list_quick_notes_internal_error(client, monkeypatch):
 
 
 # CREATE QUICK NOTE (POST /employee/writing)
+
 
 def test_create_quick_note_success(client):
     headers = {"Authorization": "Bearer employee_token"}
@@ -92,6 +94,7 @@ def test_create_quick_note_internal_error(client, monkeypatch):
 
 # GET INDIVIDUAL QUICK NOTE (GET /employee/writing/{note_id})
 
+
 def test_get_quick_note_success(client):
     headers = {"Authorization": "Bearer employee_token"}
     r = client.get(f"{BASE_URL}/employee/writing/1", headers=headers)
@@ -120,6 +123,7 @@ def test_get_quick_note_unauthorized(client):
 
 
 # UPDATE QUICK NOTE (PUT /employee/writing/{note_id})
+
 
 def test_update_quick_note_success(client):
     headers = {"Authorization": "Bearer employee_token"}
@@ -167,6 +171,7 @@ def test_update_quick_note_internal_error(client, monkeypatch):
 
 
 # DELETE QUICK NOTE (DELETE /employee/writing/{note_id})
+
 
 def test_delete_quick_note_success(client):
     headers = {"Authorization": "Bearer employee_token"}
