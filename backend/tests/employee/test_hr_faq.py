@@ -39,7 +39,6 @@ def test_hr_faq_create_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-
 # FAQ DETAIL GET (GET /hr/faq/{id}) — Employee allowed
 
 
@@ -92,7 +91,6 @@ def test_faq_update_unauthorized(base_url):
 
     r = httpx.put(f"{base_url}/hr/faq/1", json=payload)
     assert r.status_code in [401, 403]
-
 
 
 # DELETE FAQ (DELETE /hr/faq/{id})

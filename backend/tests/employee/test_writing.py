@@ -49,7 +49,6 @@ def test_create_quick_note_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-
 # GET /employee/writing/{note_id}
 def test_get_quick_note_success(auth_employee, base_url):
     r = httpx.get(f"{base_url}/employee/writing/1", headers=auth_employee)

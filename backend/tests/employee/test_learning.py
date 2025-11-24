@@ -27,7 +27,6 @@ def test_get_learning_unauthorized(base_url):
     assert response.status_code in [401, 403]
 
 
-
 # 2) /hr/course (CourseAdminListCreateResource)
 
 
