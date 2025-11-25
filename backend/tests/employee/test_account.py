@@ -61,7 +61,6 @@ def test_account_update_unauthorized(base_url):
     assert r.status_code in (401, 403)
 
 
-
 #   DELETE /employee/account
 
 
