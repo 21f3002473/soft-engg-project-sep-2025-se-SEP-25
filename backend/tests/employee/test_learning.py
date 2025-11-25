@@ -167,11 +167,23 @@ def test_get_course_assignments_unauthorized(base_url):
 
 
 def test_post_assign_course_success(base_url, auth_hr):
-    payload = {"course_id": 1}
+    course_payload = {
+        "course_name": "Test Course for Assignment",
+        "course_link": "https://example.com/test-course",
+        "topics": "Testing, Assignment",
+    }
+    course_resp = httpx.post(
+        f"{base_url}/hr/course", json=course_payload, headers=auth_hr
+    )
+    assert course_resp.status_code in [200, 201]
+    course_data = assert_json(course_resp)
+    course_id = course_data.get("id")
+
+    assign_payload = {"course_id": course_id}
 
     response = httpx.post(
         f"{base_url}/hr/course/assign/4",
-        json=payload,
+        json=assign_payload,
         headers=auth_hr,
     )
 
@@ -190,12 +202,24 @@ def test_post_assign_missing_fields(base_url, auth_hr):
 
 
 def test_post_assign_course_already_exists(base_url, auth_hr):
-    payload = {"course_id": 1}
+    course_payload = {
+        "course_name": "Duplicate Assignment Test Course",
+        "course_link": "https://example.com/dup-course",
+        "topics": "Duplicate, Testing",
+    }
+    course_resp = httpx.post(
+        f"{base_url}/hr/course", json=course_payload, headers=auth_hr
+    )
+    assert course_resp.status_code in [200, 201]
+    course_data = assert_json(course_resp)
+    course_id = course_data.get("id")
 
-    httpx.post(f"{base_url}/hr/course/assign/4", json=payload, headers=auth_hr)
+    assign_payload = {"course_id": course_id}
+
+    httpx.post(f"{base_url}/hr/course/assign/4", json=assign_payload, headers=auth_hr)
 
     response = httpx.post(
-        f"{base_url}/hr/course/assign/4", json=payload, headers=auth_hr
+        f"{base_url}/hr/course/assign/4", json=assign_payload, headers=auth_hr
     )
 
     assert response.status_code == 400
@@ -355,12 +379,45 @@ def test_put_employee_course_status_success(base_url, auth_employee):
         assert data.get("message") == "Course status updated"
 
 
-def test_put_employee_course_status_missing_field(base_url, auth_employee):
-    response = httpx.put(
-        f"{base_url}/employee/course/1",
-        json={},
-        headers=auth_employee,
+def test_put_employee_course_status_missing_field(base_url, auth_employee, auth_hr):
+    employee_courses_resp = httpx.get(
+        f"{base_url}/employee/courses", headers=auth_employee
     )
+    assert employee_courses_resp.status_code == 200
+    employee_courses = assert_json(employee_courses_resp)
+
+    response = {}
+    if not employee_courses:
+        course_payload = {
+            "course_name": "Missing Field Test Course",
+            "course_link": "https://example.com/missing-field-test",
+            "topics": "Testing",
+        }
+        course_resp = httpx.post(
+            f"{base_url}/hr/course", json=course_payload, headers=auth_hr
+        )
+        assert course_resp.status_code in [200, 201]
+        course_data = assert_json(course_resp)
+        course_id = course_data.get("id")
+        print("no assigned course", course_id)
+        assign_payload = {"course_id": course_id}
+        httpx.post(
+            f"{base_url}/hr/course/assign/4", json=assign_payload, headers=auth_hr
+        )
+
+        response = httpx.put(
+            f"{base_url}/employee/course/{course_id}",
+            json={},
+            headers=auth_employee,
+        )
+    else:
+        course_id = employee_courses[0].get("course_id")
+        print("there are assigned course", course_id)
+        response = httpx.put(
+            f"{base_url}/employee/course/{course_id}",
+            json={},
+            headers=auth_employee,
+        )
 
     assert response.status_code == 400
     data = assert_json(response)

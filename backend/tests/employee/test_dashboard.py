@@ -2,7 +2,6 @@ import httpx
 import pytest
 
 
-
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
@@ -217,7 +216,19 @@ def test_get_hr_announcements_unauthorized(base_url):
 # 6) /hr/annoucement/{user_id} (AnnouncementAdminListCreateResource)
 
 
-def test_get_hr_announcements_success(base_url, auth_hr):
+def test_post_hr_announcement_success(base_url, auth_hr):
+    payload = {"announcement": "Office will remain closed on Friday"}
+
+    response = httpx.post(f"{base_url}/hr/annoucement/4", json=payload, headers=auth_hr)
+
+    assert response.status_code in [200, 201]
+
+    data = assert_json(response)
+    assert data.get("message") == "Announcement created"
+    assert "id" in data
+
+
+def test_get_hr_announcement_detail_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
     assert list_resp.status_code == 200
     announcements = assert_json(list_resp)
@@ -249,18 +260,6 @@ def test_get_hr_announcement_detail_unauthorized(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/annoucement/{ann_id}")
 
     assert response.status_code in [401, 403]
-
-
-def test_post_hr_announcement_success(base_url, auth_hr):
-    payload = {"announcement": "Office will remain closed on Friday"}
-
-    response = httpx.post(f"{base_url}/hr/annoucement/1", json=payload, headers=auth_hr)
-
-    assert response.status_code in [200, 201]
-
-    data = assert_json(response)
-    assert data.get("message") == "Announcement created"
-    assert "id" in data
 
 
 def test_post_hr_announcement_missing_field(base_url, auth_hr):
