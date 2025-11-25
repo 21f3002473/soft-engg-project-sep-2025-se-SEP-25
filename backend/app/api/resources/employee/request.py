@@ -1,17 +1,18 @@
 from logging import getLogger
+from typing import Optional
 
 from app.api.validators import LeaveCreate, ReimbursementCreate, TransferCreate
 from app.database import (
     Leave,
     Reimbursement,
     Request,
+    RequestStatusTypeEnum,
     RequestTypeEnum,
-    StatusTypeEnum,
     Transfer,
     User,
     get_session,
 )
-from app.middleware import require_employee
+from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
@@ -92,6 +93,8 @@ class AllLeaveRequestResource(Resource):
 
             return {"leaves": data}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -147,15 +150,21 @@ class AllLeaveRequestResource(Resource):
 
             req = Request(
                 request_type=RequestTypeEnum.LEAVE,
-                status=StatusTypeEnum.PENDING,
+                status=RequestStatusTypeEnum.PENDING,
                 user_id=current_user.id,
                 leave_id=leave.id,
             )
             session.add(req)
             session.commit()
 
-            return {"message": "Leave request submitted", "request_id": req.id}
+            return {
+                "message": "Leave request submitted",
+                "request_id": req.id,
+                "leave_id": leave.id,
+            }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -198,22 +207,32 @@ class LeaveRequestResource(Resource):
         Error Codes:
             - 404 Not Found: Leave request does not exist or belongs to another employee
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database query failures
         """
-        leave = session.get(Leave, leave_id)
-        if not leave or leave.user_id != current_user.id:
-            raise HTTPException(404, "Leave request not found")
+        try:
+            leave = session.get(Leave, leave_id)
+            if not leave or leave.user_id != current_user.id:
+                raise HTTPException(404, "Leave request not found")
 
-        req = session.exec(select(Request).where(Request.leave_id == leave_id)).first()
+            req = session.exec(
+                select(Request).where(Request.leave_id == leave_id)
+            ).first()
 
-        return {
-            "request_id": req.id,
-            "leave_id": leave.id,
-            "leave_type": leave.leave_type,
-            "from_date": leave.from_date,
-            "to_date": leave.to_date,
-            "reason": leave.reason,
-            "status": req.status.value,
-        }
+            return {
+                "request_id": req.id,
+                "leave_id": leave.id,
+                "leave_type": leave.leave_type,
+                "from_date": leave.from_date,
+                "to_date": leave.to_date,
+                "reason": leave.reason,
+                "status": req.status.value,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -258,6 +277,7 @@ class LeaveRequestResource(Resource):
         """
         try:
             leave = session.get(Leave, leave_id)
+            print(leave)
             if not leave or leave.user_id != current_user.id:
                 raise HTTPException(404, "Leave request not found")
 
@@ -265,7 +285,7 @@ class LeaveRequestResource(Resource):
                 select(Request).where(Request.leave_id == leave_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be modified")
 
             leave.leave_type = payload.leave_type
@@ -277,6 +297,8 @@ class LeaveRequestResource(Resource):
 
             return {"message": "Leave request updated"}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -325,7 +347,7 @@ class LeaveRequestResource(Resource):
                 select(Request).where(Request.leave_id == leave_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be deleted")
 
             session.delete(req)
@@ -334,6 +356,8 @@ class LeaveRequestResource(Resource):
 
             return {"message": "Leave request deleted"}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -408,6 +432,8 @@ class AllReimbursementRequestResource(Resource):
 
             return {"reimbursements": data}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -462,15 +488,21 @@ class AllReimbursementRequestResource(Resource):
 
             req = Request(
                 request_type=RequestTypeEnum.REIMBURSEMENT,
-                status=StatusTypeEnum.PENDING,
+                status=RequestStatusTypeEnum.PENDING,
                 user_id=current_user.id,
                 reimbursement_id=rb.id,
             )
             session.add(req)
             session.commit()
 
-            return {"message": "Reimbursement submitted"}
+            return {
+                "message": "Reimbursement submitted",
+                "request_id": req.id,
+                "reimbursement_id": rb.id,
+            }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -512,24 +544,32 @@ class ReimbursementRequestResource(Resource):
         Error Codes:
             - 404 Not Found: Reimbursement request does not exist or belongs to another employee
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database query failures
         """
-        rb = session.get(Reimbursement, reimbursement_id)
-        if not rb or rb.user_id != current_user.id:
-            raise HTTPException(404, "Reimbursement not found")
+        try:
+            rb = session.get(Reimbursement, reimbursement_id)
+            if not rb or rb.user_id != current_user.id:
+                raise HTTPException(404, "Reimbursement not found")
 
-        req = session.exec(
-            select(Request).where(Request.reimbursement_id == reimbursement_id)
-        ).first()
+            req = session.exec(
+                select(Request).where(Request.reimbursement_id == reimbursement_id)
+            ).first()
 
-        return {
-            "request_id": req.id,
-            "reimbursement_id": rb.id,
-            "expense_type": rb.expense_type,
-            "amount": rb.amount,
-            "date_expense": rb.date_expense,
-            "remark": rb.remark,
-            "status": req.status.value,
-        }
+            return {
+                "request_id": req.id,
+                "reimbursement_id": rb.id,
+                "expense_type": rb.expense_type,
+                "amount": rb.amount,
+                "date_expense": rb.date_expense,
+                "remark": rb.remark,
+                "status": req.status.value,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -581,7 +621,7 @@ class ReimbursementRequestResource(Resource):
                 select(Request).where(Request.reimbursement_id == reimbursement_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be modified")
 
             rb.expense_type = payload.expense_type
@@ -593,6 +633,8 @@ class ReimbursementRequestResource(Resource):
 
             return {"message": "Reimbursement updated"}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -641,7 +683,7 @@ class ReimbursementRequestResource(Resource):
                 select(Request).where(Request.reimbursement_id == reimbursement_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be deleted")
 
             session.delete(req)
@@ -650,6 +692,8 @@ class ReimbursementRequestResource(Resource):
 
             return {"message": "Reimbursement deleted"}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -721,6 +765,8 @@ class AllTransferRequestResource(Resource):
 
             return {"transfers": data}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -773,15 +819,21 @@ class AllTransferRequestResource(Resource):
 
             req = Request(
                 request_type=RequestTypeEnum.TRANSFER,
-                status=StatusTypeEnum.PENDING,
+                status=RequestStatusTypeEnum.PENDING,
                 user_id=current_user.id,
                 transfer_id=tr.id,
             )
             session.add(req)
             session.commit()
 
-            return {"message": "Transfer request submitted"}
+            return {
+                "message": "Transfer request submitted",
+                "request_id": req.id,
+                "transfer_id": tr.id,
+            }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -822,23 +874,31 @@ class TransferRequestResource(Resource):
         Error Codes:
             - 404 Not Found: Transfer request does not exist or belongs to another employee
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database query failures
         """
-        tr = session.get(Transfer, transfer_id)
-        if not tr or tr.user_id != current_user.id:
-            raise HTTPException(404, "Transfer request not found")
+        try:
+            tr = session.get(Transfer, transfer_id)
+            if not tr or tr.user_id != current_user.id:
+                raise HTTPException(404, "Transfer request not found")
 
-        req = session.exec(
-            select(Request).where(Request.transfer_id == transfer_id)
-        ).first()
+            req = session.exec(
+                select(Request).where(Request.transfer_id == transfer_id)
+            ).first()
 
-        return {
-            "request_id": req.id,
-            "transfer_id": tr.id,
-            "current_department": tr.current_department,
-            "request_department": tr.request_department,
-            "reason": tr.reason,
-            "status": req.status.value,
-        }
+            return {
+                "request_id": req.id,
+                "transfer_id": tr.id,
+                "current_department": tr.current_department,
+                "request_department": tr.request_department,
+                "reason": tr.reason,
+                "status": req.status.value,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -889,7 +949,7 @@ class TransferRequestResource(Resource):
                 select(Request).where(Request.transfer_id == transfer_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be modified")
 
             tr.current_department = payload.current_department
@@ -900,6 +960,8 @@ class TransferRequestResource(Resource):
 
             return {"message": "Transfer request updated"}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -948,7 +1010,7 @@ class TransferRequestResource(Resource):
                 select(Request).where(Request.transfer_id == transfer_id)
             ).first()
 
-            if req.status != StatusTypeEnum.PENDING:
+            if req.status != RequestStatusTypeEnum.PENDING:
                 raise HTTPException(400, "Only pending requests can be deleted")
 
             session.delete(req)
@@ -957,6 +1019,314 @@ class TransferRequestResource(Resource):
 
             return {"message": "Transfer request deleted"}
 
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+
+class AllHRRequestResource(Resource):
+    """
+    HR Request Management (List/View All Requests) — Story Point:
+    "As an HR Manager, I want to review, track, and manage employee requests so that I can
+    efficiently approve or reject leave, reimbursement, and transfer workflows."
+
+    This resource provides HR the ability to view **all employee requests across all departments**,
+    including leave requests, reimbursement submissions, and transfer requests. HR can filter
+    results based on request type and status, allowing them to quickly focus on pending items
+    that require attention.
+
+    HR visibility ensures consistent approval workflows, strengthens compliance, and provides
+    centralized monitoring of employee needs without relying on decentralized departmental processes.
+    """
+
+    def get(
+        self,
+        request_type: Optional[str] = None,
+        status: Optional[str] = None,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Retrieve all employee requests with optional filtering.
+
+        Story Points Supported:
+        - "As an HR Manager, I want to review pending and completed requests to ensure workflow transparency."
+        - "As an HR Manager, I want to filter requests by type or status so that I can
+           focus on items requiring urgent action."
+
+        Retrieves **all request types** (leave, reimbursement, transfer) submitted by employees.
+        HR can apply optional filters to restrict results based on:
+        - request type: "leave", "reimbursement", "transfer"
+        - status: "pending", "accepted", "rejected"
+
+        Args:
+            request_type (str, optional): Filter by request type. Must be one of:
+                - "leave"
+                - "reimbursement"
+                - "transfer"
+            status (str, optional): Filter by request status. Must be one of:
+                - "pending"
+                - "accepted"
+                - "rejected"
+            current_user (User): Authenticated HR user object
+            session (Session): Active database session for querying
+
+        Returns:
+            dict: Collection of employee requests with their linked details.
+                - requests (list[dict]): Array of request objects containing:
+                    - request_id (int): Unique ID of the request
+                    - user_id (int): Employee who submitted the request
+                    - request_type (str): "leave", "reimbursement", or "transfer"
+                    - status (str): Current status ("pending", "accepted", "rejected")
+                    - created_date (datetime): Timestamp of the request submission
+                    - details (dict): Additional request-type-specific data
+
+        Error Codes:
+            - 401 Unauthorized: User is not HR
+            - 400 Bad Request: Invalid request_type or status filter
+            - 500 Internal Server Error: Database query failures
+
+        Raises:
+            HTTPException(400): If filtering values are invalid
+            HTTPException(500): For unexpected database failures
+        """
+
+        try:
+            if (
+                request_type
+                and request_type not in RequestTypeEnum.__members__.values()
+            ):
+                raise HTTPException(400, "Invalid request type")
+
+            if status and status not in RequestStatusTypeEnum.__members__.values():
+                raise HTTPException(400, "Invalid status")
+
+            q = select(Request)
+
+            if request_type:
+                q = q.where(Request.request_type == request_type)
+
+            if status:
+                q = q.where(Request.status == status)
+
+            q = q.order_by(Request.created_date.desc())
+            results = session.exec(q).all()
+
+            data = []
+            for req in results:
+                item = {
+                    "request_id": req.id,
+                    "user_id": req.user_id,
+                    "request_type": req.request_type.value,
+                    "status": req.status.value,
+                    "created_date": req.created_date,
+                }
+
+                if req.leave_id:
+                    leave = session.get(Leave, req.leave_id)
+                    item["details"] = {
+                        "leave_type": leave.leave_type,
+                        "from_date": leave.from_date,
+                        "to_date": leave.to_date,
+                        "reason": leave.reason,
+                    }
+
+                elif req.reimbursement_id:
+                    rb = session.get(Reimbursement, req.reimbursement_id)
+                    item["details"] = {
+                        "expense_type": rb.expense_type,
+                        "amount": rb.amount,
+                        "date_expense": rb.date_expense,
+                        "remark": rb.remark,
+                    }
+
+                elif req.transfer_id:
+                    tr = session.get(Transfer, req.transfer_id)
+                    item["details"] = {
+                        "current_department": tr.current_department,
+                        "request_department": tr.request_department,
+                        "reason": tr.reason,
+                    }
+
+                data.append(item)
+
+            return {"requests": data}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+
+class HRRequestResource(Resource):
+    """
+    HR Individual Request Management (Accept/Reject) — Story Point:
+    "As an HR Manager, I want to approve or reject employee requests so that I can maintain
+    proper workflow compliance and ensure timely handling of employee matters."
+
+    This resource enables HR to:
+    - View individual request details
+    - Accept a pending request
+    - Reject a pending request
+
+    HR actions directly update workflow status, helping employees track outcomes and strengthening
+    operational efficiency across leave, reimbursement, and transfer workflows.
+    """
+
+    def get(
+        self,
+        request_id: int,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Retrieve details of a specific employee request.
+
+        Args:
+            request_id (int): ID of the request to retrieve
+            current_user (User): Authenticated HR user
+            session (Session): Active database session
+
+        Returns:
+            dict: Detailed request object with:
+                - request_id
+                - user_id
+                - request_type
+                - status
+                - created_date
+                - details (specific to leave, reimbursement, or transfer)
+
+        Error Codes:
+            - 404 Not Found: Request doesn't exist
+            - 401 Unauthorized: User is not HR
+            - 500 Internal Server Error: Database query issues
+        """
+        try:
+            req = session.get(Request, request_id)
+            if not req:
+                raise HTTPException(404, "Request not found")
+
+            data = {
+                "request_id": req.id,
+                "user_id": req.user_id,
+                "request_type": req.request_type.value,
+                "status": req.status.value,
+                "created_date": req.created_date,
+            }
+
+            if req.leave_id:
+                leave = session.get(Leave, req.leave_id)
+                data["details"] = {
+                    "leave_type": leave.leave_type,
+                    "from_date": leave.from_date,
+                    "to_date": leave.to_date,
+                    "reason": leave.reason,
+                }
+
+            elif req.reimbursement_id:
+                rb = session.get(Reimbursement, req.reimbursement_id)
+                data["details"] = {
+                    "expense_type": rb.expense_type,
+                    "amount": rb.amount,
+                    "date_expense": rb.date_expense,
+                    "remark": rb.remark,
+                }
+
+            elif req.transfer_id:
+                tr = session.get(Transfer, req.transfer_id)
+                data["details"] = {
+                    "current_department": tr.current_department,
+                    "request_department": tr.request_department,
+                    "reason": tr.reason,
+                }
+
+            return data
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+    def put(
+        self,
+        request_id: int,
+        payload: dict,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Update a request's status — accept or reject.
+
+        Story Points Supported:
+        - "As an HR Manager, I want to approve or reject employee requests so that I can ensure
+        timely decision-making and maintain clear workflow traceability."
+        - "As an HR Manager, I want consistent request handling by restricting updates to only
+        pending items, preventing accidental modifications after resolution."
+
+        This endpoint allows HR managers to update a request’s workflow status. Only
+        **pending** requests are eligible for update, ensuring auditability and preventing
+        invalid workflow transitions. HR must explicitly provide the action in the request
+        body, ensuring clarity and intentionality during approval or rejection.
+
+        Expected Request Body:
+            {
+                "action": "accept" | "reject"
+            }
+
+        Args:
+            request_id (int): Unique ID of the request to update
+            payload (dict): JSON body containing the update command, specifically:
+                - action (str): Must be one of {"accept", "reject"}
+            current_user (User): Authenticated HR user
+            session (Session): Active database session
+
+        Returns:
+            dict: A message confirming that the request was accepted or rejected.
+
+        Error Codes:
+            - 400 Bad Request:
+                - Missing "action"
+                - Invalid action (not "accept" or "reject")
+                - Request is not pending
+            - 404 Not Found: Request does not exist
+            - 401 Unauthorized: User is not HR
+            - 500 Internal Server Error: Database update failures
+
+        Raises:
+            HTTPException(400): Invalid or missing update action
+            HTTPException(404): If request does not exist
+            HTTPException(500): Unexpected server errors
+        """
+        try:
+            req = session.get(Request, request_id)
+            if not req:
+                raise HTTPException(404, "Request not found")
+
+            if req.status != RequestStatusTypeEnum.PENDING:
+                raise HTTPException(400, "Only pending requests can be updated")
+
+            action = payload.get("action")
+            if not action:
+                raise HTTPException(400, "Missing required field: 'action'")
+
+            if action not in {"accept", "reject"}:
+                raise HTTPException(400, "Invalid action. Must be 'accept' or 'reject'")
+
+            if action == "accept":
+                req.status = RequestStatusTypeEnum.ACCEPTED
+            else:
+                req.status = RequestStatusTypeEnum.REJECTED
+
+            session.commit()
+
+            return {"message": f"Request {action}ed successfully"}
+
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
