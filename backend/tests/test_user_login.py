@@ -5,25 +5,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = "http://localhost:8000"
-ROOT_USER_EMAIL = ROOT_USER_PASSWORD = "root@gmail.com"
-PM_USER_EMAIL = PM_USER_PASSWORD = "pm@gmail.com"
-HR_USER_EMAIL = HR_USER_PASSWORD = "hr@gmail.com"
-EMPLOYEE_USER_EMAIL = EMPLOYEE_USER_PASSWORD = "emp@gmail.com"
+BASE_URL = os.getenv("BASE_URL")
 
-# BASE_URL = os.getenv("BASE_URL")
+ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL")
+ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
 
-# ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL")
-# ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
+PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
+PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
 
-# PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
-# PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
+HR_USER_EMAIL = os.getenv("HR_USER_EMAIL")
+HR_USER_PASSWORD = os.getenv("HR_USER_PASSWORD")
 
-# HR_USER_EMAIL = os.getenv("HR_USER_EMAIL")
-# HR_USER_PASSWORD = os.getenv("HR_USER_PASSWORD")
-
-# EMPLOYEE_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
-# EMPLOYEE_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
+EMPLOYEE_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
+EMPLOYEE_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
 
 
 @pytest.fixture
@@ -148,9 +142,9 @@ def test_post_employee_login(client):
     assert data.get("role") == "employee"
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# -----------------------------------
+#  /api/user/login (POST) - Bad login
+# -----------------------------------
 
 
 def test_post_bad_login(client):

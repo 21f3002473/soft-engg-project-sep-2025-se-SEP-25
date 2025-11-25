@@ -16,17 +16,17 @@ from app.api.resources.hr.hr_review_resource import (
     HRReviewsByUserResource,
     HRReviewsListResource,
 )
-from app.api.resources.pr_resources.clients import (
+from app.api.resources.pm_resources.clients import (
     ClientRequirementResource,
     ClientsResource,
     ClientUpdatesResource,
 )
-from app.api.resources.pr_resources.dashboard import PRDashboardResource
-from app.api.resources.pr_resources.employee import (
+from app.api.resources.pm_resources.dashboard import PRDashboardResource
+from app.api.resources.pm_resources.employee import (
     EmployeePerformanceResource,
     EmployeesResource,
 )
-from app.api.resources.pr_resources.project import ProjectsResource
+from app.api.resources.pm_resources.project import ProjectsResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,

@@ -150,6 +150,10 @@ python -c "import secrets; print(secrets.token_hex(32))"
 
 Add the generated key to your `.env` file:
 
-## How to run Pytest
+## How to run Pytest for entire project
 
-pytest tests/test_user_login.py
+python3 -m pytest -vv
+
+## How to run Pytest for single pytest file
+
+pytest tests/test_user_login.py -vv
