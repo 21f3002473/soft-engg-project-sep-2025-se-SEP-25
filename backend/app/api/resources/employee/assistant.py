@@ -1,35 +1,33 @@
 from logging import getLogger
-
 import httpx
 from app.api.validators import ChatMessage, ChatResponse
 from app.config import Config
-from app.database import User, get_session
+from app.database import User, Chat, get_session
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session
+from sqlmodel import select
+from datetime import datetime
 
 logger = getLogger(__name__)
 
 
 class AIAssistantResource(Resource):
     """
-    GenAI-Powered HR Chatbot Resource - Story Point:
-    "As an Employee, I want GenAI chatbot to provide me with instant answers to HR-related queries..."
+    GenAI-Powered HR Chat Assistant Resource — Story Point:
+    "As an Employee, I want a GenAI-powered HR assistant that instantly answers my common questions
+    so that I don’t need to wait for HR or managers to respond to simple queries."
 
-    Provides an AI-powered conversational assistant for employees to get instant answers to
-    common HR queries without waiting for manager or HR support. The chatbot leverages Google
-    Gemini 2.0 Flash model to handle queries about:
-    - Dress code policies
-    - Leave types and procedures
-    - Work-from-home (WFH) guidelines
-    - Travel policies and reimbursement
-    - Benefits and compensation
-    - General HR procedures
+    This resource provides conversational access to a GenAI HR assistant backed by Google Gemini 2.0 Flash.
+    Employees can ask questions related to HR policies, leave processes, company rules, reimbursements,
+    WFH guidelines, benefits, dress code, and more.
 
-    This enables employees to resolve trivial, frequently-asked HR questions in real-time,
-    reducing support overhead and improving employee satisfaction. Responses are powered by
-    GenAI for natural, contextual answers tailored to the query.
+    Every interaction is **persisted in the Chat model**, enabling:
+    - Full conversation history retrieval
+    - Consistent user experience across sessions
+    - Future context-aware responses (if enabled later)
+    - Analytics on employee HR enquires
     """
 
     async def post(
@@ -39,50 +37,79 @@ class AIAssistantResource(Resource):
         session: Session = Depends(get_session),
     ):
         """
-        Send a message to the GenAI HR chatbot and receive an instant response.
+        Send a user message to the GenAI HR assistant, store the conversation entries (user + assistant),
+        and return the AI-generated answer.
 
         Story Points Supported:
-        - "As an Employee, I want GenAI chatbot to provide me with instant answers to HR-related queries (e.g., dress code, leave, WFH, travel) so that I don't have to wait for my manager to address trivial questions."
+        - "As an Employee, I want instant answers to HR questions about leave, reimbursements,
+           company rules, and policies."
+        - "As an Employee, I want my chat history saved so I can revisit earlier replies
+           and maintain a consistent conversation."
 
         Workflow:
-        1. Receive employee query/message
-        2. Format message with system prompt identifying this as Sync'em AI Assistant
-        3. Send to Google Gemini 2.0 Flash API with appropriate context
-        4. Parse and return AI-generated response
-        5. Handle timeouts and API errors gracefully
+        1. Save the employee's message to the Chat table.
+        2. Construct a Gemini API request with system prompt ("You are Sync'em AI Assistant").
+        3. Send the request to Google Gemini 2.0 Flash (30s timeout).
+        4. Parse the AI response safely.
+        5. Save the AI response to the Chat table.
+        6. Return the formatted reply to the frontend.
 
         Args:
-            payload (ChatMessage): Request payload containing:
-                - message (str): Employee's HR query or question (e.g., "What is the dress code?", "How do I request WFH?")
-            current_user (User): Authenticated employee user object
-            session (Session): Database session (passed for consistency, not actively used)
+            payload (ChatMessage):
+                - message (str): The employee's HR-related question.
+                  Example:
+                  {
+                      "message": "How many casual leaves do we get?"
+                  }
+
+            current_user (User):
+                Authenticated employee asking the question.
+
+            session (Session):
+                Active database session used for storing messages and fetching history.
 
         Returns:
-            ChatResponse: AI-generated response containing:
-                - reply (str): Natural language answer to the employee's question from Gemini
+            ChatResponse:
+                - reply (str): AI-generated answer to the employee's query.
 
         Error Codes:
-            - 400 Bad Request: Missing or invalid message in payload
-            - 401 Unauthorized: User is not an employee (caught by middleware)
-            - 500 Internal Server Error: GenAI API request failures, timeouts, or response parsing errors
-            - 503 Service Unavailable: GenAI API service down or unreachable
+            - 400 Bad Request:
+                * Missing/invalid message in payload.
+            - 401 Unauthorized:
+                * Employee not authenticated (handled by middleware).
+            - 500 Internal Server Error:
+                * Gemini API request failure.
+                * JSON parsing errors.
+                * Database commit issues.
+            - 503 Service Unavailable:
+                * Gemini service unreachable, heavy load, or timed out.
 
         Raises:
-            HTTPException(500): If Gemini API request fails, times out, or response parsing fails
+            HTTPException(500): For LLM failures, unexpected exceptions, or response parsing issues.
 
-        GenAI Integration Details:
-            - Model: Google Gemini 2.0 Flash (fast, cost-efficient)
-            - System Role: "Sync'em AI Assistant" (branded HR chatbot)
-            - Timeout: 30 seconds for API response
-            - API: Google Generative AI REST endpoint
-            - Authentication: Via Config.GEMINI_API_KEY
+        Example Usage:
+            POST /assistant
+            Body:
+            {
+                "message": "What is our reimbursement policy?"
+            }
 
-        Example Query/Response:
-            Request: {"message": "What is our dress code policy?"}
-            Response: {"reply": "Our dress code policy is business casual..."}
+            Response:
+            {
+                "reply": "Employees may claim travel, food, and lodging reimbursements..."
+            }
         """
 
         try:
+            user_chat = Chat(
+                user_id=current_user.id,
+                role="user",
+                message=payload.message,
+            )
+            session.add(user_chat)
+            session.commit()
+            session.refresh(user_chat)
+
             url = (
                 "https://generativelanguage.googleapis.com/v1beta/models/"
                 "gemini-2.0-flash:generateContent"
@@ -95,7 +122,10 @@ class AIAssistantResource(Resource):
                         "role": "user",
                         "parts": [
                             {
-                                "text": f"You are Sync'em AI Assistant.\nUser: {payload.message}"
+                                "text": (
+                                    "You are Sync'em AI Assistant, a professional HR support chatbot.\n"
+                                    f"User: {payload.message}"
+                                )
                             }
                         ],
                     }
@@ -115,8 +145,120 @@ class AIAssistantResource(Resource):
 
             reply = data["candidates"][0]["content"]["parts"][0]["text"]
 
+            assistant_chat = Chat(
+                user_id=current_user.id,
+                role="assistant",
+                message=reply,
+            )
+            session.add(assistant_chat)
+            session.commit()
+
             return ChatResponse(reply=reply)
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error("AI Assistant Error", exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+
+class AIChatHistoryResource(Resource):
+    """
+    Chat History Retrieval Resource — Story Point:
+    "As an Employee, I want to view my previous conversations with the HR assistant so that I can
+    revisit previous answers without asking the same questions again."
+
+    Provides employees with a complete chronological history of their GenAI HR assistant interactions.
+    This improves transparency, user satisfaction, and continuity across sessions.
+    """
+
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Retrieve the full chat conversation history for the authenticated employee.
+
+        Story Points Supported:
+        - "As an Employee, I want my previous HR chatbot interactions accessible so that I can
+           continue conversations naturally and reference prior answers."
+        - "As an Employee, I want a timeline of all messages exchanged with the assistant."
+
+        Workflow:
+        1. Fetch all chat messages for the authenticated user.
+        2. Order them chronologically.
+        3. Format messages with timestamps, roles, and message content.
+        4. Return structured chat history to the client.
+
+        Args:
+            current_user (User):
+                Authenticated employee whose chat history is being retrieved.
+
+            session (Session):
+                Database session for performing the query.
+
+        Returns:
+            dict:
+                {
+                    "messages": [
+                        {
+                            "id": <int>,
+                            "role": "user" | "assistant",
+                            "message": <str>,
+                            "created_at": <datetime>
+                        },
+                        ...
+                    ]
+                }
+
+        Error Codes:
+            - 401 Unauthorized:
+                * If user is not logged in or not an employee.
+            - 500 Internal Server Error:
+                * Database query or session failure.
+
+        Raises:
+            HTTPException(500): For unexpected database or server failures.
+
+        Example Response:
+            {
+                "messages": [
+                    {
+                        "id": 1,
+                        "role": "user",
+                        "message": "What is the dress code?",
+                        "created_at": "2025-01-18T09:22:14Z"
+                    },
+                    {
+                        "id": 2,
+                        "role": "assistant",
+                        "message": "Our dress code is business casual...",
+                        "created_at": "2025-01-18T09:22:15Z"
+                    }
+                ]
+            }
+        """
+
+        try:
+            chats = session.exec(
+                select(Chat)
+                .where(Chat.user_id == current_user.id)
+                .order_by(Chat.created_at.asc())
+            ).all()
+
+            return {
+                "messages": [
+                    {
+                        "id": c.id,
+                        "role": c.role,
+                        "message": c.message,
+                        "created_at": c.created_at,
+                    }
+                    for c in chats
+                ]
+            }
+
+        except Exception as e:
+            logger.error("Chat History Error", exc_info=True)
             raise HTTPException(500, "Internal server error")

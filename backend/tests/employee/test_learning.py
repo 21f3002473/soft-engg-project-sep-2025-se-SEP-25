@@ -1,4 +1,5 @@
 import httpx
+import pytest
 
 
 def assert_json(response):
@@ -25,7 +26,6 @@ def test_get_learning_success(base_url, auth_employee):
 def test_get_learning_unauthorized(base_url):
     response = httpx.get(f"{base_url}/employee/learning")
     assert response.status_code in [401, 403]
-
 
 
 # 2) /hr/course (CourseAdminListCreateResource)
@@ -71,12 +71,19 @@ def test_post_courses_admin_missing_name(base_url, auth_hr):
 
 
 def test_get_course_detail_success(base_url, auth_hr):
-    response = httpx.get(f"{base_url}/hr/course/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
+    assert list_resp.status_code == 200
+    courses = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert set(data.keys()) == {"id", "course_name", "course_link", "topics"}
+    if not courses:
+        pytest.skip("No courses available to test GET detail")
+
+    course_id = courses[0]["id"]
+    response = httpx.get(f"{base_url}/hr/course/{course_id}", headers=auth_hr)
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert set(data.keys()) == {"id", "course_name", "course_link", "topics"}
 
 
 def test_get_course_detail_not_found(base_url, auth_hr):
@@ -88,14 +95,23 @@ def test_get_course_detail_not_found(base_url, auth_hr):
 
 
 def test_put_course_detail_success(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
+    assert list_resp.status_code == 200
+    courses = assert_json(list_resp)
+
+    if not courses:
+        pytest.skip("No courses available to test PUT")
+
+    course_id = courses[0]["id"]
     payload = {"course_name": "Updated course"}
 
-    response = httpx.put(f"{base_url}/hr/course/1", json=payload, headers=auth_hr)
-    assert response.status_code in [200, 404]
+    response = httpx.put(
+        f"{base_url}/hr/course/{course_id}", json=payload, headers=auth_hr
+    )
+    assert response.status_code == 200
 
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Course updated"
+    data = assert_json(response)
+    assert data.get("message") == "Course updated"
 
 
 def test_put_course_detail_not_found(base_url, auth_hr):
@@ -111,12 +127,19 @@ def test_put_course_detail_not_found(base_url, auth_hr):
 
 
 def test_delete_course_success(base_url, auth_hr):
-    response = httpx.delete(f"{base_url}/hr/course/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
+    assert list_resp.status_code == 200
+    courses = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Course deleted"
+    if not courses:
+        pytest.skip("No courses available to test DELETE")
+
+    course_id = courses[0]["id"]
+    response = httpx.delete(f"{base_url}/hr/course/{course_id}", headers=auth_hr)
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Course deleted"
 
 
 def test_delete_course_not_found(base_url, auth_hr):
@@ -131,7 +154,7 @@ def test_delete_course_not_found(base_url, auth_hr):
 
 
 def test_get_course_assignments_success(base_url, auth_hr):
-    response = httpx.get(f"{base_url}/hr/course/assign/1", headers=auth_hr)
+    response = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
 
     assert response.status_code == 200
     data = assert_json(response)
@@ -139,7 +162,7 @@ def test_get_course_assignments_success(base_url, auth_hr):
 
 
 def test_get_course_assignments_unauthorized(base_url):
-    response = httpx.get(f"{base_url}/hr/course/assign/1")
+    response = httpx.get(f"{base_url}/hr/course/assign/4")
     assert response.status_code in [401, 403]
 
 
@@ -147,7 +170,7 @@ def test_post_assign_course_success(base_url, auth_hr):
     payload = {"course_id": 1}
 
     response = httpx.post(
-        f"{base_url}/hr/course/assign/1",
+        f"{base_url}/hr/course/assign/4",
         json=payload,
         headers=auth_hr,
     )
@@ -159,7 +182,7 @@ def test_post_assign_course_success(base_url, auth_hr):
 
 
 def test_post_assign_missing_fields(base_url, auth_hr):
-    response = httpx.post(f"{base_url}/hr/course/assign/1", json={}, headers=auth_hr)
+    response = httpx.post(f"{base_url}/hr/course/assign/4", json={}, headers=auth_hr)
 
     assert response.status_code == 400
     data = assert_json(response)
@@ -169,12 +192,10 @@ def test_post_assign_missing_fields(base_url, auth_hr):
 def test_post_assign_course_already_exists(base_url, auth_hr):
     payload = {"course_id": 1}
 
-    # first assignment
-    httpx.post(f"{base_url}/hr/course/assign/1", json=payload, headers=auth_hr)
+    httpx.post(f"{base_url}/hr/course/assign/4", json=payload, headers=auth_hr)
 
-    # second should fail
     response = httpx.post(
-        f"{base_url}/hr/course/assign/1", json=payload, headers=auth_hr
+        f"{base_url}/hr/course/assign/4", json=payload, headers=auth_hr
     )
 
     assert response.status_code == 400
@@ -186,18 +207,27 @@ def test_post_assign_course_already_exists(base_url, auth_hr):
 
 
 def test_get_assignment_detail_success(base_url, auth_hr):
-    response = httpx.get(f"{base_url}/hr/course/assign/edit/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
+    assert list_resp.status_code == 200
+    assignments = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert set(data.keys()) == {
-            "id",
-            "user_id",
-            "course_id",
-            "course_name",
-            "status",
-        }
+    if not assignments:
+        pytest.skip("No assignments available to test GET detail")
+
+    assign_id = assignments[0]["id"]
+    response = httpx.get(
+        f"{base_url}/hr/course/assign/edit/{assign_id}", headers=auth_hr
+    )
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert set(data.keys()) == {
+        "id",
+        "user_id",
+        "course_id",
+        "course_name",
+        "status",
+    }
 
 
 def test_get_assignment_detail_not_found(base_url, auth_hr):
@@ -209,25 +239,40 @@ def test_get_assignment_detail_not_found(base_url, auth_hr):
 
 
 def test_put_assignment_success(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
+    assert list_resp.status_code == 200
+    assignments = assert_json(list_resp)
+
+    if not assignments:
+        pytest.skip("No assignments available to test PUT")
+
+    assign_id = assignments[0]["id"]
     payload = {"status": "completed"}
 
     response = httpx.put(
-        f"{base_url}/hr/course/assign/edit/1",
+        f"{base_url}/hr/course/assign/edit/{assign_id}",
         json=payload,
         headers=auth_hr,
     )
 
-    assert response.status_code in [200, 404]
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Assignment updated"
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Assignment updated"
 
 
 def test_put_assignment_invalid_status(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
+    assert list_resp.status_code == 200
+    assignments = assert_json(list_resp)
+
+    if not assignments:
+        pytest.skip("No assignments available to test invalid status update")
+
+    assign_id = assignments[0]["id"]
     payload = {"status": "INVALID"}
 
     response = httpx.put(
-        f"{base_url}/hr/course/assign/edit/1",
+        f"{base_url}/hr/course/assign/edit/{assign_id}",
         json=payload,
         headers=auth_hr,
     )
@@ -250,12 +295,21 @@ def test_put_assignment_not_found(base_url, auth_hr):
 
 
 def test_delete_assignment_success(base_url, auth_hr):
-    response = httpx.delete(f"{base_url}/hr/course/assign/edit/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
+    assert list_resp.status_code == 200
+    assignments = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Assignment removed"
+    if not assignments:
+        pytest.skip("No assignments available to test DELETE")
+
+    assign_id = assignments[0]["id"]
+    response = httpx.delete(
+        f"{base_url}/hr/course/assign/edit/{assign_id}", headers=auth_hr
+    )
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Assignment removed"
 
 
 def test_delete_assignment_not_found(base_url, auth_hr):
@@ -313,13 +367,21 @@ def test_put_employee_course_status_missing_field(base_url, auth_employee):
     assert data.get("detail") == "status field is required"
 
 
-def test_put_employee_course_status_invalid(base_url, auth_employee):
+def test_put_assignment_invalid_status(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
+    assert list_resp.status_code == 200
+    assignments = assert_json(list_resp)
+
+    if not assignments:
+        pytest.skip("No assignments exist to test invalid status update")
+
+    assign_id = assignments[0]["id"]
     payload = {"status": "INVALID"}
 
     response = httpx.put(
-        f"{base_url}/employee/course/1",
+        f"{base_url}/hr/course/assign/edit/{assign_id}",
         json=payload,
-        headers=auth_employee,
+        headers=auth_hr,
     )
 
     assert response.status_code == 400

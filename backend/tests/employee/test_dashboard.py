@@ -1,4 +1,6 @@
 import httpx
+import pytest
+
 
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
@@ -81,14 +83,19 @@ def test_post_todo_unauthorized(base_url):
 
 
 def test_get_todo_success(base_url, auth_employee):
-    task_id = 1
+    list_resp = httpx.get(f"{base_url}/employee/todo", headers=auth_employee)
+    assert list_resp.status_code == 200
+    todos = assert_json(list_resp)
+
+    if not todos:
+        pytest.skip("No todos available to test GET")
+
+    task_id = todos[0]["id"]
     response = httpx.get(f"{base_url}/employee/todo/{task_id}", headers=auth_employee)
 
-    assert response.status_code in [200, 404]
-
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert set(data.keys()) == {"id", "task", "status", "deadline", "date_created"}
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert set(data.keys()) == {"id", "task", "status", "deadline", "date_created"}
 
 
 def test_get_todo_not_found(base_url, auth_employee):
@@ -100,23 +107,37 @@ def test_get_todo_not_found(base_url, auth_employee):
 
 
 def test_put_todo_success(base_url, auth_employee):
-    task_id = 1
+    list_resp = httpx.get(f"{base_url}/employee/todo", headers=auth_employee)
+    assert list_resp.status_code == 200
+    todos = assert_json(list_resp)
+
+    if not todos:
+        pytest.skip("No todos available to test PUT")
+
+    task_id = todos[0]["id"]
     payload = {"task": "Updated task", "status": "completed"}
 
     response = httpx.put(
         f"{base_url}/employee/todo/{task_id}", json=payload, headers=auth_employee
     )
 
-    assert response.status_code in [200, 404]
-
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Task updated successfully"
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Task updated successfully"
 
 
 def test_put_todo_invalid_status(base_url, auth_employee):
+    list_resp = httpx.get(f"{base_url}/employee/todo", headers=auth_employee)
+    assert list_resp.status_code == 200
+    todos = assert_json(list_resp)
+
+    if not todos:
+        pytest.skip("No todos available to test invalid status update")
+
+    task_id = todos[0]["id"]
+
     payload = {"status": "INVALID_STATUS"}
-    url = f"{base_url}/employee/todo/1"
+    url = f"{base_url}/employee/todo/{task_id}"
 
     response = httpx.put(url, json=payload, headers=auth_employee)
 
@@ -135,16 +156,21 @@ def test_put_todo_not_found(base_url, auth_employee):
 
 
 def test_delete_todo_success(base_url, auth_employee):
-    task_id = 1
+    list_resp = httpx.get(f"{base_url}/employee/todo", headers=auth_employee)
+    assert list_resp.status_code == 200
+    todos = assert_json(list_resp)
+
+    if not todos:
+        pytest.skip("No todos available to test DELETE")
+
+    task_id = todos[0]["id"]
     response = httpx.delete(
         f"{base_url}/employee/todo/{task_id}", headers=auth_employee
     )
 
-    assert response.status_code in [200, 404]
-
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Task deleted successfully"
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Task deleted successfully"
 
 
 def test_delete_todo_not_found(base_url, auth_employee):
@@ -171,19 +197,56 @@ def test_get_employee_announcements_unauthorized(base_url):
     assert response.status_code in [401, 403]
 
 
-# 5) /hr/annoucement/{user_id} (AnnouncementAdminListCreateResource)
+# 5) /hr/annoucements (AnnouncementAdminListResource)
 
 
 def test_get_hr_announcements_success(base_url, auth_hr):
-    response = httpx.get(f"{base_url}/hr/annoucement/1", headers=auth_hr)
+    response = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    assert isinstance(data, list)
+
+
+def test_get_hr_announcements_unauthorized(base_url):
+    response = httpx.get(f"{base_url}/hr/annoucements")
+    assert response.status_code in [401, 403]
+
+
+# 6) /hr/annoucement/{user_id} (AnnouncementAdminListCreateResource)
+
+
+def test_get_hr_announcements_success(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
+    assert list_resp.status_code == 200
+    announcements = assert_json(list_resp)
+
+    if not announcements:
+        pytest.skip("No announcements available to test GET detail")
+
+    ann_id = announcements[0]["id"]
+    response = httpx.get(f"{base_url}/hr/annoucement/{ann_id}", headers=auth_hr)
 
     assert response.status_code == 200
     data = assert_json(response)
     assert isinstance(data, list)
 
 
-def test_get_hr_announcements_unauthorized(base_url):
-    response = httpx.get(f"{base_url}/hr/annoucement/1")
+def test_get_hr_announcement_detail_unauthorized(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/annoucement/1", headers=auth_hr)
+
+    if list_resp.status_code == 404:
+        pytest.skip("No announcements to test unauthorized access")
+
+    data = assert_json(list_resp)
+
+    if isinstance(data, list) and not data:
+        pytest.skip("No announcements exist")
+
+    ann_id = data[0]["id"]
+
+    response = httpx.get(f"{base_url}/hr/annoucement/{ann_id}")
+
     assert response.status_code in [401, 403]
 
 
@@ -207,17 +270,23 @@ def test_post_hr_announcement_missing_field(base_url, auth_hr):
     assert data.get("detail") == "announcement field is required"
 
 
-# 6) /hr/annoucement/edit/{ann_id} (AnnouncementAdminDetailResource)
+# 7) /hr/annoucement/edit/{ann_id} (AnnouncementAdminDetailResource)
 
 
 def test_get_hr_announcement_detail_success(base_url, auth_hr):
-    response = httpx.get(f"{base_url}/hr/annoucement/edit/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
+    assert list_resp.status_code == 200
+    announcements = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
+    if not announcements:
+        pytest.skip("No announcements available to test GET detail")
 
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert set(data.keys()) == {"id", "announcement", "created_at", "user_id"}
+    ann_id = announcements[0]["id"]
+    response = httpx.get(f"{base_url}/hr/annoucement/edit/{ann_id}", headers=auth_hr)
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert set(data.keys()) == {"id", "announcement", "created_at", "user_id"}
 
 
 def test_get_hr_announcement_detail_not_found(base_url, auth_hr):
@@ -229,17 +298,23 @@ def test_get_hr_announcement_detail_not_found(base_url, auth_hr):
 
 
 def test_put_hr_announcement_success(base_url, auth_hr):
+    list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
+    assert list_resp.status_code == 200
+    announcements = assert_json(list_resp)
+
+    if not announcements:
+        pytest.skip("No announcements available to test PUT")
+
+    ann_id = announcements[0]["id"]
     payload = {"announcement": "Updated message"}
 
     response = httpx.put(
-        f"{base_url}/hr/annoucement/edit/1", json=payload, headers=auth_hr
+        f"{base_url}/hr/annoucement/edit/{ann_id}", json=payload, headers=auth_hr
     )
 
-    assert response.status_code in [200, 404]
-
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Announcement updated"
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Announcement updated"
 
 
 def test_put_hr_announcement_not_found(base_url, auth_hr):
@@ -255,13 +330,19 @@ def test_put_hr_announcement_not_found(base_url, auth_hr):
 
 
 def test_delete_hr_announcement_success(base_url, auth_hr):
-    response = httpx.delete(f"{base_url}/hr/annoucement/edit/1", headers=auth_hr)
+    list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
+    assert list_resp.status_code == 200
+    announcements = assert_json(list_resp)
 
-    assert response.status_code in [200, 404]
+    if not announcements:
+        pytest.skip("No announcements available to test DELETE")
 
-    if response.status_code == 200:
-        data = assert_json(response)
-        assert data.get("message") == "Announcement deleted"
+    ann_id = announcements[0]["id"]
+    response = httpx.delete(f"{base_url}/hr/annoucement/edit/{ann_id}", headers=auth_hr)
+
+    assert response.status_code == 200
+    data = assert_json(response)
+    assert data.get("message") == "Announcement deleted"
 
 
 def test_delete_hr_announcement_not_found(base_url, auth_hr):

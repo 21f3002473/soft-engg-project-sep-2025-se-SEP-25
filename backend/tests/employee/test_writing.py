@@ -1,4 +1,5 @@
 import httpx
+import pytest
 
 
 def assert_json(response):
@@ -49,17 +50,23 @@ def test_create_quick_note_unauthorized(base_url):
     assert r.status_code in [401, 403]
 
 
-
 # GET /employee/writing/{note_id}
 def test_get_quick_note_success(auth_employee, base_url):
-    r = httpx.get(f"{base_url}/employee/writing/1", headers=auth_employee)
+    list_resp = httpx.get(f"{base_url}/employee/writing", headers=auth_employee)
+    assert list_resp.status_code == 200
+    data = assert_json(list_resp)
+    notes = data.get("notes", [])
 
-    assert r.status_code in [200, 404]
+    if not notes:
+        pytest.skip("No notes available to test GET")
 
-    if r.status_code == 200:
-        data = assert_json(r)
-        assert "note" in data
-        assert {"id", "topic", "notes"}.issubset(data["note"].keys())
+    note_id = notes[0]["id"]
+    r = httpx.get(f"{base_url}/employee/writing/{note_id}", headers=auth_employee)
+
+    assert r.status_code == 200
+    response_data = assert_json(r)
+    assert "note" in response_data
+    assert {"id", "topic", "notes"}.issubset(response_data["note"].keys())
 
 
 def test_get_quick_note_not_found(auth_employee, base_url):
@@ -76,14 +83,23 @@ def test_get_quick_note_unauthorized(base_url):
 
 # PUT /employee/writing/{note_id}
 def test_update_quick_note_success(auth_employee, base_url):
+    list_resp = httpx.get(f"{base_url}/employee/writing", headers=auth_employee)
+    assert list_resp.status_code == 200
+    data = assert_json(list_resp)
+    notes = data.get("notes", [])
+
+    if not notes:
+        pytest.skip("No notes available to test PUT")
+
+    note_id = notes[0]["id"]
     payload = {"topic": "Updated Topic", "notes": "Updated content"}
 
-    r = httpx.put(f"{base_url}/employee/writing/1", json=payload, headers=auth_employee)
+    r = httpx.put(
+        f"{base_url}/employee/writing/{note_id}", json=payload, headers=auth_employee
+    )
 
-    assert r.status_code in [200, 404]
-
-    if r.status_code == 200:
-        assert assert_json(r)["message"] == "Note updated"
+    assert r.status_code == 200
+    assert assert_json(r)["message"] == "Note updated"
 
 
 def test_update_quick_note_not_found(auth_employee, base_url):
@@ -106,12 +122,19 @@ def test_update_quick_note_unauthorized(base_url):
 
 # DELETE /employee/writing/{note_id}
 def test_delete_quick_note_success(auth_employee, base_url):
-    r = httpx.delete(f"{base_url}/employee/writing/1", headers=auth_employee)
+    list_resp = httpx.get(f"{base_url}/employee/writing", headers=auth_employee)
+    assert list_resp.status_code == 200
+    data = assert_json(list_resp)
+    notes = data.get("notes", [])
 
-    assert r.status_code in [200, 404]
+    if not notes:
+        pytest.skip("No notes available to test DELETE")
 
-    if r.status_code == 200:
-        assert assert_json(r)["message"] == "Note deleted"
+    note_id = notes[0]["id"]
+    r = httpx.delete(f"{base_url}/employee/writing/{note_id}", headers=auth_employee)
+
+    assert r.status_code == 200
+    assert assert_json(r)["message"] == "Note deleted"
 
 
 def test_delete_quick_note_not_found(auth_employee, base_url):

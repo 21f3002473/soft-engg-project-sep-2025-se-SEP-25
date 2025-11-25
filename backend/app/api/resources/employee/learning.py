@@ -108,6 +108,8 @@ class LearningResource(Resource):
                 "recommended": recommended_list,
             }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Learning page error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -147,19 +149,27 @@ class CourseAdminListCreateResource(Resource):
 
         Error Codes:
             - 401 Unauthorized: User is not HR personnel (caught by middleware)
+            - 500 Internal Server Error: Database query failures
         """
 
-        courses = session.exec(select(Course).order_by(Course.id.desc())).all()
+        try:
+            courses = session.exec(select(Course).order_by(Course.id.desc())).all()
 
-        return [
-            {
-                "id": c.id,
-                "course_name": c.course_name,
-                "course_link": c.course_link,
-                "topics": c.topics,
-            }
-            for c in courses
-        ]
+            return [
+                {
+                    "id": c.id,
+                    "course_name": c.course_name,
+                    "course_link": c.course_link,
+                    "topics": c.topics,
+                }
+                for c in courses
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAdminListCreateResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def post(
         self,
@@ -189,23 +199,31 @@ class CourseAdminListCreateResource(Resource):
         Error Codes:
             - 400 Bad Request: Missing required "course_name" field
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database insertion or commit failures
         """
 
-        name = data.get("course_name")
-        if not name:
-            raise HTTPException(400, "course_name is required")
+        try:
+            name = data.get("course_name")
+            if not name:
+                raise HTTPException(400, "course_name is required")
 
-        new_course = Course(
-            course_name=name,
-            course_link=data.get("course_link"),
-            topics=data.get("topics"),
-        )
+            new_course = Course(
+                course_name=name,
+                course_link=data.get("course_link"),
+                topics=data.get("topics"),
+            )
 
-        session.add(new_course)
-        session.commit()
-        session.refresh(new_course)
+            session.add(new_course)
+            session.commit()
+            session.refresh(new_course)
 
-        return {"message": "Course created", "id": new_course.id}
+            return {"message": "Course created", "id": new_course.id}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAdminListCreateResource POST error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class CourseAdminDetailResource(Resource):
@@ -241,18 +259,26 @@ class CourseAdminDetailResource(Resource):
         Error Codes:
             - 404 Not Found: Course with given ID does not exist
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database query failures
         """
 
-        course = session.get(Course, course_id)
-        if not course:
-            raise HTTPException(404, "Course not found")
+        try:
+            course = session.get(Course, course_id)
+            if not course:
+                raise HTTPException(404, "Course not found")
 
-        return {
-            "id": course.id,
-            "course_name": course.course_name,
-            "course_link": course.course_link,
-            "topics": course.topics,
-        }
+            return {
+                "id": course.id,
+                "course_name": course.course_name,
+                "course_link": course.course_link,
+                "topics": course.topics,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAdminDetailResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -280,23 +306,31 @@ class CourseAdminDetailResource(Resource):
         Error Codes:
             - 404 Not Found: Course does not exist
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database commit failures
         """
 
-        course = session.get(Course, course_id)
-        if not course:
-            raise HTTPException(404, "Course not found")
+        try:
+            course = session.get(Course, course_id)
+            if not course:
+                raise HTTPException(404, "Course not found")
 
-        if "course_name" in data:
-            course.course_name = data["course_name"]
-        if "course_link" in data:
-            course.course_link = data["course_link"]
-        if "topics" in data:
-            course.topics = data["topics"]
+            if "course_name" in data:
+                course.course_name = data["course_name"]
+            if "course_link" in data:
+                course.course_link = data["course_link"]
+            if "topics" in data:
+                course.topics = data["topics"]
 
-        session.commit()
-        session.refresh(course)
+            session.commit()
+            session.refresh(course)
 
-        return {"message": "Course updated"}
+            return {"message": "Course updated"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAdminDetailResource PUT error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def delete(
         self,
@@ -319,16 +353,24 @@ class CourseAdminDetailResource(Resource):
         Error Codes:
             - 404 Not Found: Course does not exist
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database deletion failures
         """
 
-        course = session.get(Course, course_id)
-        if not course:
-            raise HTTPException(404, "Course not found")
+        try:
+            course = session.get(Course, course_id)
+            if not course:
+                raise HTTPException(404, "Course not found")
 
-        session.delete(course)
-        session.commit()
+            session.delete(course)
+            session.commit()
 
-        return {"message": "Course deleted"}
+            return {"message": "Course deleted"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAdminDetailResource DELETE error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class CourseAssignmentListResource(Resource):
@@ -364,21 +406,29 @@ class CourseAssignmentListResource(Resource):
 
         Error Codes:
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database query failures
         """
 
-        assigned = session.exec(
-            select(UserCourse).where(UserCourse.user_id == user_id)
-        ).all()
+        try:
+            assigned = session.exec(
+                select(UserCourse).where(UserCourse.user_id == user_id)
+            ).all()
 
-        return [
-            {
-                "id": uc.id,
-                "course_id": uc.course_id,
-                "course_name": uc.course.course_name if uc.course else None,
-                "status": uc.status.value,
-            }
-            for uc in assigned
-        ]
+            return [
+                {
+                    "id": uc.id,
+                    "course_id": uc.course_id,
+                    "course_name": uc.course.course_name if uc.course else None,
+                    "status": uc.status.value,
+                }
+                for uc in assigned
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentListResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def post(
         self,
@@ -408,33 +458,41 @@ class CourseAssignmentListResource(Resource):
         Error Codes:
             - 400 Bad Request: Missing user_id or course_id, or course already assigned to user
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database insertion or commit failures
         """
 
-        course_id = data.get("course_id")
+        try:
+            course_id = data.get("course_id")
 
-        if not user_id or not course_id:
-            raise HTTPException(400, "user_id and course_id required")
+            if not user_id or not course_id:
+                raise HTTPException(400, "user_id and course_id required")
 
-        exists = session.exec(
-            select(UserCourse)
-            .where(UserCourse.user_id == user_id)
-            .where(UserCourse.course_id == course_id)
-        ).first()
+            exists = session.exec(
+                select(UserCourse)
+                .where(UserCourse.user_id == user_id)
+                .where(UserCourse.course_id == course_id)
+            ).first()
 
-        if exists:
-            raise HTTPException(400, "Course already assigned to this user")
+            if exists:
+                raise HTTPException(400, "Course already assigned to this user")
 
-        uc = UserCourse(
-            user_id=user_id,
-            course_id=course_id,
-            status=StatusTypeEnum.PENDING,
-        )
+            uc = UserCourse(
+                user_id=user_id,
+                course_id=course_id,
+                status=StatusTypeEnum.PENDING,
+            )
 
-        session.add(uc)
-        session.commit()
-        session.refresh(uc)
+            session.add(uc)
+            session.commit()
+            session.refresh(uc)
 
-        return {"message": "Course assigned", "id": uc.id}
+            return {"message": "Course assigned", "id": uc.id}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentListResource POST error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class CourseAssignmentDetailResource(Resource):
@@ -471,19 +529,27 @@ class CourseAssignmentDetailResource(Resource):
         Error Codes:
             - 404 Not Found: Assignment does not exist
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database query failures
         """
 
-        uc = session.get(UserCourse, assign_id)
-        if not uc:
-            raise HTTPException(404, "Assignment not found")
+        try:
+            uc = session.get(UserCourse, assign_id)
+            if not uc:
+                raise HTTPException(404, "Assignment not found")
 
-        return {
-            "id": uc.id,
-            "user_id": uc.user_id,
-            "course_id": uc.course_id,
-            "course_name": uc.course.course_name if uc.course else None,
-            "status": uc.status.value,
-        }
+            return {
+                "id": uc.id,
+                "user_id": uc.user_id,
+                "course_id": uc.course_id,
+                "course_name": uc.course.course_name if uc.course else None,
+                "status": uc.status.value,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentDetailResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -511,25 +577,33 @@ class CourseAssignmentDetailResource(Resource):
             - 404 Not Found: Assignment does not exist
             - 400 Bad Request: Invalid status value
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database commit failures
         """
 
-        uc = session.get(UserCourse, assign_id)
-        if not uc:
-            raise HTTPException(404, "Assignment not found")
+        try:
+            uc = session.get(UserCourse, assign_id)
+            if not uc:
+                raise HTTPException(404, "Assignment not found")
 
-        if "status" in data:
-            status = data["status"]
-            if status not in ["pending", "completed"]:
-                raise HTTPException(400, "Invalid status")
-            uc.status = StatusTypeEnum(status)
+            if "status" in data:
+                status = data["status"]
+                if status not in ["pending", "completed"]:
+                    raise HTTPException(400, "Invalid status")
+                uc.status = StatusTypeEnum(status)
 
-        if "course_id" in data:
-            uc.course_id = data["course_id"]
+            if "course_id" in data:
+                uc.course_id = data["course_id"]
 
-        session.commit()
-        session.refresh(uc)
+            session.commit()
+            session.refresh(uc)
 
-        return {"message": "Assignment updated"}
+            return {"message": "Assignment updated"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentDetailResource PUT error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def delete(
         self,
@@ -552,16 +626,24 @@ class CourseAssignmentDetailResource(Resource):
         Error Codes:
             - 404 Not Found: Assignment does not exist
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database deletion failures
         """
 
-        uc = session.get(UserCourse, assign_id)
-        if not uc:
-            raise HTTPException(404, "Assignment not found")
+        try:
+            uc = session.get(UserCourse, assign_id)
+            if not uc:
+                raise HTTPException(404, "Assignment not found")
 
-        session.delete(uc)
-        session.commit()
+            session.delete(uc)
+            session.commit()
 
-        return {"message": "Assignment removed"}
+            return {"message": "Assignment removed"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentDetailResource DELETE error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class CourseAssignmentEmployeeResource(Resource):
@@ -597,21 +679,29 @@ class CourseAssignmentEmployeeResource(Resource):
 
         Error Codes:
             - 401 Unauthorized: User is not an employee (caught by middleware)
+            - 500 Internal Server Error: Database query failures
         """
 
-        assigned = session.exec(
-            select(UserCourse).where(UserCourse.user_id == current_user.id)
-        ).all()
+        try:
+            assigned = session.exec(
+                select(UserCourse).where(UserCourse.user_id == current_user.id)
+            ).all()
 
-        return [
-            {
-                "id": uc.id,
-                "course_id": uc.course_id,
-                "course_name": uc.course.course_name if uc.course else None,
-                "status": uc.status.value,
-            }
-            for uc in assigned
-        ]
+            return [
+                {
+                    "id": uc.id,
+                    "course_id": uc.course_id,
+                    "course_name": uc.course.course_name if uc.course else None,
+                    "status": uc.status.value,
+                }
+                for uc in assigned
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"CourseAssignmentEmployeeResource error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class CourseRecommendationResource(Resource):
@@ -741,6 +831,8 @@ class CourseRecommendationResource(Resource):
                 "recommended_courses": final_recommendations,
             }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Recommendation error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -784,27 +876,35 @@ class EmployeeCourseUpdateByCourseIdResource(Resource):
             - 404 Not Found: Course assignment does not exist for this employee
             - 400 Bad Request: Missing "status" field or invalid status value
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database commit failures
         """
 
-        uc = session.exec(
-            select(UserCourse)
-            .where(UserCourse.user_id == current_user.id)
-            .where(UserCourse.course_id == course_id)
-        ).first()
+        try:
+            uc = session.exec(
+                select(UserCourse)
+                .where(UserCourse.user_id == current_user.id)
+                .where(UserCourse.course_id == course_id)
+            ).first()
 
-        if not uc:
-            raise HTTPException(404, "Course assignment not found")
+            if not uc:
+                raise HTTPException(404, "Course assignment not found")
 
-        if "status" not in data:
-            raise HTTPException(400, "status field is required")
+            if "status" not in data:
+                raise HTTPException(400, "status field is required")
 
-        status = data["status"]
-        if status not in ["pending", "completed"]:
-            raise HTTPException(400, "Invalid status")
+            status = data["status"]
+            if status not in ["pending", "completed"]:
+                raise HTTPException(400, "Invalid status")
 
-        uc.status = StatusTypeEnum(status)
+            uc.status = StatusTypeEnum(status)
 
-        session.commit()
-        session.refresh(uc)
+            session.commit()
+            session.refresh(uc)
 
-        return {"message": "Course status updated"}
+            return {"message": "Course status updated"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"EmployeeCourseUpdateByCourseIdResource error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")

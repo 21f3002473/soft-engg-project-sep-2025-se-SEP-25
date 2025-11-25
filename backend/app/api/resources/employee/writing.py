@@ -55,6 +55,8 @@ class AllQuickNotesResource(Resource):
 
             return {"notes": [QuickNoteOut.model_validate(n) for n in notes]}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -104,6 +106,8 @@ class AllQuickNotesResource(Resource):
 
             return {"message": "Note saved successfully", "id": note.id}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -142,12 +146,20 @@ class QuickNotesResource(Resource):
         Error Codes:
             - 404 Not Found: Note does not exist or belongs to another employee
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database query failures
         """
-        note = session.get(QuickNote, note_id)
-        if not note or note.user_id != current_user.id:
-            raise HTTPException(404, "Note not found")
+        try:
+            note = session.get(QuickNote, note_id)
+            if not note or note.user_id != current_user.id:
+                raise HTTPException(404, "Note not found")
 
-        return {"note": QuickNoteOut.model_validate(note)}
+            return {"note": QuickNoteOut.model_validate(note)}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,

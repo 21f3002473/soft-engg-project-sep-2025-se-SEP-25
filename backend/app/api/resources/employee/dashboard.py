@@ -146,6 +146,8 @@ class DashboardResource(Resource):
                 },
             }
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Dashboard error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -187,22 +189,29 @@ class AllToDoResource(Resource):
             - 401 Unauthorized: User is not an employee (caught by middleware)
         """
 
-        tasks = session.exec(
-            select(ToDo)
-            .where(ToDo.user_id == current_user.id)
-            .order_by(ToDo.date_created.desc())
-        ).all()
+        try:
+            tasks = session.exec(
+                select(ToDo)
+                .where(ToDo.user_id == current_user.id)
+                .order_by(ToDo.date_created.desc())
+            ).all()
 
-        return [
-            {
-                "id": t.id,
-                "task": t.task,
-                "status": t.status.value,
-                "deadline": t.deadline,
-                "date_created": t.date_created,
-            }
-            for t in tasks
-        ]
+            return [
+                {
+                    "id": t.id,
+                    "task": t.task,
+                    "status": t.status.value,
+                    "deadline": t.deadline,
+                    "date_created": t.date_created,
+                }
+                for t in tasks
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"AllToDoResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def post(
         self,
@@ -231,24 +240,32 @@ class AllToDoResource(Resource):
         Error Codes:
             - 400 Bad Request: Missing required "task" field
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database insertion or commit failures
         """
 
-        task_text = data.get("task")
-        if not task_text:
-            raise HTTPException(400, "Task field is required")
+        try:
+            task_text = data.get("task")
+            if not task_text:
+                raise HTTPException(400, "Task field is required")
 
-        new_task = ToDo(
-            user_id=current_user.id,
-            task=task_text,
-            status=StatusTypeEnum.PENDING,
-            deadline=data.get("deadline"),
-        )
+            new_task = ToDo(
+                user_id=current_user.id,
+                task=task_text,
+                status=StatusTypeEnum.PENDING,
+                deadline=data.get("deadline"),
+            )
 
-        session.add(new_task)
-        session.commit()
-        session.refresh(new_task)
+            session.add(new_task)
+            session.commit()
+            session.refresh(new_task)
 
-        return {"message": "Task added successfully", "task_id": new_task.id}
+            return {"message": "Task added successfully", "task_id": new_task.id}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"AllToDoResource POST error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class ToDoResource(Resource):
@@ -286,17 +303,24 @@ class ToDoResource(Resource):
             - 401 Unauthorized: User is not an employee
         """
 
-        task = session.get(ToDo, task_id)
-        if not task or task.user_id != current_user.id:
-            raise HTTPException(404, "Task not found")
+        try:
+            task = session.get(ToDo, task_id)
+            if not task or task.user_id != current_user.id:
+                raise HTTPException(404, "Task not found")
 
-        return {
-            "id": task.id,
-            "task": task.task,
-            "status": task.status.value,
-            "deadline": task.deadline,
-            "date_created": task.date_created,
-        }
+            return {
+                "id": task.id,
+                "task": task.task,
+                "status": task.status.value,
+                "deadline": task.deadline,
+                "date_created": task.date_created,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"ToDoResource GET error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -328,28 +352,36 @@ class ToDoResource(Resource):
             - 404 Not Found: Task does not exist or belongs to another user
             - 400 Bad Request: Invalid status value (not "pending" or "completed")
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database update failures
         """
 
-        task = session.get(ToDo, task_id)
-        if not task or task.user_id != current_user.id:
-            raise HTTPException(404, "Task not found")
+        try:
+            task = session.get(ToDo, task_id)
+            if not task or task.user_id != current_user.id:
+                raise HTTPException(404, "Task not found")
 
-        if "task" in data:
-            task.task = data["task"]
+            if "task" in data:
+                task.task = data["task"]
 
-        if "status" in data:
-            if data["status"] not in ["pending", "completed"]:
-                raise HTTPException(400, "Invalid status")
-            task.status = StatusTypeEnum(data["status"])
+            if "status" in data:
+                if data["status"] not in ["pending", "completed"]:
+                    raise HTTPException(400, "Invalid status")
+                task.status = StatusTypeEnum(data["status"])
 
-        if "deadline" in data:
-            task.deadline = data["deadline"]
+            if "deadline" in data:
+                task.deadline = data["deadline"]
 
-        session.add(task)
-        session.commit()
-        session.refresh(task)
+            session.add(task)
+            session.commit()
+            session.refresh(task)
 
-        return {"message": "Task updated successfully"}
+            return {"message": "Task updated successfully"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"ToDoResource PUT error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def delete(
         self,
@@ -372,16 +404,24 @@ class ToDoResource(Resource):
         Error Codes:
             - 404 Not Found: Task does not exist or belongs to another user
             - 401 Unauthorized: User is not an employee
+            - 500 Internal Server Error: Database deletion failures
         """
 
-        task = session.get(ToDo, task_id)
-        if not task or task.user_id != current_user.id:
-            raise HTTPException(404, "Task not found")
+        try:
+            task = session.get(ToDo, task_id)
+            if not task or task.user_id != current_user.id:
+                raise HTTPException(404, "Task not found")
 
-        session.delete(task)
-        session.commit()
+            session.delete(task)
+            session.commit()
 
-        return {"message": "Task deleted successfully"}
+            return {"message": "Task deleted successfully"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"ToDoResource DELETE error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
 
 class AnnouncementAdminListCreateResource(Resource):
@@ -422,19 +462,28 @@ class AnnouncementAdminListCreateResource(Resource):
             - 401 Unauthorized: User is not HR personnel (caught by middleware)
         """
 
-        ann_list = session.exec(
-            select(Announcement).order_by(Announcement.created_at.desc())
-        ).all()
+        try:
+            ann_list = session.exec(
+                select(Announcement).order_by(Announcement.created_at.desc())
+            ).all()
 
-        return [
-            {
-                "id": a.id,
-                "announcement": a.announcement,
-                "created_at": a.created_at,
-                "user_id": user_id,
-            }
-            for a in ann_list
-        ]
+            return [
+                {
+                    "id": a.id,
+                    "announcement": a.announcement,
+                    "created_at": a.created_at,
+                    "user_id": user_id,
+                }
+                for a in ann_list
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"AnnouncementAdminListCreateResource GET error: {e}", exc_info=True
+            )
+            raise HTTPException(500, "Internal server error")
 
     def post(
         self,
@@ -464,22 +513,32 @@ class AnnouncementAdminListCreateResource(Resource):
         Error Codes:
             - 400 Bad Request: Missing required "announcement" field
             - 401 Unauthorized: User is not HR personnel
+            - 500 Internal Server Error: Database insertion or commit failures
         """
 
-        text = data.get("announcement")
-        if not text:
-            raise HTTPException(400, "announcement field is required")
+        try:
+            text = data.get("announcement")
+            if not text:
+                raise HTTPException(400, "announcement field is required")
 
-        ann = Announcement(
-            user_id=user_id,
-            announcement=text,
-        )
+            ann = Announcement(
+                user_id=user_id,
+                announcement=text,
+            )
 
-        session.add(ann)
-        session.commit()
-        session.refresh(ann)
+            session.add(ann)
+            session.commit()
+            session.refresh(ann)
 
-        return {"message": "Announcement created", "id": ann.id}
+            return {"message": "Announcement created", "id": ann.id}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"AnnouncementAdminListCreateResource POST error: {e}", exc_info=True
+            )
+            raise HTTPException(500, "Internal server error")
 
 
 class AnnouncementAdminDetailResource(Resource):
@@ -516,16 +575,25 @@ class AnnouncementAdminDetailResource(Resource):
             - 401 Unauthorized: User is not HR personnel
         """
 
-        ann = session.get(Announcement, ann_id)
-        if not ann:
-            raise HTTPException(404, "Announcement not found")
+        try:
+            ann = session.get(Announcement, ann_id)
+            if not ann:
+                raise HTTPException(404, "Announcement not found")
 
-        return {
-            "id": ann.id,
-            "announcement": ann.announcement,
-            "created_at": ann.created_at,
-            "user_id": ann.user_id,
-        }
+            return {
+                "id": ann.id,
+                "announcement": ann.announcement,
+                "created_at": ann.created_at,
+                "user_id": ann.user_id,
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"AnnouncementAdminDetailResource GET error: {e}", exc_info=True
+            )
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -556,17 +624,26 @@ class AnnouncementAdminDetailResource(Resource):
             - 401 Unauthorized: User is not HR personnel
         """
 
-        ann = session.get(Announcement, ann_id)
-        if not ann:
-            raise HTTPException(404, "Announcement not found")
+        try:
+            ann = session.get(Announcement, ann_id)
+            if not ann:
+                raise HTTPException(404, "Announcement not found")
 
-        if "announcement" in data:
-            ann.announcement = data["announcement"]
+            if "announcement" in data:
+                ann.announcement = data["announcement"]
 
-        session.commit()
-        session.refresh(ann)
+            session.commit()
+            session.refresh(ann)
 
-        return {"message": "Announcement updated"}
+            return {"message": "Announcement updated"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"AnnouncementAdminDetailResource PUT error: {e}", exc_info=True
+            )
+            raise HTTPException(500, "Internal server error")
 
     def delete(
         self,
@@ -591,14 +668,23 @@ class AnnouncementAdminDetailResource(Resource):
             - 401 Unauthorized: User is not HR personnel
         """
 
-        ann = session.get(Announcement, ann_id)
-        if not ann:
-            raise HTTPException(404, "Announcement not found")
+        try:
+            ann = session.get(Announcement, ann_id)
+            if not ann:
+                raise HTTPException(404, "Announcement not found")
 
-        session.delete(ann)
-        session.commit()
+            session.delete(ann)
+            session.commit()
 
-        return {"message": "Announcement deleted"}
+            return {"message": "Announcement deleted"}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(
+                f"AnnouncementAdminDetailResource DELETE error: {e}", exc_info=True
+            )
+            raise HTTPException(500, "Internal server error")
 
 
 class AnnouncementEmployeeResource(Resource):
@@ -635,17 +721,83 @@ class AnnouncementEmployeeResource(Resource):
             - 401 Unauthorized: User is not an employee (caught by middleware)
         """
 
-        ann_list = session.exec(
-            select(Announcement)
-            .where(Announcement.user_id == current_user.id)
-            .order_by(Announcement.created_at.desc())
-        ).all()
+        try:
+            ann_list = session.exec(
+                select(Announcement)
+                .where(Announcement.user_id == current_user.id)
+                .order_by(Announcement.created_at.desc())
+            ).all()
 
-        return [
-            {
-                "id": a.id,
-                "announcement": a.announcement,
-                "created_at": a.created_at,
-            }
-            for a in ann_list
-        ]
+            return [
+                {
+                    "id": a.id,
+                    "announcement": a.announcement,
+                    "created_at": a.created_at,
+                }
+                for a in ann_list
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"AnnouncementEmployeeResource error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
+
+
+class AnnouncementAdminListResource(Resource):
+    """
+    HR Announcement Viewing (List All) - Story Point: "As an Employee, I want to browse HR FAQs and documents..."
+
+    Read-only endpoint for HR personnel to view all announcements created in the system.
+    Enables HR managers to monitor all announcements, track communication history, and
+    review organizational updates. Complements the AnnouncementAdminListCreateResource
+    by providing a dedicated view for listing all announcements without creation capability.
+    """
+
+    def get(
+        self,
+        current_user: User = Depends(require_hr()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Retrieve all announcements in the system (HR only).
+
+        Story Points Supported:
+        - "As an Employee, I want to browse HR FAQs and documents..." (HR audit/monitoring)
+
+        Args:
+            current_user (User): Authenticated HR user object
+            session (Session): Database session
+
+        Returns:
+            list[dict]: Array of all announcements, each containing:
+                - id (int): Announcement identifier
+                - announcement (str): Announcement content/text
+                - created_at (datetime): When announcement was created
+                - user_id (int): HR user ID who created the announcement
+
+        Error Codes:
+            - 401 Unauthorized: User is not authenticated
+            - 403 Forbidden: User is not HR personnel (caught by middleware)
+        """
+
+        try:
+            ann_list = session.exec(
+                select(Announcement).order_by(Announcement.created_at.desc())
+            ).all()
+
+            return [
+                {
+                    "id": a.id,
+                    "announcement": a.announcement,
+                    "created_at": a.created_at,
+                    "user_id": a.user_id,
+                }
+                for a in ann_list
+            ]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"AnnouncementAdminListResource error: {e}", exc_info=True)
+            raise HTTPException(500, "Internal server error")
