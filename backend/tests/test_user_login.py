@@ -1,6 +1,7 @@
+import os
+
 import pytest
 import requests
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -124,8 +125,7 @@ def test_post_hr_login(client):
 
 
 def test_post_employee_login(client):
-    payload = {"email": EMPLOYEE_USER_EMAIL,
-               "password": EMPLOYEE_USER_PASSWORD}
+    payload = {"email": EMPLOYEE_USER_EMAIL, "password": EMPLOYEE_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
