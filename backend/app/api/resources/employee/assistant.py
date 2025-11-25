@@ -1,14 +1,14 @@
+from datetime import datetime
 from logging import getLogger
+
 import httpx
 from app.api.validators import ChatMessage, ChatResponse
 from app.config import Config
-from app.database import User, Chat, get_session
+from app.database import Chat, User, get_session
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session
-from sqlmodel import select
-from datetime import datetime
+from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 

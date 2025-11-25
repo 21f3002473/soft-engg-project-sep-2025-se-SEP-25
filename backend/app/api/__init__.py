@@ -160,9 +160,7 @@ class API:
             TransferRequestResource, f"{emp_base_url}/requests/transfer/{{transfer_id}}"
         )
         self.register_router(AllHRRequestResource, f"{hr_base_url}/request")
-        self.register_router(
-            HRRequestResource, f"{hr_base_url}/request/{{request_id}}"
-        )
+        self.register_router(HRRequestResource, f"{hr_base_url}/request/{{request_id}}")
 
         self.register_router(HRFAQListEmployeeResource, f"{emp_base_url}/hr-faqs")
         self.register_router(HRFAQCreateResource, f"{hr_base_url}/faq")
@@ -174,9 +172,7 @@ class API:
         self.register_router(AccountResource, f"{emp_base_url}/account")
 
         self.register_router(AIAssistantResource, f"{emp_base_url}/assistant")
-        self.register_router(
-            AIChatHistoryResource, f"{emp_base_url}/assistant/history"
-        )
+        self.register_router(AIChatHistoryResource, f"{emp_base_url}/assistant/history")
 
         @FastAPI.post("/token", response_model=Token)
         async def login_for_access_token(
