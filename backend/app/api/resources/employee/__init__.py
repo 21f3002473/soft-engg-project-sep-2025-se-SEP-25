@@ -4,8 +4,8 @@ from .dashboard import (
     AllToDoResource,
     AnnouncementAdminDetailResource,
     AnnouncementAdminListCreateResource,
-    AnnouncementEmployeeResource,
     AnnouncementAdminListResource,
+    AnnouncementEmployeeResource,
     DashboardResource,
     ToDoResource,
 )
@@ -21,14 +21,14 @@ from .learning import (
     LearningResource,
 )
 from .request import (
+    AllHRRequestResource,
     AllLeaveRequestResource,
     AllReimbursementRequestResource,
     AllTransferRequestResource,
+    HRRequestResource,
     LeaveRequestResource,
     ReimbursementRequestResource,
     TransferRequestResource,
-    AllHRRequestResource,
-    HRRequestResource,
 )
 from .writing import AllQuickNotesResource, QuickNotesResource
 

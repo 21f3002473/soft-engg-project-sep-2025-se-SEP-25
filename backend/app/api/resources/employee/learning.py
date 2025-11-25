@@ -222,7 +222,9 @@ class CourseAdminListCreateResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"CourseAdminListCreateResource POST error: {e}", exc_info=True)
+            logger.error(
+                f"CourseAdminListCreateResource POST error: {e}", exc_info=True
+            )
             raise HTTPException(500, "Internal server error")
 
 
@@ -548,7 +550,9 @@ class CourseAssignmentDetailResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"CourseAssignmentDetailResource GET error: {e}", exc_info=True)
+            logger.error(
+                f"CourseAssignmentDetailResource GET error: {e}", exc_info=True
+            )
             raise HTTPException(500, "Internal server error")
 
     def put(
@@ -602,7 +606,9 @@ class CourseAssignmentDetailResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"CourseAssignmentDetailResource PUT error: {e}", exc_info=True)
+            logger.error(
+                f"CourseAssignmentDetailResource PUT error: {e}", exc_info=True
+            )
             raise HTTPException(500, "Internal server error")
 
     def delete(
@@ -642,7 +648,9 @@ class CourseAssignmentDetailResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"CourseAssignmentDetailResource DELETE error: {e}", exc_info=True)
+            logger.error(
+                f"CourseAssignmentDetailResource DELETE error: {e}", exc_info=True
+            )
             raise HTTPException(500, "Internal server error")
 
 
@@ -906,5 +914,7 @@ class EmployeeCourseUpdateByCourseIdResource(Resource):
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"EmployeeCourseUpdateByCourseIdResource error: {e}", exc_info=True)
+            logger.error(
+                f"EmployeeCourseUpdateByCourseIdResource error: {e}", exc_info=True
+            )
             raise HTTPException(500, "Internal server error")

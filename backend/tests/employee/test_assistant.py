@@ -5,7 +5,9 @@ def assert_json(resp):
     assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
 
+
 # POST /employee/assistant  — SUCCESS (200 OK)
+
 
 def test_assistant_success(base_url, auth_employee):
     payload = {"message": "Hello assistant"}
@@ -21,7 +23,9 @@ def test_assistant_success(base_url, auth_employee):
     assert isinstance(data["reply"], str)
     assert len(data["reply"]) > 0
 
+
 # POST /employee/assistant  — 422 (Missing Required Field)
+
 
 def test_assistant_missing_message_field(base_url, auth_employee):
     r = httpx.post(
@@ -32,7 +36,9 @@ def test_assistant_missing_message_field(base_url, auth_employee):
 
     assert r.status_code == 422
 
+
 # POST /employee/assistant  — 401/403 Unauthorized
+
 
 def test_assistant_unauthorized(base_url):
     payload = {"message": "Is WFH allowed?"}
@@ -41,7 +47,9 @@ def test_assistant_unauthorized(base_url):
 
     assert r.status_code in (401, 403)
 
+
 # GET /employee/assistant/history — SUCCESS (200 OK)
+
 
 def test_assistant_history_success(base_url, auth_employee):
     """
@@ -73,7 +81,9 @@ def test_assistant_history_success(base_url, auth_employee):
 
         assert "created_at" in msg
 
+
 # GET /employee/assistant/history — EMPTY HISTORY (200 OK)
+
 
 def test_assistant_history_empty(base_url, auth_employee, clear_chats_for_user=None):
     """
@@ -92,7 +102,9 @@ def test_assistant_history_empty(base_url, auth_employee, clear_chats_for_user=N
     assert isinstance(data["messages"], list)
     assert all(isinstance(m, dict) for m in data["messages"])
 
+
 # GET /employee/assistant/history — Unauthorized
+
 
 def test_assistant_history_unauthorized(base_url):
     r = httpx.get(f"{base_url}/employee/assistant/history")

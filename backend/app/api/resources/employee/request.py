@@ -1,12 +1,13 @@
 from logging import getLogger
+from typing import Optional
 
 from app.api.validators import LeaveCreate, ReimbursementCreate, TransferCreate
 from app.database import (
     Leave,
     Reimbursement,
     Request,
-    RequestTypeEnum,
     RequestStatusTypeEnum,
+    RequestTypeEnum,
     Transfer,
     User,
     get_session,
@@ -15,7 +16,6 @@ from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-from typing import Optional
 
 logger = getLogger(__name__)
 
@@ -157,7 +157,11 @@ class AllLeaveRequestResource(Resource):
             session.add(req)
             session.commit()
 
-            return {"message": "Leave request submitted", "request_id": req.id, "leave_id": leave.id}
+            return {
+                "message": "Leave request submitted",
+                "request_id": req.id,
+                "leave_id": leave.id,
+            }
 
         except HTTPException:
             raise
@@ -491,7 +495,11 @@ class AllReimbursementRequestResource(Resource):
             session.add(req)
             session.commit()
 
-            return {"message": "Reimbursement submitted", "request_id": req.id, "reimbursement_id": rb.id}
+            return {
+                "message": "Reimbursement submitted",
+                "request_id": req.id,
+                "reimbursement_id": rb.id,
+            }
 
         except HTTPException:
             raise
@@ -818,7 +826,11 @@ class AllTransferRequestResource(Resource):
             session.add(req)
             session.commit()
 
-            return {"message": "Transfer request submitted", "request_id": req.id, "transfer_id": tr.id}
+            return {
+                "message": "Transfer request submitted",
+                "request_id": req.id,
+                "transfer_id": tr.id,
+            }
 
         except HTTPException:
             raise
@@ -1012,6 +1024,7 @@ class TransferRequestResource(Resource):
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
+
 
 class AllHRRequestResource(Resource):
     """
