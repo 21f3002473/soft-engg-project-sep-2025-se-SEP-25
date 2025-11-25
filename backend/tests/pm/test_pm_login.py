@@ -1,6 +1,7 @@
+import os
+
 import pytest
 import requests
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,6 +10,7 @@ BASE_URL = os.getenv("BASE_URL")
 
 PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
 PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
+
 
 @pytest.fixture
 def client():
@@ -19,9 +21,11 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # --------------------------
 #  /api/user/login (POST)
 # --------------------------
+
 
 def test_post_pm_login(client):
     payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
@@ -39,4 +43,3 @@ def test_post_pm_login(client):
     assert data.get("message") == "User logged in successfully"
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "product_manager"
-
