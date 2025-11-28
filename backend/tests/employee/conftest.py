@@ -48,7 +48,6 @@ def base_url():
     return BASE_URL + "/api"
 
 
-
 @pytest.fixture
 def auth_employee(employee_token):
     """Returns headers for employee authenticated requests"""

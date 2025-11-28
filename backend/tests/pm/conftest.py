@@ -31,7 +31,6 @@ def base_url():
     return BASE_URL + "/api"
 
 
-
 @pytest.fixture
 def auth_pm(pm_token):
     """Returns headers for pm authenticated requests"""

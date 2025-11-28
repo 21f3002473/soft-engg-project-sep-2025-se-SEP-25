@@ -25,9 +25,7 @@ def assert_json(response):
 #  /api/pm/employees (GET)
 # --------------------------
 def test_get_pm_employees(client, auth_pm):
-    response = client.get(
-        f"{BASE_URL}/api/pm/employees", headers=auth_pm
-    )
+    response = client.get(f"{BASE_URL}/api/pm/employees", headers=auth_pm)
 
     assert response.status_code == 200
 

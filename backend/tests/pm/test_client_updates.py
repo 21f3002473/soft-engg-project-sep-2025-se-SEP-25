@@ -1,9 +1,9 @@
-from starlette.responses import JSONResponse
 import os
 
 import pytest
 import requests
 from dotenv import load_dotenv
+from starlette.responses import JSONResponse
 
 load_dotenv()
 
@@ -20,6 +20,7 @@ def assert_json(response):
     """Validate that the response contains JSON and return the parsed data."""
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
+
 
 def test_get_client_updates_success(client, auth_pm):
     client_id = 1
@@ -53,6 +54,7 @@ def test_get_client_updates_success(client, auth_pm):
         assert "client_name" in data.get("data").get("clients")[0]
         assert "email" in data.get("data").get("clients")[0]
 
+
 def test_get_client_updates_failure(client, auth_pm):
     client_id = -1
     response = client.get(
@@ -78,10 +80,7 @@ class DummyResponse:
 
 
 def dummy_internal_error():
-    return DummyResponse(
-        status_code=500,
-        data={"detail": "Internal server error"}
-    )
+    return DummyResponse(status_code=500, data={"detail": "Internal server error"})
 
 
 def test_get_client_updates_server_error(client, auth_pm):
@@ -100,5 +99,3 @@ def test_get_client_updates_server_error(client, auth_pm):
 
     assert "detail" in data
     assert data.get("detail") == "Internal server error"
-
-

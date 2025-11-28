@@ -3,6 +3,7 @@ from datetime import datetime
 import httpx
 import pytest
 
+
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()

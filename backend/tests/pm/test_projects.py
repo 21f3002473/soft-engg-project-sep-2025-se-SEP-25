@@ -25,9 +25,7 @@ def assert_json(response):
 #  /api/pm/clients (GET)
 # --------------------------
 def test_get_pm_projects(client, auth_pm):
-    response = client.get(
-        f"{BASE_URL}/api/pm/projects", headers=auth_pm
-    )
+    response = client.get(f"{BASE_URL}/api/pm/projects", headers=auth_pm)
 
     assert response.status_code == 200
 
@@ -55,4 +53,3 @@ def test_get_pm_projects(client, auth_pm):
         assert "project_id" in data.get("data").get("projects")[0]
         assert "project_name" in data.get("data").get("projects")[0]
         assert "description" in data.get("data").get("projects")[0]
-

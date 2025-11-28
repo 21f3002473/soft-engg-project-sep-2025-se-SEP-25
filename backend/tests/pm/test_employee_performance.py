@@ -68,5 +68,3 @@ def test_get_employee_performance_success(client, auth_pm):
         # Validate performance_trends keys
         assert "month" in data.get("data").get("performance_trends")[0]
         assert "score" in data.get("data").get("performance_trends")[0]
-
-    

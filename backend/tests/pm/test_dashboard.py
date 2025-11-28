@@ -1,6 +1,7 @@
+import os
+
 import pytest
 import requests
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,13 +20,12 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # --------------------------
 #  /api/pm/clients (GET)
 # --------------------------
 def test_get_pm_dashboard_success(client, auth_pm):
-    response = client.get(
-        f"{BASE_URL}/api/pm/dashboard", headers=auth_pm
-    )
+    response = client.get(f"{BASE_URL}/api/pm/dashboard", headers=auth_pm)
 
     assert response.status_code == 200
 
@@ -47,7 +47,6 @@ def test_get_pm_dashboard_success(client, auth_pm):
     assert "ClientList" in data.get("data")
     assert "projects" in data.get("data")
     assert "stats" in data.get("data")
-
 
     if data.get("data").get("user"):
         # Validate user keys

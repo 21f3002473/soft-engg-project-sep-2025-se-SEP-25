@@ -8,6 +8,7 @@ load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
 
+
 @pytest.fixture
 def client():
     """Simple HTTP client wrapper using requests."""
@@ -24,9 +25,7 @@ def assert_json(response):
 #  /api/pm/clients (GET)
 # --------------------------
 def test_get_pm_clients(client, auth_pm):
-    response = client.get(
-        f"{BASE_URL}/api/pm/clients", headers=auth_pm
-    )
+    response = client.get(f"{BASE_URL}/api/pm/clients", headers=auth_pm)
 
     assert response.status_code == 200
 
