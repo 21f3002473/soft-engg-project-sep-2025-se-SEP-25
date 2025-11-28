@@ -28,11 +28,11 @@ def assert_json(response):
 
 
 def test_post_pm_login(client):
+    """Login once and return a valid Bearer token for PM."""
     payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
-    assert response.status_code in [200, 201]
-
+    assert response.status_code == 200
     data = assert_json(response)
 
     # Expected set of keys
@@ -43,17 +43,3 @@ def test_post_pm_login(client):
     assert data.get("message") == "User logged in successfully"
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "product_manager"
-
-
-@pytest.fixture
-def pm_token(client):
-    """Automatically logs in PM & returns token."""
-    payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
-    response = client.post(f"{BASE_URL}/user/login", json=payload)
-
-    assert response.status_code in (200, 201)
-
-    data = assert_json(response)
-
-    # data is already a dict, so just index it
-    return data["access_token"]
