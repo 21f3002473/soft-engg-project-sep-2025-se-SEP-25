@@ -19,24 +19,31 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 from test_admin_login import test_post_admin_login
 
 
 def admin_login_auth(token):
     return {"Authorization": f"Bearer {token}"}
+
+
 # --------------------------
 #  /api/admin/register (POST)
 # --------------------------
 def test_post_admin_register(client):
     import random
+
     admin_email = f"admin{random.randint(1, 1000)}@gmail.com"
     payload = {
         "name": "Admin",
         "email": admin_email,
         "password": "admin@gmail.com",
     }
-    response = client.post(f"{BASE_URL}/api/admin/register", json=payload,
-                           headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.post(
+        f"{BASE_URL}/api/admin/register",
+        json=payload,
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code in [200, 201]
 
     data = assert_json(response)
@@ -48,7 +55,10 @@ def test_post_admin_register(client):
 #  /api/admin/summary (GET)
 # --------------------------
 def test_get_admin_summary(client):
-    response = client.get(f"{BASE_URL}/api/admin/summary",headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.get(
+        f"{BASE_URL}/api/admin/summary",
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code == 200
 
     data = assert_json(response)
@@ -58,7 +68,6 @@ def test_get_admin_summary(client):
     # Validate expected keys
     expected_keys = ["userCount", "logsCount", "backupsCount", "currentAdmin"]
     assert set(expected_keys) == set(data.keys())
-
 
     # Validate currentAdmin
     assert isinstance(data.get("currentAdmin"), dict)
@@ -71,8 +80,10 @@ def test_get_admin_summary(client):
 
 
 def test_get_admin_employees(client):
-    response = client.get(f"{BASE_URL}/api/admin/employees",
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.get(
+        f"{BASE_URL}/api/admin/employees",
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code == 200
 
     data = assert_json(response)
@@ -101,13 +112,16 @@ def test_get_admin_employees(client):
 
 def test_post_admin_employees(client):
     import random
+
     email = f"john{random.randint(1, 1000)}@gmail.com"
     payload = {"name": "John Doe", "role": "HR", "email": email}
-    response = client.post(f"{BASE_URL}/api/admin/employees", json=payload,
-                           headers=admin_login_auth(test_post_admin_login(client)))
-    
-    assert response.status_code in [200, 201]
+    response = client.post(
+        f"{BASE_URL}/api/admin/employees",
+        json=payload,
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
 
+    assert response.status_code in [200, 201]
 
     data = assert_json(response)
     print(data)
@@ -120,8 +134,10 @@ def test_post_admin_employees(client):
 #  /api/admin/backup-config (GET)
 # -------------------------------
 def test_get_admin_backup_config(client):
-    response = client.get(f"{BASE_URL}/api/admin/backup-config",
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.get(
+        f"{BASE_URL}/api/admin/backup-config",
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code == 200
 
     data = assert_json(response)
@@ -141,8 +157,11 @@ def test_get_admin_backup_config(client):
 def test_put_admin_backup_config(client):
     payload = {"backups": [{"day": 1, "type": "full", "datetime": "2025-10-30T03:00"}]}
 
-    response = client.put(f"{BASE_URL}/api/admin/backup-config", json=payload,
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.put(
+        f"{BASE_URL}/api/admin/backup-config",
+        json=payload,
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code in [200, 204]
 
     if response.status_code != 204:
@@ -155,8 +174,10 @@ def test_put_admin_backup_config(client):
 #  /api/admin/updates (GET)
 # --------------------------
 def test_get_admin_updates(client):
-    response = client.get(f"{BASE_URL}/api/admin/updates",
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.get(
+        f"{BASE_URL}/api/admin/updates",
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code == 200
 
     data = assert_json(response)
@@ -171,8 +192,10 @@ def test_get_admin_updates(client):
 #  /api/admin/account (GET)
 # --------------------------
 def test_get_admin_account(client):
-    response = client.get(f"{BASE_URL}/api/admin/account",
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.get(
+        f"{BASE_URL}/api/admin/account",
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code == 200
 
     data = assert_json(response)
@@ -193,8 +216,11 @@ def test_put_admin_account(client):
         "new_password": "ad@gmail.com",
     }
 
-    response = client.put(f"{BASE_URL}/api/admin/account", json=payload,
-                          headers=admin_login_auth(test_post_admin_login(client)))
+    response = client.put(
+        f"{BASE_URL}/api/admin/account",
+        json=payload,
+        headers=admin_login_auth(test_post_admin_login(client)),
+    )
     assert response.status_code in [200, 204]
 
     if response.status_code != 204:

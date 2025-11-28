@@ -1,6 +1,7 @@
+import os
+
 import pytest
 import requests
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,6 +10,7 @@ BASE_URL = os.getenv("BASE_URL")
 
 ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL")
 ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
+
 
 @pytest.fixture
 def client():
@@ -23,6 +25,7 @@ def assert_json(response):
 # ----------------------------------------
 #  /api/user/login (POST) - Admin login
 # ----------------------------------------
+
 
 def test_post_admin_login(client):
     payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
