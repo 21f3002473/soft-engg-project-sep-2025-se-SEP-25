@@ -1,9 +1,10 @@
 from .account import AccountResource
-from .assistant import AIAssistantResource
+from .assistant import AIAssistantResource, AIChatHistoryResource
 from .dashboard import (
     AllToDoResource,
     AnnouncementAdminDetailResource,
     AnnouncementAdminListCreateResource,
+    AnnouncementAdminListResource,
     AnnouncementEmployeeResource,
     DashboardResource,
     ToDoResource,
@@ -20,9 +21,11 @@ from .learning import (
     LearningResource,
 )
 from .request import (
+    AllHRRequestResource,
     AllLeaveRequestResource,
     AllReimbursementRequestResource,
     AllTransferRequestResource,
+    HRRequestResource,
     LeaveRequestResource,
     ReimbursementRequestResource,
     TransferRequestResource,
@@ -36,6 +39,7 @@ __all__ = [
     "AnnouncementAdminListCreateResource",
     "AnnouncementAdminDetailResource",
     "AnnouncementEmployeeResource",
+    "AnnouncementAdminListResource",
     "LearningResource",
     "CourseAdminListCreateResource",
     "CourseAdminDetailResource",
@@ -50,6 +54,8 @@ __all__ = [
     "AllLeaveRequestResource",
     "AllReimbursementRequestResource",
     "AllTransferRequestResource",
+    "AllHRRequestResource",
+    "HRRequestResource",
     "HRFAQDetailResource",
     "HRFAQCreateResource",
     "HRFAQListEmployeeResource",
@@ -57,4 +63,5 @@ __all__ = [
     "AllQuickNotesResource",
     "AccountResource",
     "AIAssistantResource",
+    "AIChatHistoryResource",
 ]

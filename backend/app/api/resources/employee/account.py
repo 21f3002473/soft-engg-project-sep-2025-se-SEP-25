@@ -74,7 +74,8 @@ class AccountResource(Resource):
                 img_base64=current_user.img_base64,
                 department_name=dept_name,
             )
-
+        except HTTPException:
+            raise
         except Exception:
             logger.error("Account GET error", exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -122,6 +123,10 @@ class AccountResource(Resource):
 
             user = session.merge(current_user)
 
+            restricted = {"id", "role", "created_at"}
+            if restricted & update_data.keys():
+                raise HTTPException(400, "You cannot update these fields")
+
             for key, value in update_data.items():
                 setattr(user, key, value)
 
@@ -130,7 +135,12 @@ class AccountResource(Resource):
 
             return {"message": "Account updated successfully"}
 
-        except Exception:
+        except HTTPException:
+            raise
+        except ValueError as ve:
+            logger.error(ve, exc_info=True)
+            raise HTTPException(400, "Invalid input data")
+        except Exception as e:
             logger.error("Account Update error", exc_info=True)
             raise HTTPException(500, "Internal server error")
 

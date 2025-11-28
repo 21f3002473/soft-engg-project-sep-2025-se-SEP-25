@@ -64,6 +64,8 @@ class HRFAQCreateResource(Resource):
             session.refresh(faq)
             return {"message": "FAQ created successfully", "id": faq.id}
 
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")
@@ -106,15 +108,24 @@ class HRFAQDetailResource(Resource):
         Error Codes:
             - 404 Not Found: FAQ with given ID does not exist
             - 401 Unauthorized: User is not an employee (caught by middleware)
+            - 500 Internal Server Error: Database query failures
 
         Raises:
             HTTPException(404): If FAQ ID is not found in database
+            HTTPException(500): If database query fails
         """
-        faq = session.get(FAQ, faq_id)
-        if not faq:
-            raise HTTPException(404, "FAQ not found")
+        try:
+            faq = session.get(FAQ, faq_id)
+            if not faq:
+                raise HTTPException(404, "FAQ not found")
 
-        return {"faq": FAQOut.model_validate(faq)}
+            return {"faq": FAQOut.model_validate(faq)}
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            raise HTTPException(500, "Internal server error")
 
     def put(
         self,
@@ -274,6 +285,9 @@ class HRFAQListEmployeeResource(Resource):
         try:
             faqs = session.exec(select(FAQ)).all()
             return {"faqs": [FAQOut.model_validate(faq) for faq in faqs]}
+
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(e, exc_info=True)
             raise HTTPException(500, "Internal server error")

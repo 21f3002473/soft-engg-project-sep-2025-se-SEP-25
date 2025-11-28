@@ -163,7 +163,14 @@ python3 -m pytest -vv
 pytest tests/pm -vv
 
 ### How to run Pytest for a pytest file
+## Pytest for Project
+### How to run Pytest for entire project
+python3 -m pytest -vv
 
+### How to run Pytest for a sub pytest folder
+pytest tests/pm -vv
+
+### How to run Pytest for a pytest file
 pytest tests/test_user_login.py -vv
 
 ### How to run Pytest for a pytest function

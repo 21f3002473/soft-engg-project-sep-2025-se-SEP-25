@@ -76,6 +76,8 @@ class User(SQLModel, table=True):
     updates: List["Update"] = Relationship(back_populates="created_by_user")
     user_projects: List["UserProject"] = Relationship(back_populates="user")
 
+    chats: List["Chat"] = Relationship(back_populates="user")
+
     def generate_token(self) -> str:
 
         expiry = int(time.time()) + 86400
@@ -142,9 +144,10 @@ class RequestTypeEnum(str, Enum):
     TRANSFER = "transfer"
 
 
-class StatusTypeEnum(str, Enum):
+class RequestStatusTypeEnum(str, Enum):
     PENDING = "pending"
-    COMPLETED = "completed"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
 
 
 class Request(SQLModel, table=True):
@@ -154,9 +157,9 @@ class Request(SQLModel, table=True):
             SQLEnum(RequestTypeEnum, native_enum=False, length=20), nullable=False
         )
     )
-    status: StatusTypeEnum = Field(
+    status: RequestStatusTypeEnum = Field(
         sa_column=Column(
-            SQLEnum(StatusTypeEnum, native_enum=False, length=20), nullable=False
+            SQLEnum(RequestStatusTypeEnum, native_enum=False, length=20), nullable=False
         )
     )
     user_id: int = Field(foreign_key="user.id")
@@ -249,6 +252,11 @@ class Course(SQLModel, table=True):
     user_courses: List["UserCourse"] = Relationship(back_populates="course")
 
 
+class StatusTypeEnum(str, Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+
+
 class UserCourse(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
@@ -291,3 +299,13 @@ class FAQ(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     question: str = Field(nullable=False)
     answer: str = Field(nullable=False)
+
+
+class Chat(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", nullable=False)
+    role: str = Field(nullable=False)
+    message: str = Field(nullable=False)
+    created_at: datetime = Field(default_factory=current_utc_time)
+
+    user: Optional["User"] = Relationship(back_populates="chats")
