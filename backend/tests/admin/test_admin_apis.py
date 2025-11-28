@@ -136,6 +136,7 @@ def test_post_admin_employees(client):
 #  /api/admin/backup-config (GET)
 # -------------------------------
 
+
 ## FIX THIS API
 def test_get_admin_backup_config(client):
     response = client.get(
@@ -146,7 +147,7 @@ def test_get_admin_backup_config(client):
 
     data = assert_json(response)
 
-    assert data==[]
+    assert data == []
     # print(data)
     # assert isinstance(data, dict)
 
@@ -158,6 +159,7 @@ def test_get_admin_backup_config(client):
 # -------------------------------
 #  /api/admin/backup-config (PUT)
 # -------------------------------
+
 
 # FIX THIS API
 def test_put_admin_backup_config(client):
@@ -175,14 +177,14 @@ def test_put_admin_backup_config(client):
     assert "message" in data
     assert data.get("message") == "Backup configuration updated"
 
+
 # -------------------------------
 #  /api/admin/backup-config (PUT)
 # -------------------------------
 
 
 def test_put_admin_backup_config_failure(client):
-    payload = {"backups": [
-        {"day": 1, "type": "full", "datetime": "2025-10-30T03:00"}]}
+    payload = {"backups": [{"day": 1, "type": "full", "datetime": "2025-10-30T03:00"}]}
 
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
@@ -190,9 +192,9 @@ def test_put_admin_backup_config_failure(client):
         headers=admin_login_auth(test_post_admin_login(client)),
     )
 
-    response_list=[]
-    for status in range(400,600):
-        response_list=response_list+[status]
+    response_list = []
+    for status in range(400, 600):
+        response_list = response_list + [status]
     assert response.status_code in response_list
 
 
@@ -254,9 +256,11 @@ def test_put_admin_account(client):
         data = assert_json(response)
         assert "message" in data
 
+
 # ------------------------------------
 #  /api/admin/account (PUT) - Failure
 # ------------------------------------
+
 
 def test_put_admin_account_failure(client):
     payload = {
@@ -273,6 +277,5 @@ def test_put_admin_account_failure(client):
     # assert response.status_code in [400,401,402,403,404,500,503,504]
     response_list = []
     for status in range(400, 600):
-        response_list = response_list+[status]
+        response_list = response_list + [status]
     assert response.status_code in response_list
-
