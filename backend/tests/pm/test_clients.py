@@ -1,4 +1,5 @@
 import os
+
 import pytest
 import requests
 from dotenv import load_dotenv
@@ -36,15 +37,12 @@ def pm_token(client):
     return data.get("access_token")
 
 
-
-
 # --------------------------
 #  /api/pm/clients (GET)
 # --------------------------
 def test_get_pm_client(client, pm_token):
     response = client.get(
-        f"{BASE_URL}/api/pm/clients",
-        headers={"Authorization": f"Bearer {pm_token}"}
+        f"{BASE_URL}/api/pm/clients", headers={"Authorization": f"Bearer {pm_token}"}
     )
 
     assert response.status_code == 200

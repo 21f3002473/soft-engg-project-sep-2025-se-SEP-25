@@ -1,9 +1,9 @@
-from test_admin_login import admin_token
 import os
 
 import pytest
 import requests
 from dotenv import load_dotenv
+from test_admin_login import admin_token
 
 load_dotenv()
 
@@ -19,8 +19,6 @@ def client():
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
-
-
 
 
 def admin_login_auth(token):

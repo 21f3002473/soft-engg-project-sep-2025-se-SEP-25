@@ -26,6 +26,7 @@ def assert_json(response):
 #  /api/user/login (POST)
 # --------------------------
 
+
 def test_post_pm_login(client):
     """Login once and return a valid Bearer token for PM."""
     payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
