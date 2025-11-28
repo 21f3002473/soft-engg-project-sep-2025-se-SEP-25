@@ -1,6 +1,6 @@
 import httpx
 
-
+from conftest import base_url
 def assert_json(resp):
     assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
