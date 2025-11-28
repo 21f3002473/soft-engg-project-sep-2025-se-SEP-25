@@ -28,6 +28,7 @@ def assert_json(response):
 
 from test_pm_login import pm_token
 
+
 def test_get_pm_client(client, pm_token):
     headers = {"Authorization": f"Bearer {pm_token}"}
     response = client.get(f"{BASE_URL}/pm/clients", headers=headers)
@@ -42,13 +43,11 @@ def test_get_pm_client(client, pm_token):
 
     assert data.get("message") == "User login endpoint"
 
+    # ----------------------------------------
+    #  /api/user/login (POST) - Admin login
+    # ----------------------------------------
 
-# ----------------------------------------
-#  /api/user/login (POST) - Admin login
-# ----------------------------------------
-
-
-# def test_post_admin_login(client):
+    # def test_post_admin_login(client):
     payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 

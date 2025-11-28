@@ -44,6 +44,7 @@ def test_post_pm_login(client):
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "product_manager"
 
+
 @pytest.fixture
 def pm_token(client):
     """Automatically logs in PM & returns token."""
@@ -56,5 +57,3 @@ def pm_token(client):
 
     # data is already a dict, so just index it
     return data["access_token"]
-
-
