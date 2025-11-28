@@ -1,4 +1,5 @@
 import httpx
+from conftest import base_url
 
 
 def assert_json(resp):

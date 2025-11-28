@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
-PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
-PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
 
 
 @pytest.fixture
@@ -24,26 +22,10 @@ def assert_json(response):
 
 
 # --------------------------
-#  LOGIN FIXTURE (returns token)
-# --------------------------
-@pytest.fixture
-def pm_token(client):
-    """Login once and return a valid Bearer token for PM."""
-    payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
-    response = client.post(f"{BASE_URL}/user/login", json=payload)
-
-    assert response.status_code == 200
-    data = assert_json(response)
-    return data.get("access_token")
-
-
-# --------------------------
 #  /api/pm/clients (GET)
 # --------------------------
-def test_get_pm_client(client, pm_token):
-    response = client.get(
-        f"{BASE_URL}/api/pm/clients", headers={"Authorization": f"Bearer {pm_token}"}
-    )
+def test_get_pm_clients(client, auth_pm):
+    response = client.get(f"{BASE_URL}/api/pm/clients", headers=auth_pm)
 
     assert response.status_code == 200
 
@@ -51,3 +33,23 @@ def test_get_pm_client(client, pm_token):
     print(data)
 
     assert isinstance(data, dict)
+
+    # Expected set of keys
+    expected_keys = {"message", "data"}
+    assert set(data.keys()) == expected_keys
+
+    # Expected values
+    assert data.get("message") == "Clients retrieved successfully"
+    assert isinstance(data.get("data"), dict)
+
+    # Validate data keys
+    assert "clients" in data.get("data")
+    assert "total_clients" in data.get("data")
+
+    if data.get("data").get("clients"):
+        # Validate clients keys
+        assert "id" in data.get("data").get("clients")[0]
+        assert "client_id" in data.get("data").get("clients")[0]
+        assert "client_name" in data.get("data").get("clients")[0]
+        assert "email" in data.get("data").get("clients")[0]
+        assert "description" in data.get("data").get("clients")[0]
