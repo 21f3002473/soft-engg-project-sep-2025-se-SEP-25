@@ -1,16 +1,14 @@
-import os
-
 import pytest
 import requests
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
 
-PM_USER_EMAIL = os.getenv("PM_USER_EMAIL")
-PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD")
-
+ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL")
+ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
 
 @pytest.fixture
 def client():
@@ -22,19 +20,19 @@ def assert_json(response):
     return response.json()
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# ----------------------------------------
+#  /api/user/login (POST) - Admin login
+# ----------------------------------------
 
-
-def test_post_pm_login(client):
-    payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
+def test_post_admin_login(client):
+    payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
     response = client.post(f"{BASE_URL}/user/login", json=payload)
 
     assert response.status_code in [200, 201]
 
     data = assert_json(response)
 
+    print(data)
     # Expected set of keys
     expected_keys = {"message", "access_token", "token_type", "role"}
     assert set(data.keys()) == expected_keys
@@ -42,4 +40,5 @@ def test_post_pm_login(client):
     # Expected values
     assert data.get("message") == "User logged in successfully"
     assert data.get("token_type") == "bearer"
-    assert data.get("role") == "product_manager"
+    assert data.get("role") == "root"
+    return data.get("access_token")

@@ -50,9 +50,9 @@ def test_get_user_login(client):
     assert data.get("message") == "User login endpoint"
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# ----------------------------------------
+#  /api/user/login (POST) - Admin login
+# ----------------------------------------
 
 
 def test_post_admin_login(client):
@@ -73,9 +73,9 @@ def test_post_admin_login(client):
     assert data.get("role") == "root"
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# ----------------------------------------
+#  /api/user/login (POST) - PM login
+# ----------------------------------------
 
 
 def test_post_pm_login(client):
@@ -96,9 +96,9 @@ def test_post_pm_login(client):
     assert data.get("role") == "product_manager"
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# ----------------------------------------
+#  /api/user/login (POST) - HR login
+# ----------------------------------------
 
 
 def test_post_hr_login(client):
@@ -119,9 +119,9 @@ def test_post_hr_login(client):
     assert data.get("role") == "human_resource"
 
 
-# --------------------------
-#  /api/user/login (POST)
-# --------------------------
+# ----------------------------------------
+#  /api/user/login (POST) - Employee login
+# ----------------------------------------
 
 
 def test_post_employee_login(client):
@@ -157,3 +157,4 @@ def test_post_bad_login(client):
 
     assert "detail" in data
     assert data.get("detail") == "Invalid email or password"
+
