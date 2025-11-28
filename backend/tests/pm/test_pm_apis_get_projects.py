@@ -1,0 +1,66 @@
+import pytest
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BASE_URL = "http://localhost:8000"
+
+PM_USER_EMAIL = os.getenv("PM_USER_EMAIL", "pm@gmail.com")
+PM_USER_PASSWORD = os.getenv("PM_USER_PASSWORD", "pm@gmail.com")
+
+
+@pytest.fixture
+def client():
+    return requests
+
+
+def assert_json(response):
+    assert "application/json" in response.headers.get("Content-Type", "")
+    return response.json()
+
+
+def get_pm_token(client):
+    payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
+    resp = client.post(f"{BASE_URL}/user/login", json=payload)
+
+    assert resp.status_code in [200, 201]
+    data = assert_json(resp)
+
+    assert "access_token" in data
+    return data["access_token"]
+
+
+
+def test_get_pm_projects_success(client):
+    token = get_pm_token(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp = client.get(f"{BASE_URL}/api/pm/projects", headers=headers)
+
+    assert resp.status_code == 200
+
+    data = assert_json(resp)
+
+   
+    assert isinstance(data, dict)
+    assert "message" in data
+    assert "data" in data
+
+    projects_data = data["data"]
+    assert isinstance(projects_data, dict)
+
+    
+    assert "projects" in projects_data
+    assert "total_projects" in projects_data
+
+    assert isinstance(projects_data["projects"], list)
+    assert isinstance(projects_data["total_projects"], int)
+
+
+    if projects_data["projects"]:
+        first = projects_data["projects"][0]
+        assert isinstance(first, dict)
+        for key in ["id", "project_id", "project_name", "description", "status", "client_id", "manager_id"]:
+            assert key in first
