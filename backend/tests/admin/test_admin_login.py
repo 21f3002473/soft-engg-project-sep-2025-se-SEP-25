@@ -44,4 +44,10 @@ def test_post_admin_login(client):
     assert data.get("message") == "User logged in successfully"
     assert data.get("token_type") == "bearer"
     assert data.get("role") == "root"
+
+
+def admin_token(client):
+    payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
+    response = client.post(f"{BASE_URL}/user/login", json=payload)
+    data = response.json()
     return data.get("access_token")

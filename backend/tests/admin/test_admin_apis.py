@@ -1,3 +1,4 @@
+from test_admin_login import admin_token
 import os
 
 import pytest
@@ -20,7 +21,6 @@ def assert_json(response):
     return response.json()
 
 
-from test_admin_login import test_post_admin_login
 
 
 def admin_login_auth(token):
@@ -42,7 +42,7 @@ def test_post_admin_register(client):
     response = client.post(
         f"{BASE_URL}/api/admin/register",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code in [200, 201]
 
@@ -59,7 +59,7 @@ def test_post_admin_register(client):
 def test_get_admin_summary(client):
     response = client.get(
         f"{BASE_URL}/api/admin/summary",
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code == 200
 
@@ -84,7 +84,7 @@ def test_get_admin_summary(client):
 def test_get_admin_employees(client):
     response = client.get(
         f"{BASE_URL}/api/admin/employees",
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code == 200
 
@@ -120,7 +120,7 @@ def test_post_admin_employees(client):
     response = client.post(
         f"{BASE_URL}/api/admin/employees",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
 
     assert response.status_code in [200, 201]
@@ -140,7 +140,7 @@ def test_post_admin_employees(client):
 def test_get_admin_backup_config(client):
     response = client.get(
         f"{BASE_URL}/api/admin/backup-config",
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code == 200
 
@@ -166,7 +166,7 @@ def test_put_admin_backup_config(client):
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code in [200, 204]
 
@@ -187,7 +187,7 @@ def test_put_admin_backup_config_failure(client):
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
 
     response_list=[]
@@ -202,7 +202,7 @@ def test_put_admin_backup_config_failure(client):
 def test_get_admin_updates(client):
     response = client.get(
         f"{BASE_URL}/api/admin/updates",
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code == 200
 
@@ -220,7 +220,7 @@ def test_get_admin_updates(client):
 def test_get_admin_account(client):
     response = client.get(
         f"{BASE_URL}/api/admin/account",
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code == 200
 
@@ -246,7 +246,7 @@ def test_put_admin_account(client):
     response = client.put(
         f"{BASE_URL}/api/admin/account",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     assert response.status_code in [200, 204]
 
@@ -268,7 +268,7 @@ def test_put_admin_account_failure(client):
     response = client.put(
         f"{BASE_URL}/api/admin/account",
         json=payload,
-        headers=admin_login_auth(test_post_admin_login(client)),
+        headers=admin_login_auth(admin_token(client)),
     )
     # assert response.status_code in [400,401,402,403,404,500,503,504]
     response_list = []
