@@ -1,38 +1,41 @@
 import pytest
-from app.database import User
-from app.database.connection import engine
-from app.database.hr_models import HRPolicy, PerformanceReview
-from sqlmodel import Session
+import httpx
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 
 @pytest.fixture
-def session():
-    with Session(engine) as s:
-        yield s
+def client():
+    """HTTP client used for all external API requests."""
+    with httpx.Client(base_url=API_BASE_URL) as c:
+        yield c
 
 
 @pytest.fixture
-def sample_employee(session):
-    emp = User(name="John Doe", email="john@test.com", role="Engineer")
-    session.add(emp)
-    session.commit()
-    session.refresh(emp)
-    return emp
+def sample_employee_payload():
+    return {
+        "name": "John Doe",
+        "email": "john@test.com",
+        "role": "Engineer"
+    }
 
 
 @pytest.fixture
-def sample_policy(session):
-    p = HRPolicy(title="Policy A", content="Content here")
-    session.add(p)
-    session.commit()
-    session.refresh(p)
-    return p
+def sample_policy_payload():
+    return {
+        "title": "Policy A",
+        "content": "Content here"
+    }
 
 
 @pytest.fixture
-def sample_review(session, sample_employee):
-    r = PerformanceReview(user_id=sample_employee.id, rating=4, comments="Good")
-    session.add(r)
-    session.commit()
-    session.refresh(r)
-    return r
+def sample_review_payload():
+    return {
+        "user_id": 1,
+        "rating": 4,
+        "comments": "Good"
+    }

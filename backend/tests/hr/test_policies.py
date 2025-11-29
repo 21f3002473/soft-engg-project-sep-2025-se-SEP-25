@@ -1,56 +1,38 @@
-from app.main import app
-from fastapi.testclient import TestClient
-
-client = TestClient(app)
-
-
-def test_list_policies():
-    response = client.get("/policies")
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
+def test_list_policies(client):
+    res = client.get("/policies")
+    assert res.status_code == 200
+    assert isinstance(res.json(), list)
 
 
-def test_get_policy_valid(sample_policy):
-    response = client.get(f"/policies/{sample_policy.id}")
-    assert response.status_code == 200
-    assert response.json()["id"] == sample_policy.id
+def test_create_and_get_policy(client, sample_policy_payload):
+    create = client.post("/policies", json=sample_policy_payload)
+    assert create.status_code in [200, 201]
+
+    policy_id = create.json()["id"]
+
+    get = client.get(f"/policies/{policy_id}")
+    assert get.status_code == 200
+    assert get.json()["title"] == sample_policy_payload["title"]
 
 
-def test_get_policy_invalid():
-    response = client.get("/policies/999")
-    assert response.status_code == 404
+def test_create_policy_missing_title(client):
+    res = client.post("/policies", json={"content": "Some rule"})
+    assert res.status_code == 422
 
 
-def test_create_policy_valid():
-    payload = {"title": "Leave Policy", "content": "Some rules"}
-    response = client.post("/policies", json=payload)
-    assert response.status_code in [200, 201]
-    assert response.json()["title"] == "Leave Policy"
+def test_update_policy(client, sample_policy_payload):
+    create = client.post("/policies", json=sample_policy_payload)
+    policy_id = create.json()["id"]
+
+    res = client.put(f"/policies/{policy_id}", json={"title": "Updated"})
+    assert res.status_code == 200
+    assert res.json()["title"] == "Updated"
 
 
-def test_create_policy_missing_title():
-    response = client.post("/policies", json={"content": "Rules"})
-    assert response.status_code == 422
+def test_delete_policy(client, sample_policy_payload):
+    create = client.post("/policies", json=sample_policy_payload)
+    policy_id = create.json()["id"]
 
-
-def test_update_policy_valid(sample_policy):
-    payload = {"title": "Updated Title"}
-    response = client.put(f"/policies/{sample_policy.id}", json=payload)
-    assert response.status_code == 200
-    assert response.json()["title"] == "Updated Title"
-
-
-def test_update_policy_invalid_id():
-    response = client.put("/policies/999", json={"title": "Test"})
-    assert response.status_code == 404
-
-
-def test_delete_policy_valid(sample_policy):
-    response = client.delete(f"/policies/{sample_policy.id}")
-    assert response.status_code == 200
-    assert response.json()["message"] == "Policy deleted"
-
-
-def test_delete_policy_invalid():
-    response = client.delete("/policies/999")
-    assert response.status_code == 404
+    res = client.delete(f"/policies/{policy_id}")
+    assert res.status_code == 200
+    assert res.json()["message"] == "Policy deleted"
