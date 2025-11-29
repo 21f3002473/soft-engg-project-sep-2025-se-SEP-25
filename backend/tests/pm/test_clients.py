@@ -107,6 +107,22 @@ def test_get_pm_clients(client, auth_pm):
         assert "description" in data.get("data").get("clients")[0]
 
 
+import random
+
+
+def test_post_pm_client_validation_error(client, auth_pm):
+
+    client_id = random.randint(1000, 9999)
+    payload = {
+        "client_id": "C" + str(client_id),
+        "client_name": "Test Client Pvt Ltd",
+        "detail_base64": "dGVzdCBkZXRhaWw=",
+    }
+    response = client.post(f"{BASE_URL}/api/pm/clients", json=payload, headers=auth_pm)
+
+    assert response.status_code == 422
+
+
 # --------------------------
 #  /api/pm/clients (PUT)
 # --------------------------

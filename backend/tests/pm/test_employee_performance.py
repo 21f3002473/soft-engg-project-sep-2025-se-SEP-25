@@ -21,6 +21,9 @@ def assert_json(response):
     return response.json()
 
 
+# -------------------------------------------------
+#  /api/pm/employee/performance/{employee_id} (GET)
+# --------------------------------------------------
 def test_get_employee_performance_success(client, auth_pm):
     employee_id = 1
     response = client.get(
@@ -68,3 +71,11 @@ def test_get_employee_performance_success(client, auth_pm):
         # Validate performance_trends keys
         assert "month" in data.get("data").get("performance_trends")[0]
         assert "score" in data.get("data").get("performance_trends")[0]
+
+
+def test_get_pm_employees_performance_failure(client, auth_pm):
+    employee_id = 1
+    response = client.get(
+        f"{BASE_URL}/api/pm/employee/performance/{employee_id}", headers={}
+    )
+    assert response.status_code == 401

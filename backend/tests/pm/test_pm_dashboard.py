@@ -23,7 +23,7 @@ def assert_json(response):
 
 
 # --------------------------
-#  /api/pm/clients (GET)
+#  /api/pm/dashboard (GET)
 # --------------------------
 def test_get_pm_dashboard_success(client, auth_pm):
     response = client.get(f"{BASE_URL}/api/pm/dashboard", headers=auth_pm)
