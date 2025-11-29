@@ -1,6 +1,6 @@
-from fastapi.testclient import TestClient
 import pytest
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
@@ -37,10 +37,7 @@ def test_create_review_user_not_found():
 
 
 def test_update_review_valid(sample_review):
-    response = client.put(
-        f"/reviews/{sample_review.id}",
-        json={"rating": 5}
-    )
+    response = client.put(f"/reviews/{sample_review.id}", json={"rating": 5})
     assert response.status_code == 200
     assert response.json()["rating"] == 5
 

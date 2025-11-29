@@ -1,9 +1,8 @@
 import pytest
-from sqlmodel import Session
-
-from app.database.connection import engine
 from app.database import User
+from app.database.connection import engine
 from app.database.hr_models import HRPolicy, PerformanceReview
+from sqlmodel import Session
 
 
 @pytest.fixture
@@ -32,11 +31,7 @@ def sample_policy(session):
 
 @pytest.fixture
 def sample_review(session, sample_employee):
-    r = PerformanceReview(
-        user_id=sample_employee.id,
-        rating=4,
-        comments="Good"
-    )
+    r = PerformanceReview(user_id=sample_employee.id, rating=4, comments="Good")
     session.add(r)
     session.commit()
     session.refresh(r)

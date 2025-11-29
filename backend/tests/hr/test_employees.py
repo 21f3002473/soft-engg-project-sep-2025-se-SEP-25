@@ -1,7 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
-
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
@@ -38,10 +37,7 @@ def test_update_employee_invalid_id():
 
 
 def test_update_employee_invalid_fields(sample_employee):
-    response = client.put(
-        f"/employees/{sample_employee.id}",
-        json={"password": "hack"}
-    )
+    response = client.put(f"/employees/{sample_employee.id}", json={"password": "hack"})
     assert response.status_code == 200
     assert "password" not in response.json()
 
