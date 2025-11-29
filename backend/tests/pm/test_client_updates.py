@@ -88,6 +88,7 @@ class DummyResponse:
 def dummy_internal_error():
     return DummyResponse(status_code=500, data={"detail": "Internal server error"})
 
+
 # --------------------------------------------
 #  /api/pm/client/updates/{client_id} (GET)
 # -------------------------------------------
@@ -107,6 +108,7 @@ def test_get_client_updates_server_error(client, auth_pm):
 
     assert "detail" in data
     assert data.get("detail") == "Internal server error"
+
 
 # --------------------------------------------
 #  /api/pm/client/updates/{client_id} (POST)
@@ -170,6 +172,7 @@ def create_client_update(client, auth_pm):
 
     return response.json().get("data").get("id")
 
+
 # ----------------------------------------------------------------------------------
 #  /api/pm/client/updates/{client_id}/?update_id={update_id} (PUT)
 # ----------------------------------------------------------------------------------
@@ -203,9 +206,12 @@ def test_put_client_updates_success(client, auth_pm):
         assert "id" in data.get("data")
         assert "update_id" in data.get("data")
         assert "description" in data.get("data")
+
+
 # ----------------------------------------------------------------------------------
 #  /api/pm/client/updates/{client_id}/?update_id={update_id} (DELETE)
 # ----------------------------------------------------------------------------------
+
 
 def test_delete_client_updates_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
