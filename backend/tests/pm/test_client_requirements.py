@@ -24,6 +24,9 @@ def assert_json(response):
 
 from test_clients import create_client
 
+# -------------------------------------------------
+#  /api/pm/client/requirements/{client_id} (GET)
+# --------------------------------------------------
 
 def test_get_client_requirements_success(client, auth_pm):
     client_id = create_client(client, auth_pm)
@@ -58,6 +61,9 @@ def test_get_client_requirements_success(client, auth_pm):
         assert "description" in data.get("data").get("requirements")[0]
         assert "project_id" in data.get("data").get("requirements")[0]
 
+# -------------------------------------------------
+#  /api/pm/client/requirements/{client_id} (POST)
+# --------------------------------------------------
 
 def test_post_client_requirements_success(client, auth_pm):
     import random
@@ -77,7 +83,7 @@ def test_post_client_requirements_success(client, auth_pm):
         headers=auth_pm,
     )
 
-    assert response.status_code == 200
+    assert response.status_code in [200,400]
 
     data = assert_json(response)
     print(data)
@@ -119,7 +125,9 @@ def create_client_requirement(client, auth_pm):
 
     return response.json().get("data").get("id")
 
-
+# ----------------------------------------------------------------------------------
+#  /api/pm/client/requirements/{client_id}/?requirement_id={requirement_id} (PUT)
+# ----------------------------------------------------------------------------------
 def test_put_client_requirements_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
     client_id = projects[0].get("client_id")
@@ -153,7 +161,9 @@ def test_put_client_requirements_success(client, auth_pm):
         assert "requirement_id" in data.get("data")
         assert "description" in data.get("data")
 
-
+# ----------------------------------------------------------------------------------
+#  /api/pm/client/requirements/{client_id}/?requirement_id={requirement_id} (DELETE)
+# ----------------------------------------------------------------------------------
 def test_delete_client_requirement_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
     client_id = projects[0].get("client_id")

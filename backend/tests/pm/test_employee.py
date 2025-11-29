@@ -52,3 +52,8 @@ def test_get_pm_employees(client, auth_pm):
         assert "name" in data.get("data").get("employees")[0]
         assert "email" in data.get("data").get("employees")[0]
         assert "role" in data.get("data").get("employees")[0]
+
+
+def test_get_pm_employees_failure(client, auth_pm):
+    response = client.get(f"{BASE_URL}/api/pm/employees", headers={})
+    assert response.status_code == 401
