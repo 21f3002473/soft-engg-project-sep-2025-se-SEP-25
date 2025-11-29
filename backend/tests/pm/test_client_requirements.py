@@ -20,9 +20,9 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
-
+from test_clients import create_client
 def test_get_client_requirements_success(client, auth_pm):
-    client_id = 1
+    client_id = create_client(client, auth_pm)
     response = client.get(
         f"{BASE_URL}/api/pm/client/requirements/{client_id}", headers=auth_pm
     )
@@ -53,3 +53,112 @@ def test_get_client_requirements_success(client, auth_pm):
         assert "requirement_id" in data.get("data").get("requirements")[0]
         assert "description" in data.get("data").get("requirements")[0]
         assert "project_id" in data.get("data").get("requirements")[0]
+
+from test_projects import create_project
+def test_post_client_requirements_success(client, auth_pm):
+    import random
+    projects = get_projects(client, auth_pm)
+    client_id = projects[0].get("client_id")
+    project_id = projects[0].get("id")
+    requirement_id = random.randint(1000, 9999)
+    payload = {
+        "requirement_id": "R"+str(requirement_id),
+        "requirements": "add a new requirement",
+        "project_id": project_id
+    }
+    response = client.post(
+        f"{BASE_URL}/api/pm/client/requirements/{client_id}", json=payload, headers=auth_pm)
+
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    print(data)
+
+    assert isinstance(data, dict)
+
+    # Expected set of keys
+    expected_keys = {"message", "data"}
+    assert set(data.keys()) == expected_keys
+
+    # Expected values
+    assert data.get("message") == "Requirement created successfully"
+    assert isinstance(data.get("data"), dict)
+
+    # Validate data keys
+    assert "id" in data.get("data")
+    assert "requirement_id" in data.get("data")
+    assert "description" in data.get("data")
+    assert "project_id" in data.get("data")
+
+def create_client_requirement(client, auth_pm):
+    import random
+    projects = get_projects(client, auth_pm)
+    client_id = projects[0].get("client_id")
+    project_id=projects[0].get("id")
+    requirement_id = random.randint(1000, 9999)
+    payload = {
+        "requirement_id": "R"+str(requirement_id),
+        "requirements": "add a new requirement",
+        "project_id": project_id
+    }
+    response = client.post(
+        f"{BASE_URL}/api/pm/client/requirements/{client_id}", json=payload, headers=auth_pm)
+
+    return response.json().get("data").get("id")
+
+def test_put_client_requirements_success(client, auth_pm):
+    projects = get_projects(client, auth_pm)
+    client_id = projects[0].get("client_id")
+    project_id=projects[0].get("id")
+    requirement_id = create_client_requirement(client, auth_pm)
+    payload = {
+        "requirements": "update requirement",
+        "project_id": project_id
+    }
+    response = client.put(
+        f"{BASE_URL}/api/pm/client/requirements/{client_id}/?requirement_id={requirement_id}", json=payload, headers=auth_pm)
+
+    assert response.status_code in [200, 404]
+
+    if response.status_code == 200:
+        data = assert_json(response)
+        print(data)
+
+        assert isinstance(data, dict)
+
+        # Expected set of keys
+        expected_keys = {"message", "data"}
+        assert set(data.keys()) == expected_keys
+
+        # Expected values
+        assert data.get("message") == "Requirement updated successfully"
+        assert isinstance(data.get("data"), dict)
+
+        # Validate data keys
+        assert "id" in data.get("data")
+        assert "requirement_id" in data.get("data")
+        assert "description" in data.get("data")
+
+from test_projects import create_project,get_projects
+def test_delete_client_requirement_success(client, auth_pm):
+    projects = get_projects(client, auth_pm)
+    client_id = projects[0].get("client_id")
+    requirement_id = create_client_requirement(client, auth_pm)
+    response = client.delete(f"{BASE_URL}/api/pm/client/requirements/{client_id}/?requirement_id={requirement_id}", headers=auth_pm)
+    assert response.status_code in [200, 404]
+    if response.status_code == 200:
+        data = assert_json(response)
+        print(data)
+
+        assert isinstance(data, dict)
+
+        # Expected set of keys
+        expected_keys = {"message", "data"}
+        assert set(data.keys()) == expected_keys
+
+        # Expected values
+        assert data.get("message") == "Requirement deleted successfully"
+        assert isinstance(data.get("data"), dict)
+
+        # Validate data keys
+        assert "id" in data.get("data")
