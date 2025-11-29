@@ -170,6 +170,7 @@ def test_get_pm_projects(client, auth_pm):
         assert "project_name" in data.get("data").get("projects")[0]
         assert "description" in data.get("data").get("projects")[0]
 
+
 def test_get_pm_projects_failure(client, auth_pm):
     projects = get_projects(client, auth_pm)
     project_id = projects[0].get("id")

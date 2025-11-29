@@ -112,7 +112,12 @@ def test_get_admin_employees(client):
 
 def test_post_admin_employees(client):
     import random
-    payload = {"name": f"John Doe{random.randint(1, 1000)}", "role": "HR", "email": f"john{random.randint(1, 1000)}@gmail.com"}
+
+    payload = {
+        "name": f"John Doe{random.randint(1, 1000)}",
+        "role": "HR",
+        "email": f"john{random.randint(1, 1000)}@gmail.com",
+    }
     response = client.post(
         f"{BASE_URL}/api/admin/employees",
         json=payload,
@@ -156,8 +161,9 @@ def test_get_admin_backup_config(client):
 
 
 def test_put_admin_backup_config(client):
-    payload = {"backups": [
-        {"day": "Monday", "type": "full", "datetime": "2025-10-30T03:00"}]}
+    payload = {
+        "backups": [{"day": "Monday", "type": "full", "datetime": "2025-10-30T03:00"}]
+    }
 
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
@@ -178,8 +184,9 @@ def test_put_admin_backup_config(client):
 
 
 def test_put_admin_backup_config_failure(client):
-    payload = {"backups": [
-        {"day": "Monday", "type": "no", "datetime": "2025-10-30T03:00"}]}
+    payload = {
+        "backups": [{"day": "Monday", "type": "no", "datetime": "2025-10-30T03:00"}]
+    }
 
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
@@ -243,7 +250,6 @@ def test_put_admin_account(client):
         json=payload,
         headers=admin_login_auth(admin_token(client)),
     )
-
 
     if response.status_code == 200:
         assert response.status_code in [200]

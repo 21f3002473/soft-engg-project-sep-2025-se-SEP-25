@@ -20,6 +20,7 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # -------------------------------------------------
 #  /api/pm/employee/performance/{employee_id} (GET)
 # --------------------------------------------------
