@@ -3,7 +3,6 @@ import os
 import pytest
 import requests
 from dotenv import load_dotenv
-from test_clients import create_client
 
 load_dotenv()
 
