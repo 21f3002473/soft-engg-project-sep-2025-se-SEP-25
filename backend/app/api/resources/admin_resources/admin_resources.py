@@ -712,6 +712,8 @@ class AdminAccountResource(Resource):
                 - Detail: "Old password is incorrect"
         """
         updated = False
+        print(f"Updating admin account for user ID: {current_user.id}")
+        print(f"Payload received: {payload.name}, {payload.old_password}, {payload.new_password}")
 
         if (
             payload.name
