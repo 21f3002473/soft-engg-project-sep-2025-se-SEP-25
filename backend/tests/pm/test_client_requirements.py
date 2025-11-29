@@ -3,6 +3,7 @@ import os
 import pytest
 import requests
 from dotenv import load_dotenv
+from test_1_projects import create_project, get_projects
 
 load_dotenv()
 
@@ -56,9 +57,6 @@ def test_get_client_requirements_success(client, auth_pm):
         assert "requirement_id" in data.get("data").get("requirements")[0]
         assert "description" in data.get("data").get("requirements")[0]
         assert "project_id" in data.get("data").get("requirements")[0]
-
-
-from test_projects import create_project
 
 
 def test_post_client_requirements_success(client, auth_pm):
@@ -154,9 +152,6 @@ def test_put_client_requirements_success(client, auth_pm):
         assert "id" in data.get("data")
         assert "requirement_id" in data.get("data")
         assert "description" in data.get("data")
-
-
-from test_projects import create_project, get_projects
 
 
 def test_delete_client_requirement_success(client, auth_pm):

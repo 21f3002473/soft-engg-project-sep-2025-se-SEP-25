@@ -5,7 +5,8 @@ import pytest
 import requests
 from dotenv import load_dotenv
 from starlette.responses import JSONResponse
-from test_projects import create_project, get_projects
+from test_1_projects import create_project, get_projects
+from test_clients import create_client
 
 load_dotenv()
 
@@ -86,9 +87,6 @@ class DummyResponse:
 
 def dummy_internal_error():
     return DummyResponse(status_code=500, data={"detail": "Internal server error"})
-
-
-from test_clients import create_client
 
 
 def test_get_client_updates_server_error(client, auth_pm):
