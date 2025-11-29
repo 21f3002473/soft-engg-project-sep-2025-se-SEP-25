@@ -1,6 +1,7 @@
 import os
+import random
 
-import pytest,random
+import pytest
 import requests
 from dotenv import load_dotenv
 

@@ -1,10 +1,11 @@
-from test_projects import create_project, get_projects
 import os
+import random
 
-import pytest,random
+import pytest
 import requests
 from dotenv import load_dotenv
 from starlette.responses import JSONResponse
+from test_projects import create_project, get_projects
 
 load_dotenv()
 
@@ -49,7 +50,6 @@ def test_get_client_updates_success(client, auth_pm):
     assert "updates" in data.get("data")
     assert "total_updates" in data.get("data")
 
-
     client_data = data.get("data").get("client")
 
     if client_data:
@@ -89,6 +89,8 @@ def dummy_internal_error():
 
 
 from test_clients import create_client
+
+
 def test_get_client_updates_server_error(client, auth_pm):
     client_id = create_client(client, auth_pm)
     response = client.get(
@@ -115,12 +117,13 @@ def test_post_client_updates_success(client, auth_pm):
     print(project_id, client_id)
     update_id = random.randint(1000, 9999)
     payload = {
-        "update_id": "R"+str(update_id),
+        "update_id": "R" + str(update_id),
         "project_id": project_id,
-        "details": "add a new update"
+        "details": "add a new update",
     }
     response = client.post(
-        f"{BASE_URL}/api/pm/client/updates/{client_id}", json=payload, headers=auth_pm)
+        f"{BASE_URL}/api/pm/client/updates/{client_id}", json=payload, headers=auth_pm
+    )
 
     assert response.status_code == 200
 
@@ -144,22 +147,22 @@ def test_post_client_updates_success(client, auth_pm):
     assert "date" in data.get("data")
 
 
-
 def create_client_update(client, auth_pm):
     import random
 
-    projects=get_projects(client, auth_pm)
+    projects = get_projects(client, auth_pm)
     client_id = projects[0].get("client_id")
     project_id = projects[0].get("id")
     print(project_id, client_id)
     update_id = random.randint(1000, 9999)
     payload = {
-        "update_id": "R"+str(update_id),
+        "update_id": "R" + str(update_id),
         "project_id": project_id,
-        "details": "add a new update"
+        "details": "add a new update",
     }
     response = client.post(
-        f"{BASE_URL}/api/pm/client/updates/{client_id}", json=payload, headers=auth_pm)
+        f"{BASE_URL}/api/pm/client/updates/{client_id}", json=payload, headers=auth_pm
+    )
 
     assert response.status_code in [200, 404]
 
@@ -170,10 +173,12 @@ def test_put_client_updates_success(client, auth_pm):
     update_id = create_client_update(client, auth_pm)
     projects = get_projects(client, auth_pm)
     client_id = projects[0].get("client_id")
-    payload = {"details": "add a new update"
-    }
+    payload = {"details": "add a new update"}
     response = client.put(
-        f"{BASE_URL}/api/pm/client/updates/{client_id}/?update_id={update_id}", json=payload, headers=auth_pm)
+        f"{BASE_URL}/api/pm/client/updates/{client_id}/?update_id={update_id}",
+        json=payload,
+        headers=auth_pm,
+    )
 
     assert response.status_code in [200, 404]
 
@@ -200,7 +205,10 @@ def test_delete_client_updates_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
     client_id = projects[0].get("client_id")
     update_id = create_client_update(client, auth_pm)
-    response = client.delete(f"{BASE_URL}/api/pm/client/updates/{client_id}/?update_id={update_id}", headers=auth_pm)
+    response = client.delete(
+        f"{BASE_URL}/api/pm/client/updates/{client_id}/?update_id={update_id}",
+        headers=auth_pm,
+    )
     assert response.status_code in [200, 404]
     if response.status_code == 200:
         data = assert_json(response)
@@ -218,4 +226,3 @@ def test_delete_client_updates_success(client, auth_pm):
 
         # Validate data keys
         assert "id" in data.get("data")
-

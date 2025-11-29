@@ -20,32 +20,36 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 def create_client(client, auth_pm):
     import random
+
     client_id = random.randint(1000, 9999)
     payload = {
-        "client_id": "C"+str(client_id),
+        "client_id": "C" + str(client_id),
         "client_name": "Test Client Pvt Ltd",
-        "email": "client"+str(client_id)+"@test.com",
-        "detail_base64": "dGVzdCBkZXRhaWw="   # "test detail" in base64
+        "email": "client" + str(client_id) + "@test.com",
+        "detail_base64": "dGVzdCBkZXRhaWw=",  # "test detail" in base64
     }
-    response = client.post(f"{BASE_URL}/api/pm/clients",json=payload,headers=auth_pm)
+    response = client.post(f"{BASE_URL}/api/pm/clients", json=payload, headers=auth_pm)
 
     return response.json().get("data").get("id")
+
 
 # --------------------------
 #  /api/pm/clients (POST)
 # --------------------------
 def test_post_pm_clients(client, auth_pm):
     import random
+
     client_id = random.randint(1000, 9999)
     payload = {
-        "client_id": "C"+str(client_id),
+        "client_id": "C" + str(client_id),
         "client_name": "Test Client Pvt Ltd",
-        "email": "client"+str(client_id)+"@test.com",
-        "detail_base64": "dGVzdCBkZXRhaWw="   # "test detail" in base64
+        "email": "client" + str(client_id) + "@test.com",
+        "detail_base64": "dGVzdCBkZXRhaWw=",  # "test detail" in base64
     }
-    response = client.post(f"{BASE_URL}/api/pm/clients",json=payload,headers=auth_pm)
+    response = client.post(f"{BASE_URL}/api/pm/clients", json=payload, headers=auth_pm)
 
     assert response.status_code == 200
 
@@ -66,7 +70,7 @@ def test_post_pm_clients(client, auth_pm):
     assert "id" in data.get("data")
     assert "client_id" in data.get("data")
     assert "client_name" in data.get("data")
-    assert "email" in data.get("data")  
+    assert "email" in data.get("data")
 
 
 # --------------------------
@@ -113,18 +117,17 @@ def test_put_pm_clients(client, auth_pm):
     payload = {
         "client_name": "Updated Client Pvt Ltd",
         "email": "updated1001@test.com",
-        "detail_base64": "dGVzdCBkZXRhaWw="  # "test detail" in base64
+        "detail_base64": "dGVzdCBkZXRhaWw=",  # "test detail" in base64
     }
 
     response = client.put(
         f"{BASE_URL}/api/pm/clients/?client_id={client_id}",
         json=payload,
-        headers=auth_pm
+        headers=auth_pm,
     )
 
     # Ensure the update was successful
     assert response.status_code in [200, 404]
-
 
     data = response.json()
     if response.status_code == 200:
@@ -135,6 +138,7 @@ def test_put_pm_clients(client, auth_pm):
         assert client_data["client_name"] == payload["client_name"]
         assert client_data["email"] == payload["email"]
 
+
 def test_delete_pm_clients(client, auth_pm):
     # Use an existing client ID
     try:
@@ -143,14 +147,12 @@ def test_delete_pm_clients(client, auth_pm):
         client_id = 1
 
     response = client.delete(
-        f"{BASE_URL}/api/pm/clients/?client_id={client_id}",
-        headers=auth_pm
+        f"{BASE_URL}/api/pm/clients/?client_id={client_id}", headers=auth_pm
     )
 
-    assert response.status_code in [200,404]
+    assert response.status_code in [200, 404]
+
 
 def get_client(client, auth_pm):
-    response = client.get(
-        f"{BASE_URL}/api/pm/clients", headers=auth_pm
-    )
+    response = client.get(f"{BASE_URL}/api/pm/clients", headers=auth_pm)
     return response.json().get("data").get("client")
