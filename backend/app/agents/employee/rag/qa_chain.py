@@ -1,44 +1,77 @@
 import os
 import pickle
-
-from langchain.chains import RetrievalQA
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-
 from .gemini_llm import GeminiLLM
 
-
-def load_schemes_data():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-    data_path = os.path.join(project_root, "app", "static", "employee", "data.txt")
-    with open(data_path, "r") as file:
-        return file.read()
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+STATIC_DIR = os.path.join(project_root, "static")
+VECTORSTORE_PATH = os.path.join(STATIC_DIR, "vectorstore.pkl")
 
 
 def load_vector_store():
-    with open("vectorstore.pkl", "rb") as f:
+    """Loads the saved FAISS vector store from disk."""
+
+    if not os.path.exists(VECTORSTORE_PATH):
+        raise FileNotFoundError(
+            f"[RAG ERROR] vectorstore.pkl not found at:\n{VECTORSTORE_PATH}\n"
+            "Run build_vector_store.py first."
+        )
+
+    with open(VECTORSTORE_PATH, "rb") as f:
         return pickle.load(f)
 
 
-def create_qa_chain():
-    schemes_data = load_schemes_data()
+def create_rag_components():
+    """
+    Loads:
+      - FAISS Vector Store (for retrieval)
+      - Gemini LLM wrapper (for generation)
 
-    text_splitter = CharacterTextSplitter(
-        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
-    )
-    texts = text_splitter.split_text(schemes_data)
+    Returns:
+      retriever, llm
+    """
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-    vectorstore = FAISS.from_texts(texts=texts, embedding=embeddings)
+    vectorstore = load_vector_store()
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
     llm = GeminiLLM()
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever(),
-        return_source_documents=False,
+
+    return retriever, llm
+
+
+def get_rag_answer(user_question: str, employee_context: str):
+    """
+    Main RAG function that:
+    1. Retrieves relevant HR chunks
+    2. Builds a combined prompt
+    3. Calls Gemini to produce answer
+    """
+
+    retriever, llm = create_rag_components()
+
+    docs = retriever.invoke(user_question)
+    context_text = (
+        "\n\n".join([d.page_content for d in docs]) or "No relevant info found."
     )
+
+    prompt = f"""
+You are Sync'em HR AI Assistant.
+
+USER CONTEXT:
+{employee_context}
+
+GLOBAL HR CONTEXT:
+{context_text}
+
+QUESTION:
+{user_question}
+
+Guidelines:
+- Prefer USER CONTEXT if the question is personal.
+- Prefer GLOBAL CONTEXT for HR policies, rules, benefits, and processes.
+- If the info does not exist in GLOBAL CONTEXT, say you don’t know.
+- Do NOT hallucinate new HR rules.
+"""
+
+    answer = llm.invoke(prompt)
+    return answer
