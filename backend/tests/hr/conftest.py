@@ -1,7 +1,8 @@
-import pytest
-import httpx
-from dotenv import load_dotenv
 import os
+
+import httpx
+import pytest
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -17,28 +18,19 @@ def client():
 
 @pytest.fixture
 def sample_employee_payload():
-    return {
-        "name": "John Doe",
-        "email": "john@test.com",
-        "role": "Engineer"
-    }
+    return {"name": "John Doe", "email": "john@test.com", "role": "Engineer"}
 
 
 @pytest.fixture
 def sample_policy_payload():
-    return {
-        "title": "Policy A",
-        "content": "Content here"
-    }
+    return {"title": "Policy A", "content": "Content here"}
 
 
 @pytest.fixture
 def sample_review_payload():
-    return {
-        "user_id": 1,
-        "rating": 4,
-        "comments": "Good"
-    }
+    return {"user_id": 1, "rating": 4, "comments": "Good"}
+
+
 import os
 
 import httpx

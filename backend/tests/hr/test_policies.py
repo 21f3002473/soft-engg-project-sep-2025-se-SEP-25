@@ -36,6 +36,8 @@ def test_delete_policy(client, sample_policy_payload):
     res = client.delete(f"/policies/{policy_id}")
     assert res.status_code == 200
     assert res.json()["message"] == "Policy deleted"
+
+
 import os
 
 import pytest
