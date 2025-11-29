@@ -1,5 +1,7 @@
 import os
+
 from dotenv import load_dotenv
+
 load_dotenv()
 import httpx
 
@@ -10,8 +12,6 @@ def assert_json(resp):
 
 
 # POST /employee/assistant  — SUCCESS (200 OK)
-
-
 
 
 BASE_URL = os.getenv("BASE_URL")
@@ -25,7 +25,7 @@ def test_assistant_success(base_url, auth_employee):
     )
 
     if os.getenv("GEMINI_API_KEY"):
-        assert r.status_code== 200
+        assert r.status_code == 200
     else:
         assert r.status_code in [500]
     data = assert_json(r)

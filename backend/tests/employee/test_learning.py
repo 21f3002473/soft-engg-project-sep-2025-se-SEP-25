@@ -1,7 +1,8 @@
-from dotenv import load_dotenv
 import os
+
 import httpx
 import pytest
+from dotenv import load_dotenv
 
 
 def assert_json(response):
@@ -464,6 +465,7 @@ def test_put_employee_course_status_not_found(base_url, auth_employee):
 
 # 8) /employee/recommendations (CourseRecommendationResource)
 load_dotenv()
+
 
 def test_get_recommendations_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/recommendations", headers=auth_employee)
