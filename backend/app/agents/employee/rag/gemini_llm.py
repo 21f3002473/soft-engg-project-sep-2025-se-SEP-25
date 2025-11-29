@@ -1,6 +1,7 @@
+from typing import Any, Optional
+
 import google.generativeai as genai
 from app.config import Config
-from typing import Optional, Any
 from langchain_core.language_models import LLM
 from pydantic import BaseModel, Field
 
