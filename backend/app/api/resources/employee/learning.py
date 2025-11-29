@@ -1,12 +1,12 @@
 import json
 from logging import getLogger
 
+import google.generativeai as genai
 import httpx
 from app.config import Config
 from app.database import Course, StatusTypeEnum, User, UserCourse, get_session
 from app.middleware import require_employee, require_hr
 from fastapi import Depends, HTTPException
-import google.generativeai as genai
 from fastapi_restful import Resource
 from sqlmodel import Session, select
 

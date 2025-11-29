@@ -159,7 +159,6 @@ def test_get_admin_backup_config(client):
 # -------------------------------
 
 
-
 def test_put_admin_backup_config(client):
     payload = {"backups": [{"day": 1, "type": "full", "datetime": "2025-10-30T03:00"}]}
 
@@ -237,6 +236,7 @@ def test_get_admin_account(client):
 #  /api/admin/account (PUT)
 # --------------------------
 
+
 def test_put_admin_account(client):
     payload = {
         "name": "Admin",
@@ -249,7 +249,7 @@ def test_put_admin_account(client):
         json=payload,
         headers=admin_login_auth(admin_token(client)),
     )
-    
+
     assert response.status_code in [200, 204] + list(range(400, 600))
 
     if response.status_code == 200:

@@ -1,13 +1,12 @@
 from logging import getLogger
 
+from app.agents.employee.rag.qa_chain import get_rag_answer
 from app.api.validators import ChatMessage, ChatResponse
 from app.database import *
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-
-from app.agents.employee.rag.qa_chain import get_rag_answer
 
 logger = getLogger(__name__)
 
@@ -93,6 +92,7 @@ LEAVE REQUESTS:
 REIMBURSEMENTS:
 - Total Claims Submitted: {len(reimbursements)}
 """
+
 
 class AIAssistantResource(Resource):
     """
