@@ -42,3 +42,24 @@ def test_delete_employee(client, sample_employee_payload):
     delete = client.delete(f"/employees/{emp_id}")
     assert delete.status_code == 200
     assert delete.json().get("message") == "Employee deleted"
+import os
+
+import pytest
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BASE_URL = os.getenv("BASE_URL")
+
+
+@pytest.fixture
+def client():
+    """Simple HTTP client wrapper using requests."""
+    return requests
+
+
+def assert_json(response):
+    """Validate that the response contains JSON and return the parsed data."""
+    assert "application/json" in response.headers.get("Content-Type", "")
+    return response.json()
