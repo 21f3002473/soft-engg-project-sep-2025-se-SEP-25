@@ -33,6 +33,9 @@ def create_client(client, auth_pm):
     }
     response = client.post(f"{BASE_URL}/api/pm/clients", json=payload, headers=auth_pm)
 
+    if response.status_code != 200:
+        return 1
+
     return response.json().get("data").get("id")
 
 
