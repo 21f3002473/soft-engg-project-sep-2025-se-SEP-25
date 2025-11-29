@@ -164,7 +164,7 @@ export default {
             this.error = null;
 
             try {
-                const response = await make_getrequest(`/pr/client/updates/${this.clientID}`);
+                const response = await make_getrequest(`/api/pm/client/updates/${this.clientID}`);
                 
                 console.log('Client Updates Response:', response);
 

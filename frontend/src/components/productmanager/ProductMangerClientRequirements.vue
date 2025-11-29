@@ -151,7 +151,7 @@ export default {
       this.error = null;
       
       try {
-        const response = await make_getrequest(`/pr/client/requirements/${this.clientId}`);
+        const response = await make_getrequest(`/api/pm/client/requirements/${this.clientId}`);
         
         console.log('Client Details Response:', response);
         

@@ -169,7 +169,7 @@ export default {
       this.error = null;
 
       try {
-        const response = await make_getrequest(`/pr/employee/performance/${this.employeeId}`);
+        const response = await make_getrequest(`/api/pm/employee/performance/${this.employeeId}`);
         
         console.log('Performance Response:', response);
 

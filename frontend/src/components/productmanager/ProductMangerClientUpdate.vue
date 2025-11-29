@@ -77,7 +77,7 @@ export default {
             this.error = null;
 
             try {
-                const response = await make_getrequest('/pr/clients');
+                const response = await make_getrequest('/api/pm/clients');
                 
                 console.log('Clients Response:', response);
 

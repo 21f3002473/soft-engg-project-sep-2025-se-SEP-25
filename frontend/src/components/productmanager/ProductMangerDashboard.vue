@@ -127,7 +127,7 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
-// make API call to the endpoint "/pr/dashboard" to get the list of clients
+// make API call to the endpoint "/api/pm/dashboard" to get the list of clients
 
 export default {
     name: 'ProductmanagerDashboard',
@@ -146,7 +146,7 @@ export default {
     methods: {
         async fetchClientList() {
             try {
-                const response = await make_getrequest('/pr/dashboard');
+                const response = await make_getrequest('/api/pm/dashboard');
                 
                 // Handle the nested response structure - data is inside response.data
                 const dashboardData = response?.data || {};

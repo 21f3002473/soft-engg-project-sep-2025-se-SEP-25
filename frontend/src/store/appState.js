@@ -93,9 +93,9 @@ export async function submitLogin(params = {}, router) {
     var role = data.role; 
     if (role == "root") {
       role = "admin";
-    }else if (role == "pm") {
+    }else if (role == "product_manager") {
       role = "productmanager";
-    }else if (role == "hr") {
+    }else if (role == "human_resource") {
       role = "hr";
     }else if (role == "employee") {
       role = "employee";
