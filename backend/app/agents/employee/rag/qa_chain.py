@@ -4,7 +4,7 @@ from .gemini_llm import GeminiLLM
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-STATIC_DIR = os.path.join(project_root, "static")
+STATIC_DIR = os.path.join(project_root, "static", "employee")
 VECTORSTORE_PATH = os.path.join(STATIC_DIR, "vectorstore.pkl")
 
 

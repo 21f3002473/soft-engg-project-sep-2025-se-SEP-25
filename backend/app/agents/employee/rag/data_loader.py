@@ -20,7 +20,7 @@ def load_data(file_path):
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-    data_path = os.path.join(project_root, "static", "data.txt")
+    data_path = os.path.join(project_root, "static", "employee", "data.txt")
 
     docs = load_data(data_path)
     print(f"Loaded {len(docs)} document chunks from RAG dataset.")

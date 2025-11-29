@@ -6,10 +6,6 @@ from pydantic import BaseModel, Field
 
 
 class GeminiLLM(LLM, BaseModel):
-    """
-    Custom wrapper for Google Gemini via google-genai SDK,
-    correctly implemented for LangChain + Pydantic compatibility.
-    """
 
     model_name: str = Field(default="gemini-2.0-flash")
     api_key: str = Field(default=Config.GEMINI_API_KEY)

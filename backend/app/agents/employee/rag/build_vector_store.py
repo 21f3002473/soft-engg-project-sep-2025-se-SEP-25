@@ -12,7 +12,7 @@ def build_faiss_index():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 
-    static_dir = os.path.join(project_root, "static")
+    static_dir = os.path.join(project_root, "static", "employee")
     data_path = os.path.join(static_dir, "data.txt")
     index_path = os.path.join(static_dir, "vectorstore.pkl")
 
@@ -32,7 +32,7 @@ def build_faiss_index():
     print("[INFO] Building FAISS vector store ...")
     vector_store = FAISS.from_documents(docs, embeddings)
 
-    print(f"[INFO] Saving FAISS index → {index_path}")
+    print(f"[INFO] Saving FAISS index {index_path}")
 
     with open(index_path, "wb") as f:
         pickle.dump(vector_store, f)
