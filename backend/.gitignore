@@ -4,3 +4,4 @@ __pycache__/
 admin_api_docs.md
 requests.http
 vectorstore.pkl
+imp_requests.http

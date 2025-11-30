@@ -13,7 +13,7 @@ HR_USER_PASSWORD = os.getenv("HR_USER_PASSWORD")
 
 @pytest.fixture(scope="session")
 def hr_token():
-    """Automatically logs in PM & returns token"""
+    """Automatically logs in HR & returns token"""
     login_url = f"{BASE_URL}/user/login"
     payload = {"email": HR_USER_EMAIL, "password": HR_USER_PASSWORD}
 
