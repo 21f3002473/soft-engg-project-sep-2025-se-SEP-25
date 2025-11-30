@@ -22,6 +22,7 @@ def assert_json(response):
 
 from test_clients import create_client
 
+
 #  /api/pm/client/requirements/{client_id} (GET)
 def test_get_client_requirements_success(client, auth_pm):
     client_id = create_client(client, auth_pm)
@@ -110,6 +111,7 @@ def create_client_requirement(client, auth_pm):
     )
 
     return response.json().get("data").get("id")
+
 
 #  /api/pm/client/requirements/{client_id}/?requirement_id={requirement_id} (PUT)
 def test_put_client_requirements_success(client, auth_pm):
