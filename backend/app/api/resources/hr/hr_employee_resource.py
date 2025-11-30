@@ -1,4 +1,4 @@
-#backend/app/api/resources/hr/hr_employee_resource.py
+# backend/app/api/resources/hr/hr_employee_resource.py
 from app.controllers import get_current_active_user
 from app.controllers.hr.hr_employee_controller import (
     delete_employee,

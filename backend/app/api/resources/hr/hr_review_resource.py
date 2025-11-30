@@ -1,4 +1,4 @@
-#backend/app/api/resources/hr/hr_review_resource.py
+# backend/app/api/resources/hr/hr_review_resource.py
 from typing import Any
 
 from app.controllers import get_current_active_user

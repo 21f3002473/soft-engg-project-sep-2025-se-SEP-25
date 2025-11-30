@@ -1,4 +1,4 @@
-#backend/app/api/resources/hr/hr_policy_resource.py
+# backend/app/api/resources/hr/hr_policy_resource.py
 from app.controllers import get_current_active_user
 from app.controllers.hr.hr_policy_controller import (
     create_policy,

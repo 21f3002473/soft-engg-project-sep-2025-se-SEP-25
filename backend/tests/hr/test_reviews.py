@@ -10,12 +10,9 @@ def assert_json(resp):
 
 # CREATE REVIEW (POST /api/hr/review)
 
+
 def test_review_create_success(base_url, auth_hr):
-    payload = {
-        "employee_id": 1,
-        "rating": 4,
-        "comments": "Good performance overall."
-    }
+    payload = {"employee_id": 1, "rating": 4, "comments": "Good performance overall."}
 
     r = httpx.post(f"{base_url}/hr/review", json=payload, headers=auth_hr)
 
@@ -42,6 +39,7 @@ def test_review_create_unauthorized(base_url):
 
 
 # GET REVIEW DETAIL (GET /api/hr/review/{id})
+
 
 def test_review_detail_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
@@ -75,6 +73,7 @@ def test_review_detail_unauthorized(base_url):
 
 
 # UPDATE REVIEW (PUT /api/hr/review/{id})
+
 
 def test_review_update_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
@@ -114,6 +113,7 @@ def test_review_update_unauthorized(base_url):
 
 # DELETE REVIEW (DELETE /api/hr/review/{id})
 
+
 def test_review_delete_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -144,6 +144,7 @@ def test_review_delete_unauthorized(base_url):
 
 
 # LIST ALL REVIEWS (GET /api/hr/reviews)
+
 
 def test_review_list_success(base_url, auth_hr):
     r = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
