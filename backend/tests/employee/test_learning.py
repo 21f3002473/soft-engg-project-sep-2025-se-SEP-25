@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
