@@ -20,10 +20,9 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 EMP_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
 EMP_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
-
-
 
 
 # --------------------------
@@ -63,10 +62,10 @@ def test_get_pm_employees_failure(client):
     response = client.get(f"{BASE_URL}/api/pm/employees", headers={})
     assert response.status_code == 401
 
+
 def get_employees(client, auth_pm):
     response = client.get(f"{BASE_URL}/api/pm/employees/", headers=auth_pm)
 
     assert response.status_code in [200]
     print(response.json())
     return response.json().get("data").get("employees")
-

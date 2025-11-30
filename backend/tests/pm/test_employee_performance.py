@@ -20,7 +20,10 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 from test_employee import get_employees
+
+
 # -------------------------------------------------
 #  /api/pm/employee/performance/{employee_id} (GET)
 # --------------------------------------------------
@@ -29,12 +32,12 @@ def test_get_employee_performance_success(client, auth_pm):
         employee_id = -1
     else:
         employee_id = get_employees(client, auth_pm)[-1].get("id")
-    
+
     response = client.get(
         f"{BASE_URL}/api/pm/employee/performance/{employee_id}", headers=auth_pm
     )
 
-    assert response.status_code in [200, 204,404]
+    assert response.status_code in [200, 204, 404]
 
     if response.status_code == 200:
         data = assert_json(response)

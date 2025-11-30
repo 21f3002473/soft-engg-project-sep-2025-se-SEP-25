@@ -45,8 +45,7 @@ def test_policy_create_unauthorized(base_url):
 
 
 def test_policy_detail_success(base_url, auth_employee):
-    list_resp = httpx.get(
-        f"{base_url}/hr/policies", headers=auth_employee)
+    list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
     policies = data.get("policies", [])
@@ -80,8 +79,7 @@ def test_policy_detail_unauthorized(base_url):
 
 
 def test_policy_update_success(base_url, auth_hr, auth_employee):
-    list_resp = httpx.get(
-        f"{base_url}/hr/policies", headers=auth_employee)
+    list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
     policies = data.get("policies", [])
@@ -93,8 +91,7 @@ def test_policy_update_success(base_url, auth_hr, auth_employee):
 
     payload = {"title": "Updated Policy", "content": "Updated content text."}
 
-    r = httpx.put(f"{base_url}/hr/policy/{pol_id}",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/policy/{pol_id}", json=payload, headers=auth_hr)
 
     assert r.status_code == 200
     assert assert_json(r)["message"] == "Policy updated"
@@ -103,8 +100,7 @@ def test_policy_update_success(base_url, auth_hr, auth_employee):
 def test_policy_update_not_found(base_url, auth_hr):
     payload = {"title": "X", "content": "Y"}
 
-    r = httpx.put(f"{base_url}/hr/policy/999999",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/policy/999999", json=payload, headers=auth_hr)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "Policy not found"
@@ -121,8 +117,7 @@ def test_policy_update_unauthorized(base_url):
 
 
 def test_policy_delete_success(base_url, auth_hr, auth_employee):
-    list_resp = httpx.get(
-        f"{base_url}/hr/policies", headers=auth_employee)
+    list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
     policies = data.get("policies", [])

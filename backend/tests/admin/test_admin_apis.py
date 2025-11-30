@@ -19,6 +19,7 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # --------------------------
 #  /api/admin/register (POST)
 # --------------------------
@@ -125,13 +126,11 @@ def test_post_admin_employees(client, auth_admin):
     expected_keys = {"id", "name", "email", "role", "temporary_password"}
     assert set(expected_keys) == set(data.keys())
 
+    # -------------------------------
+    #  /api/admin/backup-config (GET)
+    # -------------------------------
 
-# -------------------------------
-#  /api/admin/backup-config (GET)
-# -------------------------------
-
-
-# def test_get_admin_backup_config(client, auth_admin):
+    # def test_get_admin_backup_config(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/backup-config",
         headers=auth_admin,
@@ -225,13 +224,11 @@ def test_get_admin_account(client, auth_admin):
     expected_keys = {"id", "name", "email", "role"}
     assert set(expected_keys) == set(data.keys())
 
+    # --------------------------
+    #  /api/admin/account (PUT)
+    # --------------------------
 
-# --------------------------
-#  /api/admin/account (PUT)
-# --------------------------
-
-
-# def test_put_admin_account(client, auth_admin):
+    # def test_put_admin_account(client, auth_admin):
     payload = {
         "name": "Admin",
         "old_password": "root@gmail.com",
@@ -262,9 +259,8 @@ def test_put_admin_account_failure(client, auth_admin):
     }
 
     response = client.put(
-        f"{BASE_URL}/api/admin/account",
-        json=payload,
-        headers=auth_admin)
-    
+        f"{BASE_URL}/api/admin/account", json=payload, headers=auth_admin
+    )
+
     # assert response.status_code in [400,401,402,403,404,500,503,504]
     assert response.status_code in list(range(400, 600))

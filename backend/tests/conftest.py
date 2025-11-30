@@ -18,6 +18,7 @@ ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD")
 EMP_USER_EMAIL = os.getenv("EMPLOYEE_USER_EMAIL")
 EMP_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
 
+
 @pytest.fixture(scope="session")
 def admin_token():
     """Automatically logs in Admin & returns token"""

@@ -12,8 +12,7 @@ def assert_json(resp):
 
 
 def test_review_create_success(base_url, auth_hr):
-    payload = {"user_id": 1, "rating": 4,
-               "comments": "Good performance overall."}
+    payload = {"user_id": 1, "rating": 4, "comments": "Good performance overall."}
 
     r = httpx.post(f"{base_url}/hr/review/create", json=payload, headers=auth_hr)
 
@@ -26,8 +25,7 @@ def test_review_create_success(base_url, auth_hr):
 def test_review_create_sever_error(base_url, auth_hr):
     payload = {"user_id": 1}
 
-    r = httpx.post(f"{base_url}/hr/review/create",
-                   json=payload, headers=auth_hr)
+    r = httpx.post(f"{base_url}/hr/review/create", json=payload, headers=auth_hr)
 
     assert r.status_code == 500
 
@@ -44,10 +42,11 @@ def test_review_create_unauthorized(base_url):
 
 
 def test_review_detail_success(base_url, auth_hr):
-    payload = {"user_id": 2, "rating": 4,
-               "comments": "Good performance overall."}
+    payload = {"user_id": 2, "rating": 4, "comments": "Good performance overall."}
 
-    response_create=httpx.post(f"{base_url}/hr/review/create", json=payload, headers=auth_hr)
+    response_create = httpx.post(
+        f"{base_url}/hr/review/create", json=payload, headers=auth_hr
+    )
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
@@ -93,8 +92,7 @@ def test_review_update_success(base_url, auth_hr):
 
     payload = {"rating": 3, "comments": "Updated review"}
 
-    r = httpx.put(f"{base_url}/hr/review/{rev_id}",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/review/{rev_id}", json=payload, headers=auth_hr)
 
     assert r.status_code == 200
     assert assert_json(r)["message"] == "Review updated"
@@ -103,8 +101,7 @@ def test_review_update_success(base_url, auth_hr):
 def test_review_update_not_found(base_url, auth_hr):
     payload = {"rating": 1, "comments": "Test"}
 
-    r = httpx.put(f"{base_url}/hr/review/999999",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/review/999999", json=payload, headers=auth_hr)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "Review not found"

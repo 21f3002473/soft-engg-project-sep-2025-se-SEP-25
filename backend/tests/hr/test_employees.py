@@ -8,7 +8,6 @@ def assert_json(resp):
     return resp.json()
 
 
-
 # GET EMPLOYEE DETAIL (GET /api/hr/employee/{id})
 
 
@@ -31,7 +30,7 @@ def test_hr_employee_detail_success(base_url, auth_pm, auth_hr):
     assert {"id", "name", "email"}.issubset(response_data["employee"].keys())
 
 
-def test_hr_employee_detail_not_found(base_url,auth_pm):
+def test_hr_employee_detail_not_found(base_url, auth_pm):
     r = httpx.get(f"{base_url}/hr/employee/999999", headers=auth_pm)
 
     assert r.status_code == 404
@@ -64,27 +63,23 @@ def test_hr_employee_update_success(base_url, auth_hr):
         "salary": 99999,
     }
 
-    r = httpx.put(f"{base_url}/hr/employee/{emp_id}",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/employee/{emp_id}", json=payload, headers=auth_hr)
 
     assert r.status_code == 200
     assert assert_json(r)["message"] == "Employee updated"
 
 
 def test_hr_employee_update_not_found(base_url, auth_hr):
-    payload = {"name": "Anything", "email": "x@y.com",
-               "position": "Dev", "salary": 10}
+    payload = {"name": "Anything", "email": "x@y.com", "position": "Dev", "salary": 10}
 
-    r = httpx.put(f"{base_url}/hr/employee/999999",
-                  json=payload, headers=auth_hr)
+    r = httpx.put(f"{base_url}/hr/employee/999999", json=payload, headers=auth_hr)
 
     assert r.status_code == 404
     assert assert_json(r)["detail"] == "Employee not found"
 
 
 def test_hr_employee_update_unauthorized(base_url):
-    payload = {"name": "No Auth", "email": "no@auth.com",
-               "position": "X", "salary": 1}
+    payload = {"name": "No Auth", "email": "no@auth.com", "position": "X", "salary": 1}
 
     r = httpx.put(f"{base_url}/hr/employee/1", json=payload)
 
