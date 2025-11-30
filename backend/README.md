@@ -174,4 +174,4 @@ pytest tests/pm -vv
 pytest tests/login/test_user_login.py -vv
 
 ### How to run Pytest for a pytest function
-pytest tests/test_user_login.py::test_post_admin_login -vv
+pytest tests/login/test_user_login.py::test_post_admin_login -vv
