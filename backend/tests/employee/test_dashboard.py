@@ -8,8 +8,6 @@ def assert_json(response):
 
 
 # 1) /employee/dashboard (DashboardResource)
-
-
 def test_get_dashboard_success(base_url, auth_employee):
     url = f"{base_url}/employee/dashboard"
     response = httpx.get(url, headers=auth_employee)
@@ -35,8 +33,6 @@ def test_get_dashboard_unauthorized(base_url):
 
 
 # 2) /employee/todo (AllToDoResource)
-
-
 def test_get_all_todos_success(base_url, auth_employee):
     url = f"{base_url}/employee/todo"
     response = httpx.get(url, headers=auth_employee)
@@ -80,8 +76,6 @@ def test_post_todo_unauthorized(base_url):
 
 
 # 3) /employee/todo/{task_id} (ToDoResource)
-
-
 def test_get_todo_success(base_url, auth_employee):
     list_resp = httpx.get(f"{base_url}/employee/todo", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -182,8 +176,6 @@ def test_delete_todo_not_found(base_url, auth_employee):
 
 
 # 4) /employee/annoucements (AnnouncementEmployeeResource)
-
-
 def test_get_employee_announcements_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/annoucements", headers=auth_employee)
     assert response.status_code == 200
@@ -198,8 +190,6 @@ def test_get_employee_announcements_unauthorized(base_url):
 
 
 # 5) /hr/annoucements (AnnouncementAdminListResource)
-
-
 def test_get_hr_announcements_success(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
     assert response.status_code == 200
@@ -214,8 +204,6 @@ def test_get_hr_announcements_unauthorized(base_url):
 
 
 # 6) /hr/annoucement/{user_id} (AnnouncementAdminListCreateResource)
-
-
 def test_post_hr_announcement_success(base_url, auth_hr):
     payload = {"announcement": "Office will remain closed on Friday"}
 
@@ -271,8 +259,6 @@ def test_post_hr_announcement_missing_field(base_url, auth_hr):
 
 
 # 7) /hr/annoucement/edit/{ann_id} (AnnouncementAdminDetailResource)
-
-
 def test_get_hr_announcement_detail_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
     assert list_resp.status_code == 200

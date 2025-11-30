@@ -8,8 +8,6 @@ def assert_json(resp):
 
 
 # HR FAQ CREATE  (POST /hr/faq)
-
-
 def test_hr_faq_create_success(base_url, auth_hr):
     payload = {
         "question": "What is the leave policy?",
@@ -41,8 +39,6 @@ def test_hr_faq_create_unauthorized(base_url):
 
 
 # FAQ DETAIL GET (GET /hr/faq/{id}) — Employee allowed
-
-
 def test_faq_detail_get_success(base_url, auth_employee):
     list_resp = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -74,8 +70,6 @@ def test_faq_detail_unauthorized(base_url):
 
 
 # UPDATE FAQ (PUT /hr/faq/{id})
-
-
 def test_faq_update_success(base_url, auth_employee, auth_hr):
     list_resp = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -111,8 +105,6 @@ def test_faq_update_unauthorized(base_url):
 
 
 # DELETE FAQ (DELETE /hr/faq/{id})
-
-
 def test_faq_delete_success(base_url, auth_employee, auth_hr):
     list_resp = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -142,8 +134,6 @@ def test_faq_delete_unauthorized(base_url):
 
 
 # LIST ALL FAQS (GET /employee/hr-faqs)
-
-
 def test_employee_list_faqs_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/employee/hr-faqs", headers=auth_employee)
 

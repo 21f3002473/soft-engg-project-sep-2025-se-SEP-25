@@ -21,7 +21,6 @@ EMP_USER_PASSWORD = os.getenv("EMPLOYEE_USER_PASSWORD")
 
 @pytest.fixture(scope="session")
 def admin_token():
-    """Automatically logs in Admin & returns token"""
     login_url = f"{BASE_URL}/user/login"
     payload = {"email": ROOT_USER_EMAIL, "password": ROOT_USER_PASSWORD}
 
@@ -35,7 +34,6 @@ def admin_token():
 
 @pytest.fixture(scope="session")
 def employee_token():
-    """Automatically logs in employee & returns token"""
     login_url = f"{BASE_URL}/user/login"
     payload = {"email": EMP_USER_EMAIL, "password": EMP_USER_PASSWORD}
 
@@ -49,7 +47,6 @@ def employee_token():
 
 @pytest.fixture(scope="session")
 def pm_token():
-    """Automatically logs in PM & returns token"""
     login_url = f"{BASE_URL}/user/login"
     payload = {"email": PM_USER_EMAIL, "password": PM_USER_PASSWORD}
 
@@ -63,7 +60,6 @@ def pm_token():
 
 @pytest.fixture(scope="session")
 def hr_token():
-    """Automatically logs in HR & returns token"""
     login_url = f"{BASE_URL}/user/login"
     payload = {"email": HR_USER_EMAIL, "password": HR_USER_PASSWORD}
 
@@ -82,25 +78,21 @@ def base_url():
 
 @pytest.fixture(scope="session")
 def auth_hr(hr_token):
-    """Returns headers for hr authenticated requests"""
     return {"Authorization": f"Bearer {hr_token}"}
 
 
 @pytest.fixture(scope="session")
 def auth_pm(pm_token):
-    """Returns headers for pm authenticated requests"""
     return {"Authorization": f"Bearer {pm_token}"}
 
 
 @pytest.fixture(scope="session")
 def auth_admin(admin_token):
-    """Returns headers for admin authenticated requests"""
     return {"Authorization": f"Bearer {admin_token}"}
 
 
 @pytest.fixture(scope="session")
 def auth_employee(employee_token):
-    """Returns headers for employee authenticated requests"""
     return {"Authorization": f"Bearer {employee_token}"}
 
 

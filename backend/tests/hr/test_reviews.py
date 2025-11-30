@@ -3,14 +3,11 @@ import pytest
 
 
 def assert_json(resp):
-    """Validate that the response contains JSON and return the parsed data."""
     assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
 
 
 # CREATE REVIEW (POST /api/hr/review/create)
-
-
 def test_review_create_success(base_url, auth_hr):
     payload = {"user_id": 1, "rating": 4, "comments": "Good performance overall."}
 
@@ -39,8 +36,6 @@ def test_review_create_unauthorized(base_url):
 
 
 # GET REVIEW DETAIL (GET /api/hr/review/{id})
-
-
 def test_review_detail_success(base_url, auth_hr):
     payload = {"user_id": 2, "rating": 4, "comments": "Good performance overall."}
 
@@ -77,8 +72,6 @@ def test_review_detail_unauthorized(base_url):
 
 
 # UPDATE REVIEW (PUT /api/hr/review/{id})
-
-
 def test_review_update_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -116,8 +109,6 @@ def test_review_update_unauthorized(base_url):
 
 
 # DELETE REVIEW (DELETE /api/hr/review/{id})
-
-
 def test_review_delete_success(base_url, auth_hr, auth_admin):
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -148,8 +139,6 @@ def test_review_delete_unauthorized(base_url):
 
 
 # LIST ALL REVIEWS (GET /api/hr/reviews)
-
-
 def test_review_list_success(base_url, auth_hr):
     r = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
 

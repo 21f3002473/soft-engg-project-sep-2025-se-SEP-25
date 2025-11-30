@@ -3,14 +3,11 @@ import pytest
 
 
 def assert_json(resp):
-    """Validate that the response contains JSON and return the parsed data."""
     assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
 
 
 # GET EMPLOYEE DETAIL (GET /api/hr/employee/{id})
-
-
 def test_hr_employee_detail_success(base_url, auth_pm, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -43,8 +40,6 @@ def test_hr_employee_detail_unauthorized(base_url):
 
 
 # UPDATE EMPLOYEE (PUT /api/hr/employee/{id})
-
-
 def test_hr_employee_update_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -87,8 +82,6 @@ def test_hr_employee_update_unauthorized(base_url):
 
 
 # DELETE EMPLOYEE (DELETE /api/hr/employee/{id})
-
-
 def test_hr_employee_delete_success(base_url, auth_admin, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -120,8 +113,6 @@ def test_hr_employee_delete_unauthorized(base_url):
 
 
 # LIST ALL EMPLOYEES (GET /api/hr/employees)
-
-
 def test_hr_employee_list_success(base_url, auth_hr):
     r = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
 

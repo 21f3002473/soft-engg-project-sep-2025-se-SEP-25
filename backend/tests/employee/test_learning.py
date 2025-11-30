@@ -4,6 +4,7 @@ import httpx
 import pytest
 from dotenv import load_dotenv
 
+load_dotenv()
 
 def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
@@ -11,8 +12,6 @@ def assert_json(response):
 
 
 # 1) /employee/learning (LearningResource)
-
-
 def test_get_learning_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/learning", headers=auth_employee)
 
@@ -32,8 +31,6 @@ def test_get_learning_unauthorized(base_url):
 
 
 # 2) /hr/course (CourseAdminListCreateResource)
-
-
 def test_get_courses_admin_success(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
 
@@ -71,8 +68,6 @@ def test_post_courses_admin_missing_name(base_url, auth_hr):
 
 
 # 3) /hr/course/{course_id} (CourseAdminDetailResource)
-
-
 def test_get_course_detail_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -154,8 +149,6 @@ def test_delete_course_not_found(base_url, auth_hr):
 
 
 # 4) /hr/course/assign/{user_id} (CourseAssignmentListResource)
-
-
 def test_get_course_assignments_success(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
 
@@ -231,8 +224,6 @@ def test_post_assign_course_already_exists(base_url, auth_hr):
 
 
 # 5) /hr/course/assign/edit/{assign_id} (CourseAssignmentDetailResource)
-
-
 def test_get_assignment_detail_success(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -348,8 +339,6 @@ def test_delete_assignment_not_found(base_url, auth_hr):
 
 
 # 6) /employee/courses (CourseAssignmentEmployeeResource)
-
-
 def test_get_employee_course_assignments_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/courses", headers=auth_employee)
 
@@ -364,8 +353,6 @@ def test_get_employee_course_assignments_unauthorized(base_url):
 
 
 # 7) /employee/course/{course_id} (EmployeeCourseUpdateByCourseIdResource)
-
-
 def test_put_employee_course_status_success(base_url, auth_employee):
     payload = {"status": "completed"}
 
@@ -464,9 +451,6 @@ def test_put_employee_course_status_not_found(base_url, auth_employee):
 
 
 # 8) /employee/recommendations (CourseRecommendationResource)
-load_dotenv()
-
-
 def test_get_recommendations_success(base_url, auth_employee):
     response = httpx.get(f"{base_url}/employee/recommendations", headers=auth_employee)
 

@@ -3,14 +3,11 @@ import pytest
 
 
 def assert_json(resp):
-    """Validate that the response contains JSON and return the parsed data."""
     assert "application/json" in resp.headers.get("content-type", "").lower()
     return resp.json()
 
 
 # CREATE POLICY (POST /api/hr/policy/create)
-
-
 def test_policy_create_success(base_url, auth_hr):
     payload = {
         "title": "Leave Policy",
@@ -42,8 +39,6 @@ def test_policy_create_unauthorized(base_url):
 
 
 # GET POLICY DETAIL (GET /api/hr/policy/{id})
-
-
 def test_policy_detail_success(base_url, auth_employee):
     list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -76,8 +71,6 @@ def test_policy_detail_unauthorized(base_url):
 
 
 # UPDATE POLICY (PUT /api/hr/policy/{id})
-
-
 def test_policy_update_success(base_url, auth_hr, auth_employee):
     list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -114,8 +107,6 @@ def test_policy_update_unauthorized(base_url):
 
 
 # DELETE POLICY (DELETE /api/hr/policy/{id})
-
-
 def test_policy_delete_success(base_url, auth_hr, auth_employee):
     list_resp = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
     assert list_resp.status_code == 200
@@ -146,8 +137,6 @@ def test_policy_delete_unauthorized(base_url):
 
 
 # LIST ALL POLICIES (GET /api/employee/policies)
-
-
 def test_policy_list_employee_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/hr/policies", headers=auth_employee)
 

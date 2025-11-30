@@ -20,11 +20,7 @@ def assert_json(response):
     return response.json()
 
 
-# --------------------------
 #  /api/admin/register (POST)
-# --------------------------
-
-
 def test_post_admin_register(client, auth_admin):
     import random
 
@@ -43,14 +39,11 @@ def test_post_admin_register(client, auth_admin):
 
     data = assert_json(response)
     print(data)
-    # Validate expected keys
     expected_keys = ["id", "name", "email", "role"]
     assert set(expected_keys) == set(data.keys())
 
 
-# --------------------------
 #  /api/admin/summary (GET)
-# --------------------------
 def test_get_admin_summary(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/summary",
@@ -62,20 +55,14 @@ def test_get_admin_summary(client, auth_admin):
     print(data)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = ["userCount", "logsCount", "backupsCount", "currentAdmin"]
     assert set(expected_keys) == set(data.keys())
 
-    # Validate currentAdmin
     assert isinstance(data.get("currentAdmin"), dict)
     assert ["id", "name", "email"] == list(data.get("currentAdmin").keys())
 
 
-# ---------------------------
 #  /api/admin/employees (GET)
-# ---------------------------
-
-
 def test_get_admin_employees(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/employees",
@@ -86,24 +73,17 @@ def test_get_admin_employees(client, auth_admin):
     data = assert_json(response)
     assert isinstance(data, list)
 
-    # Expected set of keys
     expected_keys = {"id", "name", "email", "role"}
 
-    # Ensure every item has exactly these keys
     for item in data:
         assert set(item.keys()) == expected_keys
 
-    # Validate roles for all employees
     valid_roles = {"root", "product_manager", "human_resource", "employee"}
     for item in data:
         assert item["role"] in valid_roles
 
 
-# ----------------------------
 #  /api/admin/employees (POST)
-# ----------------------------
-
-
 def test_post_admin_employees(client, auth_admin):
     import random
 
@@ -122,59 +102,11 @@ def test_post_admin_employees(client, auth_admin):
 
     data = assert_json(response)
     print(data)
-    # Validate expected keys
     expected_keys = {"id", "name", "email", "role", "temporary_password"}
     assert set(expected_keys) == set(data.keys())
 
-    # -------------------------------
-    #  /api/admin/backup-config (GET)
-    # -------------------------------
 
-    # def test_get_admin_backup_config(client, auth_admin):
-    response = client.get(
-        f"{BASE_URL}/api/admin/backup-config",
-        headers=auth_admin,
-    )
-
-    if response.status_code == 200:
-        assert response.status_code == 200
-        data = assert_json(response)
-        if data:
-            print(data)
-            assert isinstance(data, dict)
-            # Validate expected keys
-            expected_keys = {"day", "type", "datetime"}
-            assert set(expected_keys) == set(data.keys())
-
-
-# -------------------------------
 #  /api/admin/backup-config (PUT)
-# -------------------------------
-
-
-# def test_put_admin_backup_config(client, auth_admin):
-#     payload = {
-#         "backups": [{"day": "Monday", "type": "full", "datetime": "2025-10-30T03:00"}]
-#     }
-
-#     response = client.put(
-#         f"{BASE_URL}/api/admin/backup-config",
-#         json=payload,
-#         headers=auth_admin,
-#     )
-#     if response.status_code == 200:
-#         assert response.status_code == 200
-#         data = assert_json(response)
-#         print(data)
-#         assert "message" in data
-#         assert data.get("message") == "Backup configuration updated"
-
-
-# -------------------------------
-#  /api/admin/backup-config (PUT)
-# -------------------------------
-
-
 def test_put_admin_backup_config_failure(client, auth_admin):
     payload = {
         "backups": [{"day": "Monday", "type": "no", "datetime": "2025-10-30T03:00"}]
@@ -189,9 +121,7 @@ def test_put_admin_backup_config_failure(client, auth_admin):
     assert response.status_code in list(range(400, 600))
 
 
-# --------------------------
 #  /api/admin/updates (GET)
-# --------------------------
 def test_get_admin_updates(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/updates",
@@ -202,14 +132,11 @@ def test_get_admin_updates(client, auth_admin):
     data = assert_json(response)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = {"currentVersion", "updateAvailable", "lastChecked"}
     assert set(expected_keys) == set(data.keys())
 
 
-# --------------------------
 #  /api/admin/account (GET)
-# --------------------------
 def test_get_admin_account(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/account",
@@ -220,38 +147,11 @@ def test_get_admin_account(client, auth_admin):
     data = assert_json(response)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = {"id", "name", "email", "role"}
     assert set(expected_keys) == set(data.keys())
 
-    # --------------------------
-    #  /api/admin/account (PUT)
-    # --------------------------
 
-    # def test_put_admin_account(client, auth_admin):
-    payload = {
-        "name": "Admin",
-        "old_password": "root@gmail.com",
-        "new_password": "ad@gmail.com",
-    }
-
-    response = client.put(
-        f"{BASE_URL}/api/admin/account",
-        json=payload,
-        headers=auth_admin,
-    )
-
-    if response.status_code == 200:
-        assert response.status_code in [200]
-        data = assert_json(response)
-        assert "message" in data
-
-
-# ------------------------------------
 #  /api/admin/account (PUT) - Failure
-# ------------------------------------
-
-
 def test_put_admin_account_failure(client, auth_admin):
     payload = {
         "name": "XYZ",
@@ -262,5 +162,4 @@ def test_put_admin_account_failure(client, auth_admin):
         f"{BASE_URL}/api/admin/account", json=payload, headers=auth_admin
     )
 
-    # assert response.status_code in [400,401,402,403,404,500,503,504]
     assert response.status_code in list(range(400, 600))
