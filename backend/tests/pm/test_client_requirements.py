@@ -72,8 +72,8 @@ def test_post_client_requirements_success(client, auth_pm):
     import random
 
     projects = get_projects(client, auth_pm)
-    client_id = projects[0].get("client_id")
-    project_id = projects[0].get("id")
+    client_id = projects[-1].get("client_id")
+    project_id = projects[-1].get("id")
     requirement_id = random.randint(1000, 9999)
     payload = {
         "requirement_id": "R" + str(requirement_id),
@@ -86,7 +86,7 @@ def test_post_client_requirements_success(client, auth_pm):
         headers=auth_pm,
     )
 
-    assert response.status_code in [200, 400]
+    assert response.status_code in [200]
 
     data = assert_json(response)
     print(data)
@@ -112,8 +112,8 @@ def create_client_requirement(client, auth_pm):
     import random
 
     projects = get_projects(client, auth_pm)
-    client_id = projects[0].get("client_id")
-    project_id = projects[0].get("id")
+    client_id = projects[-1].get("client_id")
+    project_id = projects[-1].get("id")
     requirement_id = random.randint(1000, 9999)
     payload = {
         "requirement_id": "R" + str(requirement_id),
@@ -134,8 +134,8 @@ def create_client_requirement(client, auth_pm):
 # ----------------------------------------------------------------------------------
 def test_put_client_requirements_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
-    client_id = projects[0].get("client_id")
-    project_id = projects[0].get("id")
+    client_id = projects[-1].get("client_id")
+    project_id = projects[-1].get("id")
     requirement_id = create_client_requirement(client, auth_pm)
     payload = {"requirements": "update requirement", "project_id": project_id}
     response = client.put(
@@ -144,7 +144,7 @@ def test_put_client_requirements_success(client, auth_pm):
         headers=auth_pm,
     )
 
-    assert response.status_code in [200, 404]
+    assert response.status_code in [200]
 
     if response.status_code == 200:
         data = assert_json(response)
@@ -171,13 +171,13 @@ def test_put_client_requirements_success(client, auth_pm):
 # ----------------------------------------------------------------------------------
 def test_delete_client_requirement_success(client, auth_pm):
     projects = get_projects(client, auth_pm)
-    client_id = projects[0].get("client_id")
+    client_id = projects[-1].get("client_id")
     requirement_id = create_client_requirement(client, auth_pm)
     response = client.delete(
         f"{BASE_URL}/api/pm/client/requirements/{client_id}/?requirement_id={requirement_id}",
         headers=auth_pm,
     )
-    assert response.status_code in [200, 404]
+    assert response.status_code in [200]
     if response.status_code == 200:
         data = assert_json(response)
         print(data)

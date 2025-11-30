@@ -50,6 +50,7 @@ class API:
         # HR
         hr_base_url = "/api/hr"
         self.register_router(HRReviewsListResource, f"{hr_base_url}/reviews")
+        self.register_router(HRReviewsListResource, f"{hr_base_url}/review/create")
         self.register_router(
             HRReviewsByUserResource, f"{hr_base_url}/reviews/{{user_id}}"
         )

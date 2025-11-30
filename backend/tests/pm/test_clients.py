@@ -146,7 +146,7 @@ def test_put_pm_clients(client, auth_pm):
     )
 
     # Ensure the update was successful
-    assert response.status_code in [200, 404]
+    assert response.status_code in [200]
 
     data = response.json()
     if response.status_code == 200:
@@ -160,16 +160,13 @@ def test_put_pm_clients(client, auth_pm):
 
 def test_delete_pm_clients(client, auth_pm):
     # Use an existing client ID
-    try:
-        client_id = create_client(client, auth_pm)
-    except:
-        client_id = 1
+    client_id = create_client(client, auth_pm)
 
     response = client.delete(
         f"{BASE_URL}/api/pm/clients/?client_id={client_id}", headers=auth_pm
     )
 
-    assert response.status_code in [200, 404]
+    assert response.status_code in [200]
 
 
 def get_client(client, auth_pm):

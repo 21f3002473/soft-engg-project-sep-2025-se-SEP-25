@@ -37,5 +37,13 @@ Apply migrations if needed
 
 To execute all tests with verbose output:
 ```bash
-python3 -m pytest -vv
+python3 -m pytest tests/admin/ -vv;
+
+python3 -m pytest tests/hr/ -vv;
+
+python3 -m pytest tests/pm/ -vv;
+
+python3 -m pytest tests/employee/ -vv;
+
+python3 -m pytest tests/login/ -vv
 ```
