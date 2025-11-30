@@ -28,7 +28,7 @@ def create_client(client, auth_pm):
         "client_id": "C" + str(client_id),
         "client_name": "Test Client Pvt Ltd",
         "email": "client" + str(client_id) + "@test.com",
-        "detail_base64": "dGVzdCBkZXRhaWw=",  # "test detail" in base64
+        "detail_base64": "dGVzdCBkZXRhaWw=",
     }
     response = client.post(f"{BASE_URL}/api/pm/clients", json=payload, headers=auth_pm)
 
