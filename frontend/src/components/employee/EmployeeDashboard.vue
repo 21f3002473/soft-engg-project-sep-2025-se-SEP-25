@@ -1,6 +1,5 @@
 <template>
   <div class="container py-4 dashboard-page">
-    <!-- Welcome Section -->
     <section class="mb-4">
       <div class="card border-0 shadow text-white welcome-card p-4">
         <div class="card-body p-0">
@@ -10,7 +9,6 @@
       </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="row g-4 mb-4">
       <div class="col-md-3 col-sm-6" v-for="(item, index) in stats" :key="index">
         <div class="card border-0 shadow-sm h-100 stat-card-hover">
@@ -27,15 +25,12 @@
       </div>
     </section>
 
-    <!-- Content Section -->
     <section class="row g-4">
-      <!-- Tasks -->
       <div class="col-md-6">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body p-4">
             <h3 class="h3 fw-bold text-primary mb-3">Your Tasks</h3>
             
-            <!-- Add Task Form -->
             <div class="d-flex gap-2 mb-3">
               <input 
                 v-model="newTask" 
@@ -65,7 +60,6 @@
         </div>
       </div>
 
-      <!-- Announcements -->
       <div class="col-md-6">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body p-4">

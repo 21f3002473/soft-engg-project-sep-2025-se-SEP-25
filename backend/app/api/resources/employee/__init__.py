@@ -18,7 +18,6 @@ from .learning import (
     CourseAssignmentListResource,
     CourseRecommendationResource,
     EmployeeCourseUpdateByCourseIdResource,
-    LearningResource,
 )
 from .request import (
     AllHRRequestResource,
@@ -40,7 +39,6 @@ __all__ = [
     "AnnouncementAdminDetailResource",
     "AnnouncementEmployeeResource",
     "AnnouncementAdminListResource",
-    "LearningResource",
     "CourseAdminListCreateResource",
     "CourseAdminDetailResource",
     "CourseAssignmentListResource",
