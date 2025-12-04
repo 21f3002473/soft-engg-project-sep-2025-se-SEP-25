@@ -1,6 +1,7 @@
 import json
 from logging import getLogger
 
+import google.generativeai as genai
 import httpx
 from app.config import Config
 from app.database import Course, StatusTypeEnum, User, UserCourse, get_session
@@ -771,57 +772,57 @@ class CourseRecommendationResource(Resource):
         """
 
         try:
-            user_id = current_user.id
-
             assigned = session.exec(
-                select(UserCourse).where(UserCourse.user_id == user_id)
+                select(UserCourse).where(UserCourse.user_id == current_user.id)
             ).all()
 
             assigned_course_ids = [uc.course_id for uc in assigned]
 
             assigned_course_names = [
-                session.get(Course, cid).course_name
+                (c := session.get(Course, cid)).course_name
                 for cid in assigned_course_ids
                 if session.get(Course, cid)
             ]
-
             courses = session.exec(select(Course)).all()
 
             all_course_names = [c.course_name for c in courses]
 
+            genai.configure(api_key=Config.GEMINI_API_KEY)
+            model = genai.GenerativeModel("gemini-2.0-flash")
+
             prompt = f"""
-            A user has completed or is assigned these courses: {assigned_course_names}.
-            The full list of available courses is: {all_course_names}.
+You are a Course Recommendation AI.
 
-            Based on similarity, difficulty, or natural learning progression…
+Employee has completed these courses:
+{assigned_course_names}
 
-            → Recommend EXACT course names from the available list.
-            → Return ONLY a JSON list. Example:
-            ["Machine Learning", "Deep Learning Basics"]
-            """
+Available course catalog (choose ONLY from this list):
+{all_course_names}
 
-            GEMINI_URL = (
-                "https://generativelanguage.googleapis.com/v1beta/models/"
-                "gemini-2.0-flash:generateContent"
-            )
+Your job:
+- Recommend 3 to 5 courses that would be a natural next step.
+- Base it on skill progression, difficulty, and topic similarity.
+- DO NOT invent new courses.
+- DO NOT return duplicates.
+- ONLY choose exact names from the available course list.
+- Your entire output MUST be valid JSON, exactly like this:
 
-            async with httpx.AsyncClient(timeout=20.0) as client:
-                response = await client.post(
-                    GEMINI_URL,
-                    params={"key": Config.GEMINI_API_KEY},
-                    json={"contents": [{"parts": [{"text": prompt}]}]},
-                )
+["Course Name 1", "Course Name 2", "Course Name 3"]
+"""
 
-            if response.status_code != 200:
-                logger.error(response.text)
-                raise HTTPException(500, "Gemini API request failed")
-
-            text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+            response = model.generate_content(prompt)
+            raw_text = response.text.strip()
 
             try:
-                recommended_names = json.loads(text)
-            except:
-                recommended_names = [name for name in all_course_names if name in text]
+                recommended_names = json.loads(raw_text)
+            except Exception:
+                recommended_names = [
+                    c for c in all_course_names if c.lower() in raw_text.lower()
+                ]
+
+            recommended_names = [
+                name for name in recommended_names if name in all_course_names
+            ]
 
             final_recommendations = [
                 {
@@ -841,8 +842,9 @@ class CourseRecommendationResource(Resource):
 
         except HTTPException:
             raise
+
         except Exception as e:
-            logger.error(f"Recommendation error: {e}", exc_info=True)
+            logger.error(f"Course Recommendation Error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
 
 
