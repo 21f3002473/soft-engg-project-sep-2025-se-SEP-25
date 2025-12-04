@@ -1,40 +1,40 @@
 <template>
   <Transition name="slide">
-    <div v-if="isOpen" class="chat-popup">
-      <div class="chat-header">
-        <div class="chat-header-info">
-          <div class="chat-avatar mb-4">🤖</div>
+    <div v-if="isOpen" class="chat-popup position-fixed d-flex flex-column bg-white shadow rounded-4 overflow-hidden">
+      <div class="chat-header p-3 border-bottom d-flex justify-content-between align-items-center text-white">
+        <div class="chat-header-info d-flex align-items-center gap-2">
+          <div class="chat-avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold">🤖</div>
           <div>
-            <h3>Sync’em AI Assistant</h3>
-            <span class="status-dot"></span><span class="status">Online</span>
+            <h3 class="h6 mb-0 fw-bold">Sync’em AI Assistant</h3>
+            <div class="small"><span class="status-dot d-inline-block rounded-circle bg-success me-1"></span>Online</div>
           </div>
         </div>
       </div>
 
-      <div class="chat-messages" ref="messagesContainer">
+      <div class="chat-messages flex-grow-1 overflow-auto p-3 d-flex flex-column gap-2 bg-light" ref="messagesContainer">
         <div
           v-for="(msg, idx) in messages"
           :key="idx"
-          :class="['message', msg.sender]"
+          :class="['message p-2 px-3 rounded-4 position-relative', msg.sender]"
         >
-          <div class="message-content">{{ msg.text }}</div>
-          <div class="message-time">{{ formatTime(msg.time) }}</div>
+          <div class="message-content text-break" v-html="renderMessage(msg.text)"></div>
+          <div class="message-time small opacity-75 text-end mt-1">{{ formatTime(msg.time) }}</div>
         </div>
 
-        <div v-if="isTyping" class="typing-indicator">
+        <div v-if="isTyping" class="typing-indicator d-flex gap-1 p-2 align-self-start">
           <span></span><span></span><span></span>
         </div>
       </div>
 
-      <!-- Input -->
-      <div class="chat-input">
+      <div class="chat-input p-3 border-top d-flex gap-2 bg-white">
         <input
           type="text"
+          class="form-control rounded-pill shadow-none"
           v-model="newMessage"
           @keyup.enter="sendMessage"
           placeholder="Ask me anything..."
         />
-        <button @click="sendMessage" :disabled="!newMessage.trim()">
+        <button @click="sendMessage" :disabled="!newMessage.trim()" class="btn rounded-circle d-flex align-items-center justify-content-center p-0 text-white border-0 shadow-sm">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
@@ -45,53 +45,139 @@
 </template>
 
 <script>
+import { make_getrequest, make_postrequest } from "@/store/appState.js";
+import MarkdownIt from "markdown-it";
+import mk from "markdown-it-katex";
+import DOMPurify from "dompurify";
+
 export default {
   name: "EmployeeChatPopup",
   props: { isOpen: Boolean },
   data() {
     return {
-      messages: [
-        {
-          text: "Hey there! I’m your Sync’em AI assistant. How can I help today?",
-          sender: "bot",
-          time: new Date()
-        }
-      ],
+      messages: [],
       newMessage: "",
-      isTyping: false
+      isTyping: false,
+      md: new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true
+      }).use(mk)
     };
+  },
+  mounted() {
+    this.fetchHistory();
+  },
+  watch: {
+    isOpen(newVal) {
+      if (newVal) {
+        this.scrollToBottom();
+        this.fetchHistory();
+      }
+    }
   },
   methods: {
     formatTime(date) {
+      if (!date) return "";
+      const d = new Date(date);
       return new Intl.DateTimeFormat("en", {
         hour: "2-digit",
         minute: "2-digit"
-      }).format(date);
+      }).format(d);
+    },
+    renderMessage(text) {
+      if (!text) return "";
+      const rawHtml = this.md.render(text);
+      return DOMPurify.sanitize(rawHtml);
+    },
+    async fetchHistory() {
+      try {
+        const response = await make_getrequest('/api/employee/assistant/history');
+        
+        if (response && response.messages) {
+          this.messages = response.messages.map(msg => ({
+            text: msg.message,
+            sender: msg.role === "assistant" ? "bot" : "user",
+            time: msg.created_at
+          }));
+          
+          if (this.messages.length === 0) {
+            this.messages.push({
+              text: "Hey there! I’m your Sync’em AI assistant. How can I help today?",
+              sender: "bot",
+              time: new Date()
+            });
+          }
+        }
+        this.scrollToBottom();
+      } catch (error) {
+        console.error("Failed to fetch chat history:", error);
+      }
     },
     async sendMessage() {
       if (!this.newMessage.trim()) return;
 
+      const userText = this.newMessage;
+      this.newMessage = "";
+
       this.messages.push({
-        text: this.newMessage,
+        text: userText,
         sender: "user",
         time: new Date()
       });
-      const userMessage = this.newMessage;
-      this.newMessage = "";
+      this.scrollToBottom();
 
       this.isTyping = true;
-      await new Promise((r) => setTimeout(r, 1200));
 
-      this.isTyping = false;
-      this.messages.push({
-        text: `Got it! You mentioned "${userMessage}". Let me process that for you.`,
-        sender: "bot",
-        time: new Date()
-      });
+      try {
+        const response = await make_postrequest('/api/employee/assistant', { message: userText });
 
+        this.isTyping = false;
+
+        if (response && response.reply) {
+          this.messages.push({
+            text: "",
+            sender: "bot",
+            time: new Date()
+          });
+          
+          const msgIndex = this.messages.length - 1;
+          this.typeWriter(response.reply, msgIndex);
+        }
+      } catch (error) {
+        this.isTyping = false;
+        console.error("Failed to send message:", error);
+        this.messages.push({
+          text: "Sorry, I'm having trouble connecting right now. Please try again later.",
+          sender: "bot",
+          time: new Date()
+        });
+        this.scrollToBottom();
+      }
+    },
+    typeWriter(text, index) {
+      let i = 0;
+      const speed = 15;
+
+      const type = () => {
+        if (i < text.length) {
+          if (this.messages[index]) {
+            this.messages[index].text += text.charAt(i);
+            i++;
+            this.scrollToBottom();
+            setTimeout(type, speed);
+          }
+        }
+      };
+      
+      type();
+    },
+    scrollToBottom() {
       this.$nextTick(() => {
         const el = this.$refs.messagesContainer;
-        el.scrollTop = el.scrollHeight;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
       });
     }
   }
@@ -100,18 +186,12 @@ export default {
 
 <style scoped>
 .chat-popup {
-  position: fixed;
   right: 28px;
   bottom: 100px;
   width: 380px;
   height: 540px;
-  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
-  border-radius: 20px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  z-index: 1050;
   animation: fadeIn 0.3s ease;
 }
 
@@ -129,58 +209,26 @@ export default {
 }
 
 .chat-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background: linear-gradient(90deg, #007bff, #0056d2);
-  color: #fff;
-}
-
-.chat-header-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .chat-avatar {
   width: 36px;
   height: 36px;
-  background: #fff;
-  color: #007bff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
-  background: #2ecc71;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 4px;
 }
 
 .chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: #f8faff;
+  background: #f8faff !important;
 }
 
 .message {
-  padding: 10px 14px;
-  border-radius: 14px;
   max-width: 80%;
   word-break: break-word;
-  position: relative;
   animation: fadeIn 0.2s ease;
 }
 
@@ -197,19 +245,6 @@ export default {
   align-self: flex-end;
 }
 
-.message-time {
-  font-size: 11px;
-  color: #666;
-  margin-top: 3px;
-  text-align: right;
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 5px;
-  padding: 6px;
-  align-self: flex-start;
-}
 .typing-indicator span {
   width: 8px;
   height: 8px;
@@ -225,23 +260,6 @@ export default {
   50% { transform: translateY(-4px); opacity: 1; }
 }
 
-.chat-input {
-  padding: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  gap: 10px;
-  background: #fff;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  outline: none;
-  transition: border 0.2s;
-}
-
 .chat-input input:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
@@ -249,20 +267,24 @@ export default {
 
 .chat-input button {
   background: linear-gradient(90deg, #007bff, #0056d2);
-  color: white;
-  border: none;
-  border-radius: 50%;
   width: 42px;
   height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
 .chat-input button:hover {
   background: linear-gradient(90deg, #0069d9, #004ab3);
   transform: translateY(-2px);
+}
+
+.message-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.message-content :deep(pre) {
+  background: rgba(0,0,0,0.1);
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
 }
 </style>
