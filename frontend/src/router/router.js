@@ -77,15 +77,33 @@ const routes = [
                         component: () => import('@/components/employee/fragments/EmployeeLeaveForm.vue'),
                     },
                     {
+                        path: 'leave/:leave_id',
+                        name: 'EmployeeLeaveDetail',
+                        component: () => import('@/components/employee/fragments/EmployeeLeaveDetail.vue'),
+                        props: (route) => ({ leaveID: route.params.leave_id })
+                    },
+                    {
                         path: 'reimbursement',
                         name: 'EmployeeReimbursementForm',
                         component: () => import('@/components/employee/fragments/EmployeeReimbursementForm.vue'),
                     },
                     {
+                        path: 'reimbursement/:reimbursement_id',
+                        name: 'EmployeeReimbursementDetail',
+                        component: () => import('@/components/employee/fragments/EmployeeReimbursementDetail.vue'),
+                        props: (route) => ({ reimbursementID: route.params.reimbursement_id })
+                    },
+                    {
                         path: 'transfer',
                         name: 'EmployeeTransferForm',
                         component: () => import('@/components/employee/fragments/EmployeeTransferForm.vue'),
-                    }
+                    },
+                    {
+                        path: 'transfer/:transfer_id',
+                        name: 'EmployeeTransferDetail',
+                        component: () => import('@/components/employee/fragments/EmployeeTransferDetail.vue'),
+                        props: (route) => ({ transferID: route.params.transfer_id })
+                    } 
                 ]
             },
             {

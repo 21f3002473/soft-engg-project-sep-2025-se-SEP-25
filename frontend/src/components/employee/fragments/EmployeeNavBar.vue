@@ -1,32 +1,46 @@
 <template>
-  <header class="top-nav">
-    <nav class="nav-inner">
-      <div class="nav-left">
-        <div class="brand">
-          <p class="brand-name">Sync'em</p>
+  <nav class="navbar navbar-expand-lg sticky-top py-2 shadow-sm custom-navbar">
+    <div class="container-fluid" style="max-width: 1250px;">
+      
+      <div class="d-flex align-items-center flex-wrap gap-3 gap-lg-4 w-100 justify-content-between">
+        
+        <div class="d-flex align-items-center gap-3 gap-lg-4 flex-wrap">
+          <div class="navbar-brand fw-bold text-primary fs-4 me-0" style="letter-spacing: 0.5px;">Sync'em</div>
+          
+          <ul class="nav nav-pills d-flex gap-2">
+            <li class="nav-item">
+              <router-link :to="{ name: 'EmployeeDashboard' }" class="nav-link" active-class="active">Dashboard</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link :to="{ name: 'EmployeeLearning' }" class="nav-link" active-class="active">Learning</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link :to="{ name: 'EmployeeRequests' }" class="nav-link" active-class="active">Requests</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link :to="{ name: 'EmployeeHRFAQs' }" class="nav-link" active-class="active">HR FAQs</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link :to="{ name: 'EmployeeWriting' }" class="nav-link" active-class="active">Writing</router-link>
+            </li>
+          </ul>
         </div>
 
-        <ul class="nav-links">
-          <li><router-link :to="{ name: 'EmployeeDashboard' }" active-class="active">Dashboard</router-link></li>
-          <li><router-link :to="{ name: 'EmployeeLearning' }" active-class="active">Learning</router-link></li>
-          <li><router-link :to="{ name: 'EmployeeRequests' }" active-class="active">Requests</router-link></li>
-          <li><router-link :to="{ name: 'EmployeeHRFAQs' }" active-class="active">HR FAQs</router-link></li>
-          <li><router-link :to="{ name: 'EmployeeWriting' }" active-class="active">Writing</router-link></li>
-        </ul>
-      </div>
-
-      <div class="nav-right">
-        <div class="search-container mx-3">
-          <i class="fas fa-search"></i>
-          <input type="search" placeholder="Search..." class="nav-search" />
+        <div class="d-flex align-items-center gap-3">
+          <div class="position-relative d-none d-sm-block">
+            <i class="fas fa-search position-absolute text-muted" style="top: 50%; left: 12px; transform: translateY(-50%); font-size: 14px;"></i>
+            <input type="search" placeholder="Search..." class="form-control rounded-pill ps-5 search-input" />
+          </div>
+          
+          <router-link :to="{ name: 'EmployeeAccount' }" class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
+            <i class="fas fa-user-circle fs-5"></i>
+            <span>Account</span>
+          </router-link>
         </div>
-        <router-link :to="{ name: 'EmployeeAccount' }" active-class="active" class="account">
-          <i class="fas fa-employee-circle"></i>
-          <span>Account</span>
-        </router-link>
+
       </div>
-    </nav>
-  </header>
+    </div>
+  </nav>
 </template>
 
 <script>
@@ -36,60 +50,14 @@ export default {
 </script>
 
 <style scoped>
-.top-nav {
+.custom-navbar {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.nav-inner {
-  max-width: 1250px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 30px;
-}
-
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-}
-
-.brand-name {
-  font-size: 23px;
-  font-weight: 700;
-  color: #2563eb;
-  white-space: nowrap;
-  letter-spacing: 0.5px;
-  transform: translateY(1px);
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-links a {
-  text-decoration: none;
+.nav-link {
   color: #334155;
   font-weight: 500;
   font-size: 15px;
@@ -98,99 +66,59 @@ export default {
   transition: all 0.25s ease;
 }
 
-.nav-links a:hover {
+.nav-link:hover {
   color: #1d4ed8;
   background: rgba(37, 99, 235, 0.1);
   transform: translateY(-2px);
 }
 
-.nav-links a.active {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
+.nav-link.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: white !important;
   font-weight: 600;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-shrink: 0;
-}
-
-.search-container {
-  position: relative;
-}
-
-.search-container i {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  color: #64748b;
-  font-size: 14px;
-}
-
-.nav-search {
-  border: none;
-  background: rgba(241, 245, 255, 0.9);
-  border-radius: 20px;
-  padding: 8px 14px 8px 34px;
+.search-input {
   width: 250px;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  color: #1e293b;
+  background: rgba(241, 245, 255, 0.9);
+  border: none;
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
-.nav-search:focus {
-  outline: none;
+.search-input:focus {
   width: 300px;
+  background: #fff;
   box-shadow: 0 0 0 2px #3b82f6;
 }
 
-.account {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.account-btn {
   color: #1e3a8a;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 15px;
+  border: none;
   padding: 8px 12px;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
-.account:hover {
+.account-btn:hover {
   background: rgba(37, 99, 235, 0.1);
+  color: #1e3a8a;
 }
 
-.account.active {
+.account-btn.active {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-@media (max-width: 850px) {
-  .nav-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+@media (max-width: 576px) {
+  .search-input {
+    width: 100%;
   }
-
-  .nav-left {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .nav-links {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .nav-search {
-    width: 160px;
+  .search-input:focus {
+    width: 100%;
   }
 }
 </style>

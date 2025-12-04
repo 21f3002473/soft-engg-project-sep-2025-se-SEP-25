@@ -1,21 +1,11 @@
 <template>
   <transition name="slide-fade">
-    <div class="form-shell">
-      <h2>Reimbursement Request</h2>
+    <div class="card border-0 shadow-sm p-4 mx-auto mt-4" style="max-width: 700px; background-color: #f9fbff;">
+      <h2 class="h3 text-primary fw-bold text-center mb-4">{{ isViewMode ? 'Reimbursement Details' : 'Reimbursement Request' }}</h2>
       <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label>Employee Name</label>
-          <input
-            v-model="form.name"
-            type="text"
-            placeholder="Enter your name"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Expense Type</label>
-          <select v-model="form.expenseType" required>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Expense Type</label>
+          <select v-model="form.expenseType" class="form-select" required>
             <option value="">Select expense type</option>
             <option value="travel">Travel</option>
             <option value="food">Food</option>
@@ -24,34 +14,36 @@
           </select>
         </div>
 
-        <div class="form-row">
-          <div class="form-group half">
-            <label>Amount (₹)</label>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Amount (₹)</label>
             <input
               v-model="form.amount"
               type="number"
               min="0"
+              class="form-control"
               placeholder="Enter amount"
               required
             />
           </div>
-          <div class="form-group half">
-            <label>Date of Expense</label>
-            <input v-model="form.date" type="date" required />
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Date of Expense</label>
+            <input v-model="form.date" type="date" class="form-control" required />
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Remarks</label>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Remarks</label>
           <textarea
             v-model="form.remarks"
             rows="3"
+            class="form-control"
             placeholder="Add any remarks..."
           ></textarea>
         </div>
 
-        <div class="btn-wrap">
-          <button class="submit-btn" type="submit">Submit Request</button>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-primary px-4" type="submit">Submit Request</button>
         </div>
       </form>
     </div>
@@ -59,107 +51,53 @@
 </template>
 
 <script>
+import { make_postrequest } from "@/store/appState.js";
+
 export default {
   name: 'EmployeeReimbursementForm',
   data() {
     return {
-      form: { name: '', expenseType: '', amount: '', date: '', remarks: '' }
+      form: { expenseType: '', amount: '', date: '', remarks: '' },
+      isViewMode: false
     };
   },
+  mounted() {
+    if (history.state && history.state.requestData) {
+      const data = history.state.requestData.raw;
+      if (data) {
+        this.isViewMode = true;
+        this.form.expenseType = data.expense_type ? data.expense_type.toLowerCase() : '';
+        this.form.amount = data.amount;
+        this.form.date = data.date_expense ? data.date_expense.split('T')[0] : '';
+        this.form.remarks = data.remark || '';
+      }
+    }
+  },
   methods: {
-    submitForm() {
-      alert(`Reimbursement submitted for ₹${this.form.amount || 0}`);
+    async submitForm() {
+      if (this.isViewMode) return;
+
+      try {
+        const payload = {
+          expense_type: this.form.expenseType,
+          amount: parseFloat(this.form.amount),
+          date_expense: this.form.date,
+          remark: this.form.remarks
+        };
+
+        await make_postrequest('/api/employee/requests/reimbursement', payload);
+        alert('Reimbursement request submitted successfully!');
+        this.$router.push('/employee/requests');
+      } catch (error) {
+        console.error("Failed to submit reimbursement request:", error);
+        alert('Failed to submit reimbursement request. Please try again.');
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-.form-shell {
-  background: #f9fbff;
-  border: 1px solid #d9e6ff;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 700px;
-  margin: 30px auto 10px;
-  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.08);
-  transition: all 0.3s ease;
-}
-
-h2 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #007bff;
-  text-align: center;
-  margin-bottom: 24px;
-  letter-spacing: 0.5px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #333;
-}
-
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-
-.half {
-  flex: 1;
-}
-
-input,
-select,
-textarea {
-  padding: 10px 12px;
-  border: 1px solid #cfdaf7;
-  border-radius: 8px;
-  outline: none;
-  font-size: 15px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-}
-
-textarea {
-  resize: none;
-}
-
-.btn-wrap {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.submit-btn {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.submit-btn:hover {
-  background: #0066d3;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-}
-
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
