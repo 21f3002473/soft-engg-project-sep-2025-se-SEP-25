@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg sticky-top py-2 shadow-sm custom-navbar">
+  <nav class="navbar navbar-expand-lg sticky-top py-3 shadow-sm custom-navbar">
     <div class="container-fluid" style="max-width: 1250px;">
       
       <div class="d-flex align-items-center flex-wrap gap-3 gap-lg-4 w-100 justify-content-between">
@@ -28,7 +28,7 @@
 
         <div class="d-flex align-items-center gap-3">
           <div class="position-relative d-none d-sm-block">
-            <i class="fas fa-search position-absolute text-muted" style="top: 50%; left: 12px; transform: translateY(-50%); font-size: 14px;"></i>
+            <i class="fas fa-search position-absolute text-muted" style="top: 50%; left: 12px; transform: translateY(-50%); font-size: 18px;"></i>
             <input type="search" placeholder="Search..." class="form-control rounded-pill ps-5 search-input" />
           </div>
           
@@ -60,8 +60,8 @@ export default {
 .nav-link {
   color: #334155;
   font-weight: 500;
-  font-size: 15px;
-  padding: 8px 12px;
+  font-size: 17px;
+  padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.25s ease;
 }
@@ -84,7 +84,7 @@ export default {
   background: rgba(241, 245, 255, 0.9);
   border: none;
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
-  font-size: 14px;
+  font-size: 15px;
   transition: all 0.3s ease;
 }
 
@@ -95,9 +95,10 @@ export default {
 }
 
 .account-btn {
+  font-size: 16px;
   color: #1e3a8a;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
