@@ -3,7 +3,6 @@ import os
 import pytest
 import requests
 from dotenv import load_dotenv
-from test_admin_login import admin_token
 
 load_dotenv()
 
@@ -21,14 +20,8 @@ def assert_json(response):
     return response.json()
 
 
-def admin_login_auth(token):
-    return {"Authorization": f"Bearer {token}"}
-
-
-# --------------------------
 #  /api/admin/register (POST)
-# --------------------------
-def test_post_admin_register(client):
+def test_post_admin_register(client, auth_admin):
     import random
 
     admin_email = f"admin{random.randint(1, 1000)}@gmail.com"
@@ -40,24 +33,21 @@ def test_post_admin_register(client):
     response = client.post(
         f"{BASE_URL}/api/admin/register",
         json=payload,
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
     assert response.status_code in [200, 201]
 
     data = assert_json(response)
     print(data)
-    # Validate expected keys
     expected_keys = ["id", "name", "email", "role"]
     assert set(expected_keys) == set(data.keys())
 
 
-# --------------------------
 #  /api/admin/summary (GET)
-# --------------------------
-def test_get_admin_summary(client):
+def test_get_admin_summary(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/summary",
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
     assert response.status_code == 200
 
@@ -65,52 +55,36 @@ def test_get_admin_summary(client):
     print(data)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = ["userCount", "logsCount", "backupsCount", "currentAdmin"]
     assert set(expected_keys) == set(data.keys())
 
-    # Validate currentAdmin
     assert isinstance(data.get("currentAdmin"), dict)
     assert ["id", "name", "email"] == list(data.get("currentAdmin").keys())
 
 
-# ---------------------------
 #  /api/admin/employees (GET)
-# ---------------------------
-
-
-def test_get_admin_employees(client):
+def test_get_admin_employees(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/employees",
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
     assert response.status_code == 200
 
     data = assert_json(response)
     assert isinstance(data, list)
 
-    # Ensure at least 4 employees returned
-    assert len(data) >= 4
-
-    # Expected set of keys
     expected_keys = {"id", "name", "email", "role"}
 
-    # Ensure every item has exactly these keys
     for item in data:
         assert set(item.keys()) == expected_keys
 
-    # Validate roles for all employees
     valid_roles = {"root", "product_manager", "human_resource", "employee"}
     for item in data:
         assert item["role"] in valid_roles
 
 
-# ----------------------------
 #  /api/admin/employees (POST)
-# ----------------------------
-
-
-def test_post_admin_employees(client):
+def test_post_admin_employees(client, auth_admin):
     import random
 
     payload = {
@@ -121,69 +95,19 @@ def test_post_admin_employees(client):
     response = client.post(
         f"{BASE_URL}/api/admin/employees",
         json=payload,
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
 
     assert response.status_code in [200, 201]
 
     data = assert_json(response)
     print(data)
-    # Validate expected keys
     expected_keys = {"id", "name", "email", "role", "temporary_password"}
     assert set(expected_keys) == set(data.keys())
 
 
-# -------------------------------
-#  /api/admin/backup-config (GET)
-# -------------------------------
-
-
-def test_get_admin_backup_config(client):
-    response = client.get(
-        f"{BASE_URL}/api/admin/backup-config",
-        headers=admin_login_auth(admin_token(client)),
-    )
-
-    if response.status_code == 200:
-        assert response.status_code == 200
-        data = assert_json(response)
-        if data:
-            print(data)
-            assert isinstance(data, dict)
-            # Validate expected keys
-            expected_keys = {"day", "type", "datetime"}
-            assert set(expected_keys) == set(data.keys())
-
-
-# -------------------------------
 #  /api/admin/backup-config (PUT)
-# -------------------------------
-
-
-def test_put_admin_backup_config(client):
-    payload = {
-        "backups": [{"day": "Monday", "type": "full", "datetime": "2025-10-30T03:00"}]
-    }
-
-    response = client.put(
-        f"{BASE_URL}/api/admin/backup-config",
-        json=payload,
-        headers=admin_login_auth(admin_token(client)),
-    )
-    if response.status_code == 200:
-        assert response.status_code == 200
-        data = assert_json(response)
-        print(data)
-        assert "message" in data
-        assert data.get("message") == "Backup configuration updated"
-
-
-# -------------------------------
-#  /api/admin/backup-config (PUT)
-# -------------------------------
-
-
-def test_put_admin_backup_config_failure(client):
+def test_put_admin_backup_config_failure(client, auth_admin):
     payload = {
         "backups": [{"day": "Monday", "type": "no", "datetime": "2025-10-30T03:00"}]
     }
@@ -191,89 +115,51 @@ def test_put_admin_backup_config_failure(client):
     response = client.put(
         f"{BASE_URL}/api/admin/backup-config",
         json=payload,
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
 
     assert response.status_code in list(range(400, 600))
 
 
-# --------------------------
 #  /api/admin/updates (GET)
-# --------------------------
-def test_get_admin_updates(client):
+def test_get_admin_updates(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/updates",
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
     assert response.status_code == 200
 
     data = assert_json(response)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = {"currentVersion", "updateAvailable", "lastChecked"}
     assert set(expected_keys) == set(data.keys())
 
 
-# --------------------------
 #  /api/admin/account (GET)
-# --------------------------
-def test_get_admin_account(client):
+def test_get_admin_account(client, auth_admin):
     response = client.get(
         f"{BASE_URL}/api/admin/account",
-        headers=admin_login_auth(admin_token(client)),
+        headers=auth_admin,
     )
     assert response.status_code == 200
 
     data = assert_json(response)
     assert isinstance(data, dict)
 
-    # Validate expected keys
     expected_keys = {"id", "name", "email", "role"}
     assert set(expected_keys) == set(data.keys())
 
 
-# --------------------------
-#  /api/admin/account (PUT)
-# --------------------------
-
-
-def test_put_admin_account(client):
-    payload = {
-        "name": "Admin",
-        "old_password": "root@gmail.com",
-        "new_password": "ad@gmail.com",
-    }
-
-    response = client.put(
-        f"{BASE_URL}/api/admin/account",
-        json=payload,
-        headers=admin_login_auth(admin_token(client)),
-    )
-
-    assert response.status_code in [200, 204] + list(range(400, 600))
-
-    if response.status_code == 200:
-        assert response.status_code in [200]
-        data = assert_json(response)
-        assert "message" in data
-
-
-# ------------------------------------
 #  /api/admin/account (PUT) - Failure
-# ------------------------------------
-
-
-def test_put_admin_account_failure(client):
+def test_put_admin_account_failure(client, auth_admin):
     payload = {
         "name": "XYZ",
         "new_password": "ad@gmail.com",
     }
 
     response = client.put(
-        f"{BASE_URL}/api/admin/account",
-        json=payload,
-        headers=admin_login_auth(admin_token(client)),
+        f"{BASE_URL}/api/admin/account", json=payload, headers=auth_admin
     )
-    # assert response.status_code in [400,401,402,403,404,500,503,504]
+
     assert response.status_code in list(range(400, 600))

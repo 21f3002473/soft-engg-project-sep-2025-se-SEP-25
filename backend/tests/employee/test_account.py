@@ -1,5 +1,4 @@
 import httpx
-from conftest import base_url
 
 
 def assert_json(resp):
@@ -8,15 +7,12 @@ def assert_json(resp):
 
 
 #   GET /employee/account
-
-
 def test_account_get_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/employee/account", headers=auth_employee)
 
     assert r.status_code == 200
     data = assert_json(r)
 
-    # Basic fields expected in AccountOut
     assert "id" in data
     assert "name" in data
     assert "email" in data
@@ -29,8 +25,6 @@ def test_account_get_unauthorized(base_url):
 
 
 #   PUT /employee/account
-
-
 def test_account_update_success(base_url, auth_employee):
     payload = {"name": "New Automated Test Name"}
 
@@ -63,8 +57,6 @@ def test_account_update_unauthorized(base_url):
 
 
 #   DELETE /employee/account
-
-
 def test_account_logout_success(base_url, auth_employee):
     r = httpx.delete(f"{base_url}/employee/account", headers=auth_employee)
 

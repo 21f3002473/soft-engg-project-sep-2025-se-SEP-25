@@ -11,7 +11,6 @@ def assert_json(response):
 
 # HR REQUEST MANAGEMENT TESTS
 
-
 # GET /hr/request — All requests with optional filters
 def test_hr_get_all_requests_success(base_url, auth_hr):
     r = httpx.get(f"{base_url}/hr/request", headers=auth_hr, params={})

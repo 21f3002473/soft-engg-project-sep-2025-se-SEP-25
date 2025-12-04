@@ -12,11 +12,6 @@ def assert_json(resp):
 
 
 # POST /employee/assistant  — SUCCESS (200 OK)
-
-
-BASE_URL = os.getenv("BASE_URL")
-
-
 def test_assistant_success(base_url, auth_employee):
     payload = {"message": "Hello assistant"}
 
@@ -94,13 +89,7 @@ def test_assistant_history_success(base_url, auth_employee):
 
 
 # GET /employee/assistant/history — EMPTY HISTORY (200 OK)
-
-
 def test_assistant_history_empty(base_url, auth_employee, clear_chats_for_user=None):
-    """
-    Optional helper `clear_chats_for_user` can be used in your testing infra,
-    otherwise this test checks behavior for a new/clean user session.
-    """
     if clear_chats_for_user:
         clear_chats_for_user()
 
@@ -115,8 +104,6 @@ def test_assistant_history_empty(base_url, auth_employee, clear_chats_for_user=N
 
 
 # GET /employee/assistant/history — Unauthorized
-
-
 def test_assistant_history_unauthorized(base_url):
     r = httpx.get(f"{base_url}/employee/assistant/history")
 
