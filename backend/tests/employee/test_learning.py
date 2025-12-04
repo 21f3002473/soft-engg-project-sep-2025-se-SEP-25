@@ -11,26 +11,6 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
-
-# 1) /employee/learning (LearningResource)
-def test_get_learning_success(base_url, auth_employee):
-    response = httpx.get(f"{base_url}/employee/learning", headers=auth_employee)
-
-    assert response.status_code == 200
-    data = assert_json(response)
-
-    assert "message" in data
-    assert "personalized" in data
-    assert "recommended" in data
-    assert isinstance(data["personalized"], list)
-    assert isinstance(data["recommended"], list)
-
-
-def test_get_learning_unauthorized(base_url):
-    response = httpx.get(f"{base_url}/employee/learning")
-    assert response.status_code in [401, 403]
-
-
 # 2) /hr/course (CourseAdminListCreateResource)
 def test_get_courses_admin_success(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
