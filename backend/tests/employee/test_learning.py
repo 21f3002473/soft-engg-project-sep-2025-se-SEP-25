@@ -11,6 +11,7 @@ def assert_json(response):
     assert "application/json" in response.headers.get("Content-Type", "")
     return response.json()
 
+
 # 2) /hr/course (CourseAdminListCreateResource)
 def test_get_courses_admin_success(base_url, auth_hr):
     response = httpx.get(f"{base_url}/hr/course", headers=auth_hr)
