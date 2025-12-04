@@ -1,30 +1,32 @@
 <template>
-  <div class="user-shell">
+  <div class="user-shell d-flex flex-column min-vh-100">
     <UserNavBar />
 
-    <main class="content">
+    <main class="container-xl flex-grow-1 my-4 px-3" style="max-width: 1200px;">
       <transition name="fade-slide" mode="out-in">
-        <div v-if="title" key="title" class="page-header">
-          <h1 class="page-title">{{ title }}</h1>
-          <div class="page-divider"></div>
+        <div v-if="title" key="title" class="mb-4 text-start">
+          <h1 class="fw-bold mb-2" style="color: #1e3a8a; font-size: 28px;">{{ title }}</h1>
+          <div class="bg-primary rounded-pill" style="height: 3px; width: 50px;"></div>
         </div>
       </transition>
 
-      <section class="page-body">
+      <section class="page-body shadow p-4 rounded-4 bg-white bg-opacity-75" style="backdrop-filter: blur(5px); min-height: 250px;">
         <router-view />
       </section>
     </main>
 
     <button
-      class="chat-toggle"
+      class="chat-toggle btn position-fixed shadow-lg d-flex align-items-center justify-content-center border-0"
       @click="toggleChat"
-      :class="{ 'is-open': isChatOpen }"
+      :class="isChatOpen ? 'btn-danger rounded-circle' : 'btn-primary rounded-pill'"
+      :style="chatButtonStyle"
     >
-      <span v-if="!isChatOpen">💬 Need Help?</span>
-      <span v-else>&times;</span>
+      <span v-if="!isChatOpen" class="fw-semibold d-flex align-items-center">
+        <i class="bi bi-robot me-2 fs-5"></i>AI Assistant
+      </span>
+      <i v-else class="bi bi-x-lg fs-4"></i>
     </button>
 
-    <!-- Chat Popup -->
     <ChatPopup :is-open="isChatOpen" @close="toggleChat" />
   </div>
 </template>
@@ -42,6 +44,31 @@ export default {
   data() {
     return { isChatOpen: false };
   },
+  computed: {
+    chatButtonStyle() {
+      const baseStyle = {
+        right: '30px',
+        bottom: '30px',
+        zIndex: 1000,
+        transition: 'all 0.3s ease'
+      };
+      
+      if (this.isChatOpen) {
+        return {
+          ...baseStyle,
+          width: '56px',
+          height: '56px',
+          padding: '0'
+        };
+      }
+      
+      return {
+        ...baseStyle,
+        padding: '14px 28px',
+        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)'
+      };
+    }
+  },
   methods: {
     toggleChat() {
       this.isChatOpen = !this.isChatOpen;
@@ -52,77 +79,12 @@ export default {
 
 <style scoped>
 .user-shell {
-  min-height: 100vh;
   background: linear-gradient(135deg, #e9f1ff 0%, #f9fbff 100%);
-  display: flex;
-  flex-direction: column;
-}
-
-.content {
-  max-width: 1200px;
-  margin: 16px auto 32px;
-  padding: 16px;
-  width: 90%;
-}
-
-.page-header {
-  text-align: left;
-  margin-bottom: 16px;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin-bottom: 6px;
-}
-
-.page-divider {
-  height: 3px;
-  width: 50px;
-  background: #3b82f6;
-  border-radius: 6px;
-}
-
-.page-body {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(5px);
-  min-height: 250px;
-  transition: all 0.3s ease;
-}
-
-.chat-toggle {
-  position: fixed;
-  right: 30px;
-  bottom: 30px;
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  border: none;
-  border-radius: 40px;
-  cursor: pointer;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
-  transition: all 0.3s ease;
-  z-index: 1000;
 }
 
 .chat-toggle:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.5);
-}
-
-.chat-toggle.is-open {
-  background: #dc2626;
-  border-radius: 50%;
-  padding: 12px 16px;
-  width: 56px;
-  height: 56px;
-  font-size: 24px;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.5) !important;
 }
 
 .fade-slide-enter-active,
