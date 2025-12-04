@@ -1,63 +1,85 @@
 <template>
-  <div class="dashboard-page">
-    <section class="welcome-section">
-      <div class="welcome-card">
-        <h2>Welcome back, <span class="highlight">{{ userName }}</span></h2>
-        <p>Here’s what’s happening in your workspace today.</p>
-      </div>
-    </section>
-
-    <section class="stats-section">
-      <div class="stat-card" v-for="(item, index) in stats" :key="index">
-        <div class="stat-icon" :class="item.colorClass">
-          <i :class="item.icon"></i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ item.value }}</h3>
-          <p>{{ item.label }}</p>
+  <div class="container py-4 dashboard-page">
+    <!-- Welcome Section -->
+    <section class="mb-4">
+      <div class="card border-0 shadow text-white welcome-card p-4">
+        <div class="card-body p-0">
+          <h2 class="fw-bold mb-2 display-8">Welcome, <span class="text-warning">{{ userName }}</span></h2>
+          <p class="mb-0 opacity-75 fs-6">Here’s what’s happening in your workspace today.</p>
         </div>
       </div>
     </section>
 
-    <section class="content-section">
-      <div class="tasks">
-        <h3>Your Tasks</h3>
-        <div class="add-task-form">
-          <input 
-            v-model="newTask" 
-            @keyup.enter="addTask"
-            placeholder="Add a new task..." 
-            class="task-input"
-          />
-          <button @click="addTask" :disabled="!newTask" class="add-btn">
-            <i class="bi bi-plus"></i>
-          </button>
-        </div>
-        <div v-if="loadingTasks">Loading tasks...</div>
-        <ul v-else>
-          <li v-for="task in displayedTasks" :key="task.id">
-            <input 
-              type="checkbox" 
-              :checked="task.status === 'completed'" 
-              @change="toggleTask(task)"
-            />
-            <span :class="{ done: task.status === 'completed' }">{{ task.task }}</span>
-            <small v-if="task.deadline" class="deadline">Due: {{ formatDate(task.deadline) }}</small>
-          </li>
-          <li v-if="displayedTasks.length === 0">No recent tasks.</li>
-        </ul>
-      </div>
-
-      <div class="announcements">
-        <h3>Announcements</h3>
-        <div v-if="loadingAnnouncements">Loading announcements...</div>
-        <div v-else>
-          <div class="announcement" v-for="item in announcements" :key="item.id">
-            <h4>{{ item.announcement }}</h4>
-            <p v-if="item.message">{{ item.message }}</p>
-            <small>{{ formatDate(item.created_at) }}</small>
+    <!-- Stats Section -->
+    <section class="row g-4 mb-4">
+      <div class="col-md-3 col-sm-6" v-for="(item, index) in stats" :key="index">
+        <div class="card border-0 shadow-sm h-100 stat-card-hover">
+          <div class="card-body d-flex align-items-center p-3">
+            <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center me-3 text-white" :class="item.colorClass">
+              <i :class="item.icon"></i>
+            </div>
+            <div>
+              <h3 class="h4 mb-0 fw-bold text-primary fs-4">{{ item.value }}</h3>
+              <p class="text-muted mb-0">{{ item.label }}</p>
+            </div>
           </div>
-          <div v-if="announcements.length === 0">No announcements.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="row g-4">
+      <!-- Tasks -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h3 class="h3 fw-bold text-primary mb-3">Your Tasks</h3>
+            
+            <!-- Add Task Form -->
+            <div class="d-flex gap-2 mb-3">
+              <input 
+                v-model="newTask" 
+                @keyup.enter="addTask"
+                placeholder="Add a new task..." 
+                class="form-control py-4 fs-5"
+              />
+              <button @click="addTask" :disabled="!newTask" class="btn btn-primary d-flex align-items-center justify-content-center px-3">
+                <i class="bi bi-plus fs-5"></i>
+              </button>
+            </div>
+
+            <div v-if="loadingTasks" class="text-muted">Loading tasks...</div>
+            <ul v-else class="list-group list-group-flush mx-2">
+              <li v-for="task in displayedTasks" :key="task.id" class="list-group-item border-0 border-bottom d-flex align-items-center py-3">
+                <input 
+                  class="form-check-input mt-0 fs-5"
+                  type="checkbox" 
+                  :checked="task.status === 'completed'" 
+                  @change="toggleTask(task)"
+                />
+                <span :class="{ 'text-decoration-line-through text-muted': task.status === 'completed' }" class="fs-5 mx-2">{{ task.task }}</span>
+              </li>
+              <li v-if="displayedTasks.length === 0" class="list-group-item border-0 text-muted fs-5">No recent tasks.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h3 class="h3 fw-bold text-primary mb-3">Announcements</h3>
+            <div v-if="loadingAnnouncements" class="text-muted fs-5">Loading announcements...</div>
+            <div v-else>
+              <div class="mb-4 border-start border-4 border-primary ps-3" v-for="item in announcements" :key="item.id">
+                <h4 class="h5 text-primary mb-2 fw-bold">{{ item.announcement }}</h4>
+                <p v-if="item.message" class="text-muted mb-2 fs-6">{{ item.message }}</p>
+                <small class="text-secondary">{{ formatDate(item.created_at) }}</small>
+              </div>
+              <div v-if="announcements.length === 0" class="text-muted fs-5">No announcements.</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -75,10 +97,10 @@ export default {
       loadingTasks: false,
       loadingAnnouncements: false,
       stats: [
-        { label: 'Pending Tasks', value: 0, icon: 'fas fa-tasks', colorClass: 'blue', key: 'pending_tasks' },
-        { label: 'Completed', value: 0, icon: 'fas fa-check-circle', colorClass: 'green', key: 'completed_tasks' },
-        { label: 'Requests', value: 0, icon: 'fas fa-envelope-open-text', colorClass: 'purple', key: 'requests' },
-        { label: 'Courses Completed', value: 0, icon: 'fas fa-bell', colorClass: 'orange', key: 'courses_completed' }
+        { label: 'Pending Tasks', value: 0, icon: 'bi bi-list-task', colorClass: 'bg-primary', key: 'pending_tasks' },
+        { label: 'Completed', value: 0, icon: 'bi bi-check-circle-fill', colorClass: 'bg-success', key: 'completed_tasks' },
+        { label: 'Requests', value: 0, icon: 'bi bi-envelope', colorClass: 'bg-info', key: 'requests' },
+        { label: 'Courses Completed', value: 0, icon: 'bi bi-mortarboard-fill', colorClass: 'bg-warning', key: 'courses_completed' }
       ],
       tasks: [],
       announcements: [],
@@ -216,221 +238,26 @@ export default {
 
 <style scoped>
 .dashboard-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
   font-family: "Inter", sans-serif;
   color: #1e293b;
 }
 
 .welcome-card {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  border-radius: 16px;
-  padding: 20px 24px;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2);
-  text-align: left;
-  margin-bottom: 20px;
-}
-
-.welcome-card h2 {
-  font-size: 26px;
-  margin-bottom: 8px;
-  font-weight: 700;
-}
-
-.welcome-card .highlight {
-  color: #fffacd;
-}
-
-.welcome-card p {
-  font-size: 15px;
-  opacity: 0.9;
-}
-
-.stats-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.stat-card {
-  background: #fff;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  padding: 18px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
 }
 
 .stat-icon {
   width: 48px;
   height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  color: white;
   font-size: 20px;
-  margin-right: 14px;
 }
 
-.stat-icon.blue {
-  background: #3b82f6;
+.stat-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.stat-icon.green {
-  background: #10b981;
+.stat-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
-
-.stat-icon.purple {
-  background: #8b5cf6;
-}
-
-.stat-icon.orange {
-  background: #f59e0b;
-}
-
-.stat-info h3 {
-  font-size: 22px;
-  margin: 0;
-  color: #1e3a8a;
-}
-
-.stat-info p {
-  margin: 2px 0 0;
-  color: #475569;
-  font-size: 14px;
-}
-
-.content-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.tasks, .announcements {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.tasks h3, .announcements h3 {
-  margin-bottom: 14px;
-  font-weight: 600;
-  color: #1e40af;
-}
-
-.tasks ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.tasks li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  font-size: 15px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.tasks li:last-child {
-  border-bottom: none;
-}
-
-.tasks li span.done {
-  text-decoration: line-through;
-  color: #94a3b8;
-}
-
-.deadline {
-  margin-left: auto;
-  font-size: 12px;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.announcement {
-  margin-bottom: 16px;
-  border-left: 4px solid #2563eb;
-  padding-left: 12px;
-}
-
-.announcement h4 {
-  margin: 0 0 4px;
-  color: #1e3a8a;
-  font-size: 16px;
-}
-
-.announcement p {
-  margin: 0 0 4px;
-  color: #475569;
-  font-size: 14px;
-}
-
-.announcement small {
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-@media (max-width: 900px) {
-  .content-section {
-    grid-template-columns: 1fr;
-  }
-}
-
-.add-task-form {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.task-input {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.task-input:focus {
-  border-color: #3b82f6;
-}
-
-.add-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.add-btn:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-.add-btn:disabled {
-  background: #cbd5e1;
-  cursor: not-allowed;
-}
-
 </style>
