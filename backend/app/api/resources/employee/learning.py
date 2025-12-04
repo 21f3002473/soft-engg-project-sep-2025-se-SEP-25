@@ -11,6 +11,7 @@ from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 
+
 class CourseAdminListCreateResource(Resource):
     """
     HR Course Management Resource (List/Create) - Story Point:
