@@ -17,7 +17,7 @@
           :key="idx"
           :class="['message p-2 px-3 rounded-4 position-relative', msg.sender]"
         >
-          <div class="message-content text-break" v-html="renderMessage(msg.text)"></div>
+          <div class="message-content text-break text-start" v-html="renderMessage(msg.text)"></div>
           <div class="message-time small opacity-75 text-end mt-1">{{ formatTime(msg.time) }}</div>
         </div>
 
@@ -188,7 +188,7 @@ export default {
 .chat-popup {
   right: 28px;
   bottom: 100px;
-  width: 380px;
+  width: 440px;
   height: 540px;
   backdrop-filter: blur(16px);
   z-index: 1050;
@@ -275,6 +275,20 @@ export default {
 .chat-input button:hover {
   background: linear-gradient(90deg, #0069d9, #004ab3);
   transform: translateY(-2px);
+}
+
+.message-content {
+  text-align: left;
+}
+
+.message-content :deep(ul), 
+.message-content :deep(ol) {
+  padding-left: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content :deep(p) {
+  margin-bottom: 0.5rem;
 }
 
 .message-content :deep(p:last-child) {
