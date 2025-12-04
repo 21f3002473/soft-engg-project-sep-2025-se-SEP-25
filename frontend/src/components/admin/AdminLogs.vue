@@ -5,6 +5,28 @@
       <h1>Logs</h1>
       <div class="content-placeholder">
         <p>A live-tailing log viewer (e.g., for application, system, or audit logs) would go here.</p>
+        <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Admin ID</th>
+              <th>Admin Email</th>
+              <th>Admin Name</th>
+              <th>User Count</th>
+              <th>Logs Count</th>
+              <th>Backup Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ currentAdminID }}</td>
+              <td>{{ currentAdminEmail }}</td>
+              <td>{{ currentAdminName }}</td>
+              <td>{{ logs.userCount }}</td>
+              <td>{{ logs.logsCount }}</td>
+              <td>{{ logs.backupsCount }}</td>
+            </tr>
+          </tbody>
+        </table>
         </div>
     </main>
   </div>
@@ -15,8 +37,38 @@ export default {
   name: 'AdminLogs',
   data() {
     return {
+      logs: [],
+      currentAdminID: null,
+      currentAdminEmail: null,
+      currentAdminName: null,
     };
-  }
+  },
+  methods: {
+    async fetchLogs() {
+      // Placeholder for log fetching logic
+      const res = await fetch(`http://localhost:8000/api/admin/summary`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }); 
+      if (res.ok) {
+        const data = await res.json();
+        // Process and display logs
+        this.logs = data;
+        this.currentAdminID = this.logs.currentAdmin.id;
+        this.currentAdminEmail = this.logs.currentAdmin.email;
+        this.currentAdminName = this.logs.currentAdmin.name;
+      } else {
+        console.error('Failed to fetch logs');
+        return;
+      }
+    },
+  }, 
+  mounted() {
+    this.fetchLogs();
+  },
 };
 </script>
 

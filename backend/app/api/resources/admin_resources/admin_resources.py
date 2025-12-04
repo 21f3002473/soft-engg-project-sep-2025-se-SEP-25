@@ -749,3 +749,56 @@ class AdminAccountResource(Resource):
             "role": current_user.role,
             "updated": updated,
         }
+
+class AdminDeleteUserResource(Resource):
+    """
+    Admin User Deletion Resource.
+
+    Allows admin to delete user accounts from the system.
+
+    Story Point: SP-ADM-007
+
+    Endpoint: DELETE /admin/users/{user_id}
+    Required Role: ROOT
+    """
+
+    def delete(
+        self,
+        user_id: int,
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_root()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Delete a user account by user ID.
+
+        Removes the specified user from the system. Only accessible by ROOT admins.
+
+        Args:
+            user_id: ID of the user to be deleted
+            current_user: Currently authenticated user dependency
+            _: ROOT role verification dependency
+            session: Database session dependency
+
+        Returns:
+            dict: Confirmation message with keys:
+                - message: Success message
+
+        Raises:
+            HTTPException: 404 NOT FOUND if user does not exist
+                - Detail: "User with ID {user_id} not found"
+            HTTPException: 403 FORBIDDEN if user is not ROOT role
+        """
+        user = session.get(User, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with ID {user_id} not found",
+            )
+
+        session.delete(user)
+        session.commit()
+
+        return {
+            "message": f"User with ID {user_id} has been deleted successfully."
+        }

@@ -7,34 +7,73 @@
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2a9 9 0 1 0 5.293 16.293l4.707 4.707-1.414 1.414-4.707-4.707A9 9 0 0 0 11 2z" />
           </svg>
-          <input class="search-input" type="text" placeholder="Search" v-model="searchQuery" aria-label="Search employees by name" />
+          <input class="search-input" type="text" placeholder="Search by Name" v-model="searchQuery" aria-label="Search employees by name" />
           </div>
       </div>
 
   <div class="main-area">
         
         <div class="employee-list">
-          <div class="employee-item" v-for="emp in filteredEmployees" :key="emp.id">
+          <!-- <div class="employee-item" v-for="emp in this.employees" :key="emp.id">
             <span class="emp-name">{{ emp.name }}</span>
-            <span class="emp-status" :class="emp.status.toLowerCase().replace('!', '')">
+            <span class="emp-email">{{ emp.email }}</span>
+            <span class="emp-role">{{ emp.role }}</span> -->
+            <!-- <span class="emp-status" :class="emp.status.toLowerCase().replace('!', '')">
               {{ emp.status }}
-            </span>
-            <button class="btn" @click="changeStatus">Change Status</button>
-            <select class="status-dropdown">
+            </span> -->
+            <!-- <select class="status-dropdown">
               <option value="">Status Change Dropdown</option>
               <option value="active">Set Active</option>
               <option value="pending">Set Pending</option>
               <option value="disabled">Set Disabled</option>
-            </select>
-          </div>
-        </div>
+            </select> -->
+            <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Employee Name</th>
+                  <th>Work Email ID</th>
+                  <th>Employee Role</th>
+                  <th>Employee Status</th>
+                  <th>Take Action</th>
+                </tr>
+              </thead>
 
-        <div class="chat-float">
+              <tbody>
+                <tr v-for="emp in this.employees" :key="emp.id">
+                  <td>{{ emp.id }}</td>
+                  <td>{{ emp.name }}</td>
+                  <td>{{ emp.email }}</td>
+                  <td>{{ emp.role }}</td>
+
+                  <!-- Status Dropdown -->
+                  <td>
+                    <!-- <select class="status-dropdown" v-model="emp.newStatus">
+                      <option value="">Status Change Dropdown</option>
+                      <option value="active" default>Set Active</option>
+                      <option value="pending">Set Pending</option>
+                      <option value="disabled">Set Disabled</option>
+                    </select> -->
+                    Active
+                     <!-- <input type="text" value="Active" disabled class="form-control-plaintext" /> -->
+                  </td>
+
+                  <!-- <td>
+                    <button class="btn" @click="changeStatus(emp)">Change Status</button>
+                  </td> -->
+                  <td>
+                    <button class="btn btn-sm btn-outline-danger" @click="deleteUser(emp)" aria-label="Delete employee">
+                      Delete Employee
+                    </button>
+                  </td>
+                  
+                </tr>
+              </tbody>
+            </table>
+        </div>
+        <!-- <div class="chat-float">
         <button
-            class="chat-trigger"
-            @click="isChatbotOpen = !isChatbotOpen"
-            aria-label="Open AI chat"
-        >
+            class="chat-trigger" @click="isChatbotOpen = !isChatbotOpen" aria-label="Open AI chat">
             AI
         </button>
 
@@ -73,7 +112,7 @@
             </form>
             </section>
         </transition>
-        </div>
+        </div> -->
 
       </div>
     </main>
@@ -92,13 +131,14 @@ export default {
   data() {
     return {
       employees: [
-        { id: 1, name: 'EMP1', status: 'New!' },
-        { id: 2, name: 'EMP2', status: 'Old' },
-        { id: 3, name: 'EMP3', status: 'New!' },
-        { id: 4, name: 'EMP4', status: 'New!' },
-        { id: 5, name: 'EMP5', status: 'New!' },
-        { id: 6, name: 'EMP6', status: 'New!' }
+        // { id: 1, name: 'EMP1', status: 'New!' },
+        // { id: 2, name: 'EMP2', status: 'Old' },
+        // { id: 3, name: 'EMP3', status: 'New!' },
+        // { id: 4, name: 'EMP4', status: 'New!' },
+        // { id: 5, name: 'EMP5', status: 'New!' },
+        // { id: 6, name: 'EMP6', status: 'New!' }
       ],
+      originalEmployees: [],
       isChatbotOpen: this?.isChatbotOpen ?? false,
         messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
         draft: '',
@@ -107,50 +147,111 @@ export default {
   },
   computed: {
     filteredEmployees() {
-      console.log('Search query changed to:', this.searchQuery);
-
-      
+      console.log('Search query changed to:', this.searchQuery);  
       if (!this.searchQuery) {
         return this.employees;
       }
-
+      console.log('Filtered employees:', this.employees.filter(emp => {
+        return emp.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+      }));
       return this.employees.filter(emp => {
         return emp.name.toLowerCase().includes(this.searchQuery.toLowerCase());
       });
     }
   },
   watch: {
-    searchQuery(newQuery) {
-      console.log('Search query Typed by Admin:', newQuery);
+    searchQuery(newQ) {
+      const q = (newQ || '').toLowerCase().trim();
+      if (!q) {
+        this.employees = this.originalEmployees.slice();
+        return;
+      }
+      this.employees = this.originalEmployees.filter(emp =>
+        emp.name && emp.name.toLowerCase().includes(q)
+      );
     }
   },
   methods: {
     async fetchData() {
-      console.log('Fetching data...');
-      // API call would go here
+      // console.log('Fetching data...');
+      const res = await fetch(`http://localhost:8000/api/admin/employees`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!res.ok) {
+        console.error('Failed to fetch employees');
+        return;
+      }
+      const data = await res.json();
+      // console.log(data);
+      this.employees = data;
+      this.originalEmployees = Array.isArray(data) ? data.slice() : [];
+      // console.log('Employees loaded:', this.employees);
     },
-    changeStatus() {
-      console.log('Change status');
-      // Logic to change status would go here
-    },
-    sendMessage() {
-      if (!this.draft.trim()) return;
+    // async changeStatus(emp) {
+    //   // console.log('Change status');
+    //   // Logic to change status would go here
+    //   const res = await fetch(`http://localhost:8000/api/admin/employees`, {
+    //     method: 'PUT',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `bearer ${localStorage.getItem('token')}`,
+    //     },
+    //     body: JSON.stringify({ status: emp.newStatus }),
 
-      // Add user message
-      this.messages.push({ from: 'user', text: this.draft.trim() });
+    //   });
+    //   if (!res.ok) {
+    //     console.error('Failed to change status');
+    //     return;
+    //   }
+    //   const data = await res.json();
+    //   // Update local employee status
+    //   emp.status = data.status;
+    //   console.log(emp);
+    // },
+    // sendMessage() {
+    //   if (!this.draft.trim()) return;
 
-      // Simulate AI response
-      setTimeout(() => {
-        this.messages.push({ from: 'ai', text: "This is a simulated AI response." });
-        this.$nextTick(() => {
-          const chatBody = this.$refs.scrollArea;
-          chatBody.scrollTop = chatBody.scrollHeight;
-        });
-      }, 1000);
+    //   // Add user message
+    //   this.messages.push({ from: 'user', text: this.draft.trim() });
 
-      // Clear draft
-      this.draft = '';
-    },
+    //   // Simulate AI response
+    //   setTimeout(() => {
+    //     this.messages.push({ from: 'ai', text: "This is a simulated AI response." });
+    //     this.$nextTick(() => {
+    //       const chatBody = this.$refs.scrollArea;
+    //       chatBody.scrollTop = chatBody.scrollHeight;
+    //     });
+    //   }, 1000);
+
+    //   // Clear draft
+    //   this.draft = '';
+    // },
+    async deleteUser(emp) {
+      // console.log('Before Delete user:', emp);
+      if (!confirm(`Are you sure you want to delete user ${emp.name}?`)) {
+        return;
+      }
+      const res = await fetch(`http://localhost:8000/api/admin/deleteusers/${emp.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!res.ok) {
+        console.error('Failed to delete user');
+        return;
+      }
+      // Remove user from local list
+      this.employees = this.employees.filter(e => e.id !== emp.id);
+      this.originalEmployees = this.originalEmployees.filter(e => e.id !== emp.id);
+      alert(`User ${emp.name} deleted successfully.`);
+      // console.log('User deleted:', emp);
+    }
   },
   mounted() {
     // Code to run when the component is mounted
@@ -187,7 +288,7 @@ a:hover {
 }
 
 .btn:hover {
-  background-color: #eee;
+  background-color: #2563eb;
 }
 
 /* 1. Header Navigation */
@@ -507,4 +608,5 @@ a:hover {
   opacity: 0;
   transform: translateY(6px) scale(0.995);
 }
+
 </style>

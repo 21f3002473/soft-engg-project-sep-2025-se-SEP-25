@@ -16,6 +16,36 @@
       <h1>Updates</h1>
       <div class="content-placeholder">
         <p>Software update status, package versions, and a "Check for Updates" button would be displayed here.</p>
+        <table v-if="adminUpdatesData" class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Current Version</th>
+              <th scope="col">Last Checked</th>
+              <th scope="col">Update Available?</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>{{ adminUpdatesData.currentVersion }}</td>
+              <td>{{ formatDate(adminUpdatesData.lastChecked) }}</td>
+              <td>
+                <span
+                  :class="{
+                    'text-success fw-bold': adminUpdatesData.updateAvailable === true,
+                    'text-danger fw-bold': adminUpdatesData.updateAvailable === false
+                  }"
+                >
+                  {{ adminUpdatesData.updateAvailable ? "Yes" : "No" }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Empty state -->
+        <div v-else class="text-center py-4 text-muted">
+          <i class="bi bi-info-circle"></i> No update records found.
+        </div>
       </div>
     </main>
   </div>
@@ -26,8 +56,31 @@ export default {
   name: 'AdminUpdates',
   data() {
     return {
+      adminUpdatesData: null,
     };
-  }
+  },
+  methods: {
+    async adminUpdates() {
+      // Logic to fetch and display updates
+      const res = await fetch(`http://localhost:8000/api/admin/updates`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await res.json();
+      // console.log(data);
+      // console.log(data.length);
+      this.adminUpdatesData = data;
+    },
+    formatDate(dateStr) {
+      return new Date(dateStr).toLocaleString();
+    },
+  },
+  mounted() {
+    this.adminUpdates();
+  },
 };
 </script>
 

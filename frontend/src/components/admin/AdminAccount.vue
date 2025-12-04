@@ -4,6 +4,24 @@
       <h1>Account Settings</h1>
       <div class="content-placeholder">
         <p>Admin profile information, password change form, and API key management would be displayed here.</p>
+        <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ accounts.id }}</td>
+              <td>{{ accounts.name }}</td>
+              <td>{{ accounts.email }}</td>
+              <td><span class="role-pill">{{ accounts.role }}</span></td>
+            </tr>
+          </tbody>
+      </table>
       </div>
     </main>
   </div>
@@ -14,7 +32,26 @@ export default {
   name: 'AdminAccount',
   data() {
     return {
+      // Data properties for account settings can be added here
+      accounts: [],
     };
+  },
+  methods: {
+    async fetchAccountSettings() {
+      const res = await fetch(`http://localhost:8000/api/admin/account`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await res.json();
+      // console.log(data);
+      this.accounts = data;
+    }
+  },
+  mounted() {
+    this.fetchAccountSettings();
   }
 };
 </script>

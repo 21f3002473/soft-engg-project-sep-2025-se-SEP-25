@@ -46,9 +46,28 @@ export default {
     };
   },
   methods: {
-    AddEmployee() {
+    async AddEmployee() {
       // Logic to add employee
-      console.log(`Employee Name: ${this.employeeName}, Employee Type: ${this.employeeType}`);
+      // console.log(`Employee Name: ${this.employeeName}, Employee Type: ${this.employeeType}`);
+      const res = await fetch(`http://localhost:8000/api/admin/employees`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: this.employeeName,
+          role: this.employeeType
+        })
+      });
+        if (!res.ok) {
+          console.error('Failed to add employee');
+          return;
+        }
+        const data = await res.json();
+        alert(`Employee added successfully: ${data.name}, 
+        Employee Details:
+        ID: ${data.id}, Role: ${data.role}, Email: ${data.email}, Password: ${data.temporary_password}`);
       // Reset fields
       this.employeeName = '';
       this.employeeType = '';
