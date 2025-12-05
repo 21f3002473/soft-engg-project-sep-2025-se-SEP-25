@@ -42,6 +42,7 @@
 
 <script>
 import { make_getrequest } from '@/store/appState';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'AdminUpdates',
@@ -66,7 +67,7 @@ export default {
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
-      alert('Please login to access the admin dashboard.');
+      useNotify().warn('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
     }

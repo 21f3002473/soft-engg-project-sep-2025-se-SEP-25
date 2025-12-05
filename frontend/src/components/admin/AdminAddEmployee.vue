@@ -34,6 +34,8 @@
 
 <script>
 import { make_postrequest } from '@/store/appState';
+import Swal from 'sweetalert2';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'AdminAddEmployee',
@@ -46,7 +48,7 @@ export default {
   methods: {
     async AddEmployee() {
       if (!this.employeeName || !this.employeeType) {
-        alert('Please fill in all fields.');
+        useNotify().warn('Please fill in all fields.');
         return;
       }
       try {
@@ -54,18 +56,32 @@ export default {
           name: this.employeeName,
           role: this.employeeType
         });
-        alert(`Employee added successfully: ${data.name}\n\nDetails:\nID: ${data.id}\nRole: ${data.role}\nEmail: ${data.email}\nPassword: ${data.temporary_password}`);
+
+        Swal.fire({
+          title: 'Employee Added!',
+          html: `<div class="text-start">
+                  <p><strong>Name:</strong> ${data.name}</p>
+                  <p><strong>ID:</strong> ${data.id}</p>
+                  <p><strong>Role:</strong> ${data.role}</p>
+                  <p><strong>Email:</strong> ${data.email}</p>
+                  <p><strong>Password:</strong> ${data.temporary_password}</p>
+                 </div>`,
+          icon: 'success',
+          confirmButtonText: 'Great!'
+        });
+
         this.employeeName = '';
         this.employeeType = '';
       } catch (error) {
         console.error('Failed to add employee', error);
+        useNotify().error('Failed to add employee');
       }
     }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
-      alert('Please login to access the admin dashboard.');
+      useNotify().warn('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
     }

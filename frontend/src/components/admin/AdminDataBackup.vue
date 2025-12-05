@@ -70,6 +70,8 @@
 
 <script>
 import { make_getrequest, make_putrequest } from '@/store/appState';
+import Swal from 'sweetalert2';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'AdminDataBackup',
@@ -101,19 +103,25 @@ export default {
       }
     },
     async saveConfig() {
-      if (!this.day) { alert('Pick a day'); return; }
-      if (!this.backup_type) { alert('Pick a backup type'); return; }
+      if (!this.day) {
+        useNotify().warn('Pick a day');
+        return;
+      }
+      if (!this.backup_type) {
+        useNotify().warn('Pick a backup type');
+        return;
+      }
 
       let isoDatetime = null;
       if (this.date_time) {
         const d = new Date(this.date_time);
         if (isNaN(d)) {
-          alert('Please choose a valid date and time.');
+          useNotify().warn('Please choose a valid date and time.');
           return;
         }
         isoDatetime = d.toISOString();
       } else {
-        alert('Please choose a valid date and time.');
+        useNotify().warn('Please choose a valid date and time.');
         return;
       }
 
@@ -124,7 +132,7 @@ export default {
         datetime: isoDatetime
       };
 
-      const currentList = this.backups.map(b => ({
+      const currentList = (this.oldBackupConfig || []).map(b => ({
         day: b.day,
         type: b.type,
         datetime: b.datetime
@@ -135,7 +143,7 @@ export default {
 
       try {
         await make_putrequest('/api/admin/backup-config', payload);
-        alert('Saved successfully');
+        useNotify().success('Saved successfully');
 
         this.day = '';
         this.backup_type = '';
@@ -145,7 +153,7 @@ export default {
 
       } catch (e) {
         console.error(e);
-        alert(e.message || 'Save failed');
+        useNotify().error(e.message || 'Save failed');
       }
     },
 
@@ -192,23 +200,36 @@ export default {
 
     downloadLatest(item) {
       console.log('Download latest backup for', item.day);
-      alert(`Pretend downloading latest backup for ${item.day} — implement server endpoint to return file.`);
+      useNotify().info(`Pretend downloading latest backup for ${item.day} — implement server endpoint to return file.`);
     },
 
     saveSingleConfig(item) {
       console.log('Saving single config for', item.day, item);
-      alert(`Saved config for ${item.day} (UI only). Implement API call in saveSingleConfig()`);
+      useNotify().info(`Saved config for ${item.day} (UI only). Implement API call in saveSingleConfig()`);
     },
 
-    resetToDefaults() {
-      if (!confirm('Reset all backup schedules to default empty state?')) return;
+    async resetToDefaults() {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "Reset all backup schedules to default empty state?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, reset it!'
+      });
+
+      if (!result.isConfirmed) return;
+
       this.backups = [];
-    }
+      // Note: Actual implementation would likely need an API call here to clear backend as well
+      useNotify().success('Backup schedules reset (Client-side only).');
+    },
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
-      alert('Please login to access the admin dashboard.');
+      useNotify().warn('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
     }

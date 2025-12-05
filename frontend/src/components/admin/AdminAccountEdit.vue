@@ -91,6 +91,7 @@
 
 <script>
 import { make_getrequest, make_putrequest } from '@/store/appState';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'AdminAccountEdit',
@@ -114,10 +115,10 @@ export default {
           old_password: this.old_password,
           new_password: this.new_password
         });
-        alert('Account details updated successfully.');
+        useNotify().success('Account details updated successfully.');
         this.$router.push('/admin/account');
       } catch (error) {
-        alert('Failed to update account details.');
+        useNotify().error('Failed to update account details.');
         console.error(error);
       }
     },
@@ -136,7 +137,7 @@ export default {
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
-      alert('Please login to access the admin dashboard.');
+      useNotify().warn('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
     }

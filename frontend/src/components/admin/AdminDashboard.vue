@@ -61,6 +61,8 @@
 
 <script>
 import { make_getrequest, make_deleterequest } from '@/store/appState';
+import Swal from 'sweetalert2';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'AdminDashboard',
@@ -101,23 +103,35 @@ export default {
       }
     },
     async deleteUser(emp) {
-      if (!confirm(`Are you sure you want to delete user ${emp.name}?`)) {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to delete user ${emp.name}? This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (!result.isConfirmed) {
         return;
       }
+
       try {
         await make_deleterequest(`/api/admin/deleteusers/${emp.id}`);
         this.employees = this.employees.filter(e => e.id !== emp.id);
         this.originalEmployees = this.originalEmployees.filter(e => e.id !== emp.id);
-        alert(`User ${emp.name} deleted successfully.`);
+        useNotify().success(`User ${emp.name} deleted successfully.`);
       } catch (error) {
         console.error('Failed to delete user', error);
+        useNotify().error('Failed to delete user');
       }
     }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
-      alert('Please login to access the admin dashboard.');
+      useNotify().warn('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
     }
