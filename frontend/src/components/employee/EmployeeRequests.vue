@@ -83,6 +83,9 @@
 <script>
 import { make_getrequest } from "@/store/appState.js";
 
+const toTitleCase = str =>
+  str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
 export default {
   name: "EmployeeRequests",
   data() {
@@ -156,7 +159,7 @@ export default {
         const leaves = (leavesRes.leaves || []).map(l => ({
           uniqueKey: `leave-${l.request_id}`,
           type: 'Leave',
-          description: `${l.leave_type} Leave`,
+          description: `${toTitleCase(l.leave_type)} Leave`,
           details: `${l.reason || 'No reason provided'}`,
           date: l.created_date || l.from_date,
           status: l.status,
@@ -166,8 +169,8 @@ export default {
         const reimbursements = (reimbursementsRes.reimbursements || []).map(r => ({
           uniqueKey: `reimb-${r.request_id}`,
           type: 'Reimbursement',
-          description: `${r.expense_type}`,
-          details: `Amount: $${r.amount} - ${r.remark || ''}`,
+          description: `${toTitleCase(r.expense_type)} Reimbursement`,
+          details: `Amount: ₹${r.amount} - ${r.remark || ''}`,
           date: r.date_expense,
           status: r.status,
           raw: r
@@ -176,7 +179,7 @@ export default {
         const transfers = (transfersRes.transfers || []).map(t => ({
           uniqueKey: `trans-${t.request_id}`,
           type: 'Transfer',
-          description: `Transfer to ${t.request_department}`,
+          description: `Transfer to ${toTitleCase(t.request_department)}`,
           details: `Reason: ${t.reason || 'None'}`,
           date: null, 
           status: t.status,

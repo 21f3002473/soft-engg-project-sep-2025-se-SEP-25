@@ -27,11 +27,6 @@
         </div>
 
         <div class="d-flex align-items-center gap-3">
-          <div class="position-relative d-none d-sm-block">
-            <i class="fas fa-search position-absolute text-muted" style="top: 50%; left: 12px; transform: translateY(-50%); font-size: 18px;"></i>
-            <input type="search" placeholder="Search..." class="form-control rounded-pill ps-5 search-input" />
-          </div>
-          
           <router-link :to="{ name: 'EmployeeAccount' }" class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
             <i class="fas fa-user-circle fs-5"></i>
             <span>Account</span>
