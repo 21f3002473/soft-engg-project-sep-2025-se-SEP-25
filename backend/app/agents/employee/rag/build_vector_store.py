@@ -7,7 +7,6 @@ from langchain_community.vectorstores import FAISS
 
 
 def build_faiss_index():
-    """Builds a FAISS index from HR policies & course data."""
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))

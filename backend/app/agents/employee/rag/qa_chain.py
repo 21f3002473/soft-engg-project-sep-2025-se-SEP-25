@@ -10,7 +10,6 @@ VECTORSTORE_PATH = os.path.join(STATIC_DIR, "vectorstore.pkl")
 
 
 def load_vector_store():
-    """Loads the saved FAISS vector store from disk."""
 
     if not os.path.exists(VECTORSTORE_PATH):
         raise FileNotFoundError(
@@ -23,14 +22,6 @@ def load_vector_store():
 
 
 def create_rag_components():
-    """
-    Loads:
-      - FAISS Vector Store (for retrieval)
-      - Gemini LLM wrapper (for generation)
-
-    Returns:
-      retriever, llm
-    """
 
     vectorstore = load_vector_store()
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
@@ -41,12 +32,6 @@ def create_rag_components():
 
 
 def get_rag_answer(user_question: str, employee_context: str):
-    """
-    Main RAG function that:
-    1. Retrieves relevant HR chunks
-    2. Builds a combined prompt
-    3. Calls Gemini to produce answer
-    """
 
     retriever, llm = create_rag_components()
 
