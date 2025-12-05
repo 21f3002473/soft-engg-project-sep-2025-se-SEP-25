@@ -5,115 +5,50 @@
         <h1>{{ title }}</h1>
         <div class="search-bar">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2a9 9 0 1 0 5.293 16.293l4.707 4.707-1.414 1.414-4.707-4.707A9 9 0 0 0 11 2z" />
+            <path
+              d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2a9 9 0 1 0 5.293 16.293l4.707 4.707-1.414 1.414-4.707-4.707A9 9 0 0 0 11 2z" />
           </svg>
-          <input class="search-input" type="text" placeholder="Search by Name" v-model="searchQuery" aria-label="Search employees by name" />
-          </div>
+          <input class="search-input" type="text" placeholder="Search by Name" v-model="searchQuery"
+            aria-label="Search employees by name" />
+        </div>
       </div>
 
-  <div class="main-area">
-        
+      <div class="main-area">
+
         <div class="employee-list">
-          <!-- <div class="employee-item" v-for="emp in this.employees" :key="emp.id">
-            <span class="emp-name">{{ emp.name }}</span>
-            <span class="emp-email">{{ emp.email }}</span>
-            <span class="emp-role">{{ emp.role }}</span> -->
-            <!-- <span class="emp-status" :class="emp.status.toLowerCase().replace('!', '')">
-              {{ emp.status }}
-            </span> -->
-            <!-- <select class="status-dropdown">
-              <option value="">Status Change Dropdown</option>
-              <option value="active">Set Active</option>
-              <option value="pending">Set Pending</option>
-              <option value="disabled">Set Disabled</option>
-            </select> -->
-            <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
-              <thead class="table-dark">
-                <tr>
-                  <th>Employee ID</th>
-                  <th>Employee Name</th>
-                  <th>Work Email ID</th>
-                  <th>Employee Role</th>
-                  <th>Employee Status</th>
-                  <th>Take Action</th>
-                </tr>
-              </thead>
+          <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+                <th>Work Email ID</th>
+                <th>Employee Role</th>
+                <th>Employee Status</th>
+                <th>Take Action</th>
+              </tr>
+            </thead>
 
-              <tbody>
-                <tr v-for="emp in this.employees" :key="emp.id">
-                  <td>{{ emp.id }}</td>
-                  <td>{{ emp.name }}</td>
-                  <td>{{ emp.email }}</td>
-                  <td>{{ emp.role }}</td>
+            <tbody>
+              <tr v-for="emp in this.employees" :key="emp.id">
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.name }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.role }}</td>
 
-                  <!-- Status Dropdown -->
-                  <td>
-                    <!-- <select class="status-dropdown" v-model="emp.newStatus">
-                      <option value="">Status Change Dropdown</option>
-                      <option value="active" default>Set Active</option>
-                      <option value="pending">Set Pending</option>
-                      <option value="disabled">Set Disabled</option>
-                    </select> -->
-                    Active
-                     <!-- <input type="text" value="Active" disabled class="form-control-plaintext" /> -->
-                  </td>
+                <td>
+                  Active
+                </td>
+                
+                <td>
+                  <button class="btn btn-sm btn-outline-danger" @click="deleteUser(emp)" aria-label="Delete employee">
+                    Delete Employee
+                  </button>
+                </td>
 
-                  <!-- <td>
-                    <button class="btn" @click="changeStatus(emp)">Change Status</button>
-                  </td> -->
-                  <td>
-                    <button class="btn btn-sm btn-outline-danger" @click="deleteUser(emp)" aria-label="Delete employee">
-                      Delete Employee
-                    </button>
-                  </td>
-                  
-                </tr>
-              </tbody>
-            </table>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <!-- <div class="chat-float">
-        <button
-            class="chat-trigger" @click="isChatbotOpen = !isChatbotOpen" aria-label="Open AI chat">
-            AI
-        </button>
-
-        <transition name="fade-slide">
-            <section
-            v-if="isChatbotOpen"
-            class="chat-window"
-            role="dialog"
-            aria-modal="true"
-            aria-label="AI Assistant"
-            >
-            <header class="chat-header">
-                <div class="title">AI Assistant</div>
-                <div class="spacer"></div>
-                <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
-            </header>
-
-            <div class="chat-body" ref="scrollArea" aria-live="polite">
-                <div
-                v-for="(m, i) in messages"
-                :key="i"
-                :class="['message', m.from]"
-                >
-                {{ m.text }}
-                </div>
-            </div>
-
-            <form class="chat-input" @submit.prevent="sendMessage">
-                <input
-                v-model="draft"
-                type="text"
-                placeholder="Type a message…"
-                autocomplete="off"
-                />
-                <button type="submit" :disabled="!draft.trim()">Send</button>
-            </form>
-            </section>
-        </transition>
-        </div> -->
-
       </div>
     </main>
   </div>
@@ -131,23 +66,17 @@ export default {
   data() {
     return {
       employees: [
-        // { id: 1, name: 'EMP1', status: 'New!' },
-        // { id: 2, name: 'EMP2', status: 'Old' },
-        // { id: 3, name: 'EMP3', status: 'New!' },
-        // { id: 4, name: 'EMP4', status: 'New!' },
-        // { id: 5, name: 'EMP5', status: 'New!' },
-        // { id: 6, name: 'EMP6', status: 'New!' }
       ],
       originalEmployees: [],
       isChatbotOpen: this?.isChatbotOpen ?? false,
-        messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
-        draft: '',
-        searchQuery: '',
+      messages: [{ from: 'ai', text: "Hi! I'm your assistant. How can I help?" }],
+      draft: '',
+      searchQuery: '',
     };
   },
   computed: {
     filteredEmployees() {
-      console.log('Search query changed to:', this.searchQuery);  
+      console.log('Search query changed to:', this.searchQuery);
       if (!this.searchQuery) {
         return this.employees;
       }
@@ -173,7 +102,6 @@ export default {
   },
   methods: {
     async fetchData() {
-      // console.log('Fetching data...');
       const res = await fetch(`http://localhost:8000/api/admin/employees`, {
         method: 'GET',
         headers: {
@@ -186,52 +114,10 @@ export default {
         return;
       }
       const data = await res.json();
-      // console.log(data);
       this.employees = data;
       this.originalEmployees = Array.isArray(data) ? data.slice() : [];
-      // console.log('Employees loaded:', this.employees);
     },
-    // async changeStatus(emp) {
-    //   // console.log('Change status');
-    //   // Logic to change status would go here
-    //   const res = await fetch(`http://localhost:8000/api/admin/employees`, {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `bearer ${localStorage.getItem('token')}`,
-    //     },
-    //     body: JSON.stringify({ status: emp.newStatus }),
-
-    //   });
-    //   if (!res.ok) {
-    //     console.error('Failed to change status');
-    //     return;
-    //   }
-    //   const data = await res.json();
-    //   // Update local employee status
-    //   emp.status = data.status;
-    //   console.log(emp);
-    // },
-    // sendMessage() {
-    //   if (!this.draft.trim()) return;
-
-    //   // Add user message
-    //   this.messages.push({ from: 'user', text: this.draft.trim() });
-
-    //   // Simulate AI response
-    //   setTimeout(() => {
-    //     this.messages.push({ from: 'ai', text: "This is a simulated AI response." });
-    //     this.$nextTick(() => {
-    //       const chatBody = this.$refs.scrollArea;
-    //       chatBody.scrollTop = chatBody.scrollHeight;
-    //     });
-    //   }, 1000);
-
-    //   // Clear draft
-    //   this.draft = '';
-    // },
     async deleteUser(emp) {
-      // console.log('Before Delete user:', emp);
       if (!confirm(`Are you sure you want to delete user ${emp.name}?`)) {
         return;
       }
@@ -246,17 +132,14 @@ export default {
         console.error('Failed to delete user');
         return;
       }
-      // Remove user from local list
       this.employees = this.employees.filter(e => e.id !== emp.id);
       this.originalEmployees = this.originalEmployees.filter(e => e.id !== emp.id);
       alert(`User ${emp.name} deleted successfully.`);
-      // console.log('User deleted:', emp);
     }
   },
   mounted() {
-    // Code to run when the component is mounted
     const user = JSON.parse(localStorage.getItem('user'));
-    if(!localStorage.getItem('token') || user.role !== 'root') {
+    if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
@@ -297,7 +180,6 @@ a:hover {
   background-color: #2563eb;
 }
 
-/* 1. Header Navigation */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -316,12 +198,10 @@ a:hover {
 
 }
 
-/* 2. Main Content Area */
 .dashboard-content {
   padding: 25px 30px;
 }
 
-/* 2a. Content Header (Title + Search) */
 .content-header {
   display: flex;
   justify-content: space-between;
@@ -335,53 +215,55 @@ a:hover {
   font-weight: 600;
 }
 
-/* Search Bar */
 .search-bar {
   position: relative;
   width: 260px;
   display: flex;
   align-items: center;
 }
+
 .search-bar .icon {
   position: absolute;
   left: 14px;
   width: 18px;
   height: 18px;
-  fill: #6b7280; /* gray-500 */
+  fill: #6b7280;
   pointer-events: none;
 }
+
 .search-bar .search-input {
   width: 100%;
   padding: 10px 14px 10px 40px;
-  border: 1px solid #d1d5db; /* gray-300 */
+  border: 1px solid #d1d5db;
   border-radius: 10px;
   background: #ffffff;
   font-size: 14px;
-  color: #1f2937; /* gray-800 */
+  color: #1f2937;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.25s ease;
 }
+
 .search-bar .search-input::placeholder {
-  color: #9ca3af; /* gray-400 */
+  color: #9ca3af;
 }
+
 .search-bar .search-input:focus {
   outline: none;
-  border-color: #2563eb; /* blue-600 */
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-  background: #f8fafc; /* slate-50 */
-}
-.search-bar .search-input:hover:not(:focus) {
-  border-color: #9ca3af; /* gray-400 */
+  background: #f8fafc;
 }
 
-/* 2b. Main Area (List + Chat) */
+.search-bar .search-input:hover:not(:focus) {
+  border-color: #9ca3af;
+}
+
 .main-area {
   display: flex;
-  gap: 25px; 
+  gap: 25px;
 }
 
-/* Employee List (Left) */
 .employee-list {
-  flex: 3; 
+  flex: 3;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -390,7 +272,7 @@ a:hover {
 .employee-item {
   display: flex;
   align-items: center;
-  gap: 15px; 
+  gap: 15px;
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
 }
@@ -401,7 +283,7 @@ a:hover {
 
 .emp-name {
   font-weight: 600;
-  flex-basis: 10%; 
+  flex-basis: 10%;
 }
 
 .emp-status {
@@ -428,12 +310,11 @@ a:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f9f9f9;
-  flex-grow: 1; 
+  flex-grow: 1;
 }
 
-/* Chatbot Panel (Right) */
 .chatbot-panel {
-  flex: 1; 
+  flex: 1;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -450,29 +331,28 @@ a:hover {
 }
 
 .chat-history {
-  flex-grow: 1; 
+  flex-grow: 1;
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 10px;
   margin-bottom: 15px;
-  min-height: 250px; 
+  min-height: 250px;
   font-family: monospace;
   color: #666;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .btn-ai {
   background-color: #ececec;
   border: none;
-  border-radius: 50%; 
+  border-radius: 50%;
   width: 50px;
   height: 50px;
   font-weight: bold;
-  align-self: center; 
-  margin-top: auto; 
+  align-self: center;
+  margin-top: auto;
 }
 
-/* Floating trigger button */
 .chat-trigger {
   position: fixed;
   right: 24px;
@@ -481,7 +361,7 @@ a:hover {
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: #111827; /* near-black */
+  background: #111827;
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -490,13 +370,13 @@ a:hover {
   z-index: 2000;
   transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
+
 .chat-trigger:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
   background: #0b1220;
 }
 
-/* Chat window container */
 .chat-window {
   position: fixed;
   right: 24px;
@@ -506,41 +386,43 @@ a:hover {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border: 1px solid #e5e7eb; /* gray-200 */
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
   overflow: hidden;
   z-index: 2000;
 }
 
-/* Header */
 .chat-header {
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  background: #f8fafc; /* slate-50 */
+  background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
 }
+
 .chat-header .title {
   font-weight: 600;
   font-size: 14px;
 }
+
 .chat-header .spacer {
   flex: 1;
 }
+
 .chat-header .close {
   border: none;
   background: transparent;
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
-  color: #6b7280; /* gray-500 */
-}
-.chat-header .close:hover {
-  color: #111827; /* gray-900 */
+  color: #6b7280;
 }
 
-/* Body */
+.chat-header .close:hover {
+  color: #111827;
+}
+
 .chat-body {
   padding: 12px;
   gap: 8px;
@@ -549,6 +431,7 @@ a:hover {
   overflow-y: auto;
   background: #ffffff;
 }
+
 .message {
   max-width: 80%;
   padding: 8px 10px;
@@ -557,20 +440,21 @@ a:hover {
   line-height: 1.35;
   word-wrap: break-word;
 }
+
 .message.ai {
   align-self: flex-start;
-  background: #f1f5f9; /* slate-100 */
-  color: #0f172a;       /* slate-900 */
+  background: #f1f5f9;
+  color: #0f172a;
   border-top-left-radius: 4px;
 }
+
 .message.user {
   align-self: flex-end;
-  background: #2563eb; /* blue-600 */
+  background: #2563eb;
   color: #ffffff;
   border-top-right-radius: 4px;
 }
 
-/* Input area */
 .chat-input {
   display: flex;
   gap: 8px;
@@ -578,6 +462,7 @@ a:hover {
   padding: 10px;
   background: #fafafa;
 }
+
 .chat-input input {
   flex: 1;
   border: 1px solid #e5e7eb;
@@ -586,10 +471,12 @@ a:hover {
   font-size: 13px;
   outline: none;
 }
+
 .chat-input input:focus {
-  border-color: #93c5fd; /* blue-300 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* blue-500/15% */
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
+
 .chat-input button {
   border: none;
   border-radius: 10px;
@@ -599,20 +486,20 @@ a:hover {
   color: #fff;
   cursor: pointer;
 }
+
 .chat-input button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Open/close transition */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
+
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(6px) scale(0.995);
 }
-
 </style>

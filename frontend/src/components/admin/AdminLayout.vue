@@ -17,46 +17,6 @@
     <main class="dashboard-content">
       <router-view />
     </main>
-
-    <!-- <div class="chat-float">
-      <button
-        class="chat-trigger"
-        @click="isChatbotOpen = !isChatbotOpen"
-        aria-label="Open AI chat"
-      >
-        AI
-      </button>
-      <transition name="fade-slide">
-        <section
-          v-if="isChatbotOpen"
-          class="chat-window"
-          role="dialog"
-        >
-          <header class="chat-header">
-            <div class="title">AI Assistant</div>
-            <div class="spacer"></div>
-            <button class="close" @click="isChatbotOpen = false" aria-label="Close chat">×</button>
-          </header>
-          <div class="chat-body" ref="scrollArea" aria-live="polite">
-            <div
-              v-for="(m, i) in messages"
-              :key="i"
-              :class="['message', m.from]"
-            >
-              {{ m.text }}
-            </div>
-          </div>
-          <form class="chat-input" @submit.prevent="sendMessage">
-            <input
-              v-model="draft"
-              type="text"
-              placeholder="Type a message…"
-            />
-            <button type="submit" :disabled="!draft.trim()">Send</button>
-          </form>
-        </section>
-      </transition>
-    </div> -->
   </div>
 </template>
 
@@ -83,7 +43,7 @@ export default {
         this.$nextTick(() => {
           const chatBody = this.$refs.scrollArea;
           if (chatBody) {
-             chatBody.scrollTop = chatBody.scrollHeight;
+            chatBody.scrollTop = chatBody.scrollHeight;
           }
         });
       }, 1000);
@@ -96,6 +56,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -164,11 +125,11 @@ a:hover {
 
 .main-area {
   display: flex;
-  gap: 25px; 
+  gap: 25px;
 }
 
 .employee-list {
-  flex: 3; 
+  flex: 3;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -177,7 +138,7 @@ a:hover {
 .employee-item {
   display: flex;
   align-items: center;
-  gap: 15px; 
+  gap: 15px;
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
 }
@@ -188,7 +149,7 @@ a:hover {
 
 .emp-name {
   font-weight: 600;
-  flex-basis: 10%; 
+  flex-basis: 10%;
 }
 
 .emp-status {
@@ -215,11 +176,11 @@ a:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f9f9f9;
-  flex-grow: 1; 
+  flex-grow: 1;
 }
 
 .chatbot-panel {
-  flex: 1; 
+  flex: 1;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -236,26 +197,26 @@ a:hover {
 }
 
 .chat-history {
-  flex-grow: 1; 
+  flex-grow: 1;
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 10px;
   margin-bottom: 15px;
-  min-height: 250px; 
+  min-height: 250px;
   font-family: monospace;
   color: #666;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .btn-ai {
   background-color: #ececec;
   border: none;
-  border-radius: 50%; 
+  border-radius: 50%;
   width: 50px;
   height: 50px;
   font-weight: bold;
-  align-self: center; 
-  margin-top: auto; 
+  align-self: center;
+  margin-top: auto;
 }
 
 .chat-trigger {
@@ -275,6 +236,7 @@ a:hover {
   z-index: 2000;
   transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
+
 .chat-trigger:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
@@ -304,13 +266,16 @@ a:hover {
   background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
 }
+
 .chat-header .title {
   font-weight: 600;
   font-size: 14px;
 }
+
 .chat-header .spacer {
   flex: 1;
 }
+
 .chat-header .close {
   border: none;
   background: transparent;
@@ -319,6 +284,7 @@ a:hover {
   cursor: pointer;
   color: #6b7280;
 }
+
 .chat-header .close:hover {
   color: #111827;
 }
@@ -331,6 +297,7 @@ a:hover {
   overflow-y: auto;
   background: #ffffff;
 }
+
 .message {
   max-width: 80%;
   padding: 8px 10px;
@@ -339,12 +306,14 @@ a:hover {
   line-height: 1.35;
   word-wrap: break-word;
 }
+
 .message.ai {
   align-self: flex-start;
   background: #f1f5f9;
   color: #0f172a;
   border-top-left-radius: 4px;
 }
+
 .message.user {
   align-self: flex-end;
   background: #2563eb;
@@ -359,6 +328,7 @@ a:hover {
   padding: 10px;
   background: #fafafa;
 }
+
 .chat-input input {
   flex: 1;
   border: 1px solid #e5e7eb;
@@ -367,10 +337,12 @@ a:hover {
   font-size: 13px;
   outline: none;
 }
+
 .chat-input input:focus {
   border-color: #93c5fd;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
+
 .chat-input button {
   border: none;
   border-radius: 10px;
@@ -380,6 +352,7 @@ a:hover {
   color: #fff;
   cursor: pointer;
 }
+
 .chat-input button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -389,11 +362,13 @@ a:hover {
 .fade-slide-leave-active {
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
+
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(6px) scale(0.995);
 }
+
 .logout-btn {
   margin-left: 20px;
   padding: 6px 12px;
@@ -405,8 +380,8 @@ a:hover {
   font-weight: 600;
   font-size: 14px;
 }
+
 .logout-btn:hover {
   background-color: #dc2626;
 }
-
 </style>

@@ -6,8 +6,7 @@
           <div class="col-12 col-md-10 col-lg-6">
             <div class="card shadow-lg border-0 rounded-4 card-floating">
               <div
-                class="card-header d-flex align-items-center justify-content-between bg-primary text-white py-3 px-4 px-md-5"
-              >
+                class="card-header d-flex align-items-center justify-content-between bg-primary text-white py-3 px-4 px-md-5">
                 <div>
                   <h1 class="h4 mb-1 fw-semibold">Edit Account Details</h1>
                   <p class="mb-0 small text-white-50">
@@ -21,84 +20,37 @@
 
               <div class="card-body p-4 p-md-5">
                 <form @submit.prevent="handleSubmit()">
-                  <!-- User ID -->
                   <div class="mb-3">
                     <label for="id" class="form-label fw-semibold">User ID</label>
-                    <input
-                      type="text"
-                      class="form-control form-control-sm bg-light"
-                      id="id"
-                      v-model="id"
-                      disabled
-                    />
+                    <input type="text" class="form-control form-control-sm bg-light" id="id" v-model="id" disabled />
                     <div class="form-text">System generated identifier (read-only).</div>
                   </div>
 
-                  <!-- Name -->
                   <div class="mb-3">
                     <label for="name" class="form-label fw-semibold">Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="name"
-                      placeholder="Enter your name"
-                      v-model="name"
-                      disabled
-                    />
+                    <input type="text" class="form-control" id="name" placeholder="Enter your name" v-model="name"
+                      disabled />
                   </div>
 
-                  <!-- Old Password -->
                   <div class="mb-3">
                     <label for="old_password" class="form-label fw-semibold">Old Password</label>
                     <div class="input-with-eye">
-                      <input
-                        :type="showOldPassword ? 'text' : 'password'"
-                        class="form-control with-eye-input"
-                        id="old_password"
-                        placeholder="Enter old password"
-                        v-model="old_password"
-                        autocomplete="current-password"
-                        required
-                      />
-                      <button
-                        type="button"
-                        class="eye-btn"
-                        @click="showOldPassword = !showOldPassword"
+                      <input :type="showOldPassword ? 'text' : 'password'" class="form-control with-eye-input"
+                        id="old_password" placeholder="Enter old password" v-model="old_password"
+                        autocomplete="current-password" required />
+                      <button type="button" class="eye-btn" @click="showOldPassword = !showOldPassword"
                         :aria-label="showOldPassword ? 'Hide old password' : 'Show old password'"
-                        title="Toggle old password visibility"
-                      >
-                        <!-- eye open -->
-                        <svg
-                          v-if="!showOldPassword"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
+                        title="Toggle old password visibility">
+                        <svg v-if="!showOldPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
                           <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                           <circle cx="12" cy="12" r="3" />
                         </svg>
-                        <!-- eye off -->
-                        <svg
-                          v-else
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path
-                            d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.32 20.32 0 0 1 5.17-5.94"
-                          />
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.32 20.32 0 0 1 5.17-5.94" />
                           <path d="M1 1l22 22" />
                           <path d="M9.53 9.53A3 3 0 0 0 14.47 14.47" />
                         </svg>
@@ -107,58 +59,25 @@
                     <div class="form-text">Enter your current password to authorize changes.</div>
                   </div>
 
-                  <!-- New Password -->
                   <div class="mb-3">
                     <label for="new_password" class="form-label fw-semibold">New Password</label>
                     <div class="input-with-eye">
-                      <input
-                        :type="showNewPassword ? 'text' : 'password'"
-                        class="form-control with-eye-input"
-                        id="new_password"
-                        placeholder="Enter new password"
-                        v-model="new_password"
-                        autocomplete="new-password"
-                        required
-                      />
-                      <button
-                        type="button"
-                        class="eye-btn"
-                        @click="showNewPassword = !showNewPassword"
+                      <input :type="showNewPassword ? 'text' : 'password'" class="form-control with-eye-input"
+                        id="new_password" placeholder="Enter new password" v-model="new_password"
+                        autocomplete="new-password" required />
+                      <button type="button" class="eye-btn" @click="showNewPassword = !showNewPassword"
                         :aria-label="showNewPassword ? 'Hide new password' : 'Show new password'"
-                        title="Toggle new password visibility"
-                      >
-                        <!-- eye open -->
-                        <svg
-                          v-if="!showNewPassword"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
+                        title="Toggle new password visibility">
+                        <svg v-if="!showNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
                           <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                           <circle cx="12" cy="12" r="3" />
                         </svg>
-                        <!-- eye off -->
-                        <svg
-                          v-else
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path
-                            d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.32 20.32 0 0 1 5.17-5.94"
-                          />
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.32 20.32 0 0 1 5.17-5.94" />
                           <path d="M1 1l22 22" />
                           <path d="M9.53 9.53A3 3 0 0 0 14.47 14.47" />
                         </svg>
@@ -169,33 +88,20 @@
                     </div>
                   </div>
 
-                  <!-- Role -->
                   <div class="mb-3">
                     <label for="role" class="form-label fw-semibold">User Role</label>
-                    <input
-                      type="text"
-                      class="form-control form-control-sm bg-light"
-                      id="role"
-                      v-model="role"
-                      disabled
-                    />
+                    <input type="text" class="form-control form-control-sm bg-light" id="role" v-model="role"
+                      disabled />
                     <div class="form-text">Your access level in the system (read-only).</div>
                   </div>
 
-                  <!-- Email -->
                   <div class="mb-4">
                     <label for="email" class="form-label fw-semibold">Email</label>
-                    <input
-                      type="email"
-                      class="form-control form-control-sm bg-light"
-                      id="email"
-                      v-model="email"
-                      disabled
-                    />
+                    <input type="email" class="form-control form-control-sm bg-light" id="email" v-model="email"
+                      disabled />
                     <div class="form-text">Contact your administrator to change this email.</div>
                   </div>
 
-                  <!-- Actions -->
                   <div class="d-flex align-items-center justify-content-between">
                     <button type="submit" class="btn btn-primary px-4">
                       <span class="me-1">
@@ -204,11 +110,8 @@
                       Save Changes
                     </button>
 
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary btn-sm"
-                      @click="$router.push('/admin/account')"
-                    >
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                      @click="$router.push('/admin/account')">
                       Cancel
                     </button>
                   </div>
@@ -296,7 +199,6 @@ export default {
     linear-gradient(135deg, #f8f9fa, #e9ecef);
 }
 
-/* Slight floating/hover effect for card */
 .card-floating {
   transform: translateY(0);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -307,7 +209,6 @@ export default {
   box-shadow: 0 1.25rem 3rem rgba(15, 23, 42, 0.18);
 }
 
-/* Password input with inline eye button styled like an input group */
 .input-with-eye {
   position: relative;
   display: flex;
@@ -351,7 +252,6 @@ export default {
   pointer-events: none;
 }
 
-/* Small tweak for the header badge on very small screens */
 @media (max-width: 575.98px) {
   .card-header h1.h4 {
     font-size: 1.1rem;

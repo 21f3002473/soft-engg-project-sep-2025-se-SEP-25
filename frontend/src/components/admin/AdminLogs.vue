@@ -27,7 +27,7 @@
             </tr>
           </tbody>
         </table>
-        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -45,17 +45,15 @@ export default {
   },
   methods: {
     async fetchLogs() {
-      // Placeholder for log fetching logic
-      const res = await fetch(`http://localhost:8000/api/admin/summary`,{
+      const res = await fetch(`http://localhost:8000/api/admin/summary`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      }); 
+      });
       if (res.ok) {
         const data = await res.json();
-        // Process and display logs
         this.logs = data;
         this.currentAdminID = this.logs.currentAdmin.id;
         this.currentAdminEmail = this.logs.currentAdmin.email;
@@ -65,10 +63,10 @@ export default {
         return;
       }
     },
-  }, 
+  },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if(!localStorage.getItem('token') || user.role !== 'root') {
+    if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
@@ -85,13 +83,55 @@ export default {
   height: 100vh;
   color: #333;
 }
-a { text-decoration: none; color: #555; font-size: 14px; }
-a:hover { color: #000; }
-.router-link-exact-active { color: #007bff; font-weight: bold; }
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #ffffff; border-bottom: 1px solid #ddd; }
-.nav-links a { margin-right: 25px; }
-.account-link a { font-weight: bold; }
-.dashboard-content { padding: 25px 30px; }
-.dashboard-content h1 { margin: 0; font-size: 28px; font-weight: 600; margin-bottom: 20px; }
-.content-placeholder { background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; min-height: 200px; }
+
+a {
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+}
+
+a:hover {
+  color: #000;
+}
+
+.router-link-exact-active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-links a {
+  margin-right: 25px;
+}
+
+.account-link a {
+  font-weight: bold;
+}
+
+.dashboard-content {
+  padding: 25px 30px;
+}
+
+.dashboard-content h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.content-placeholder {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 200px;
+}
 </style>

@@ -7,14 +7,8 @@
         <div class="employee-item">
           <div class="form-group">
             <label for="employeeName" class="field-label">Employee Name</label>
-            <input
-              class="text-input"
-              type="text"
-              name="employeeName"
-              id="employeeName"
-              placeholder="Enter full name"
-              v-model="employeeName"
-            />
+            <input class="text-input" type="text" name="employeeName" id="employeeName" placeholder="Enter full name"
+              v-model="employeeName" />
           </div>
 
           <div class="form-group">
@@ -47,8 +41,6 @@ export default {
   },
   methods: {
     async AddEmployee() {
-      // Logic to add employee
-      // console.log(`Employee Name: ${this.employeeName}, Employee Type: ${this.employeeType}`);
       const res = await fetch(`http://localhost:8000/api/admin/employees`, {
         method: 'POST',
         headers: {
@@ -60,22 +52,21 @@ export default {
           role: this.employeeType
         })
       });
-        if (!res.ok) {
-          console.error('Failed to add employee');
-          return;
-        }
-        const data = await res.json();
-        alert(`Employee added successfully: ${data.name}, 
+      if (!res.ok) {
+        console.error('Failed to add employee');
+        return;
+      }
+      const data = await res.json();
+      alert(`Employee added successfully: ${data.name}, 
         Employee Details:
         ID: ${data.id}, Role: ${data.role}, Email: ${data.email}, Password: ${data.temporary_password}`);
-      // Reset fields
       this.employeeName = '';
       this.employeeType = '';
     }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if(!localStorage.getItem('token') || user.role !== 'root') {
+    if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
@@ -85,24 +76,64 @@ export default {
 </script>
 
 <style scoped>
-/* All styles are identical to ChatbotConfig.vue */
 .dashboard {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f4f7f6;
   height: 100vh;
   color: #333;
 }
-a { text-decoration: none; color: #555; font-size: 14px; }
-a:hover { color: #000; }
-.router-link-exact-active { color: #007bff; font-weight: bold; }
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #ffffff; border-bottom: 1px solid #ddd; }
-.nav-links a { margin-right: 25px; }
-.account-link a { font-weight: bold; }
-.dashboard-content { padding: 25px 30px; }
-.dashboard-content h1 { margin: 0; font-size: 28px; font-weight: 600; margin-bottom: 20px; }
-.content-placeholder { background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; min-height: 200px; }
 
-/* Add Employee card layout */
+a {
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+}
+
+a:hover {
+  color: #000;
+}
+
+.router-link-exact-active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-links a {
+  margin-right: 25px;
+}
+
+.account-link a {
+  font-weight: bold;
+}
+
+.dashboard-content {
+  padding: 25px 30px;
+}
+
+.dashboard-content h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.content-placeholder {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 200px;
+}
+
 .employee-list {
   max-width: 640px;
   margin: 16px auto 0;
@@ -110,18 +141,21 @@ a:hover { color: #000; }
 
 .employee-item {
   background: #ffffff;
-  border: 1px solid #e5e7eb; 
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
 }
 
-.form-group { margin-bottom: 16px; }
+.form-group {
+  margin-bottom: 16px;
+}
+
 .field-label {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151; 
+  color: #374151;
   margin-bottom: 8px;
 }
 
@@ -130,15 +164,17 @@ a:hover { color: #000; }
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
-  color: #111827; 
+  color: #111827;
   background: #fff;
-  border: 1px solid #d1d5db; 
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.text-input::placeholder { color: #9ca3af; }
+.text-input::placeholder {
+  color: #9ca3af;
+}
 
 .text-input:focus,
 .status-dropdown:focus {
@@ -146,7 +182,9 @@ a:hover { color: #000; }
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-.form-actions { margin-top: 8px; }
+.form-actions {
+  margin-top: 8px;
+}
 
 .btn {
   padding: 10px 14px;
@@ -161,7 +199,18 @@ a:hover { color: #000; }
   transition: background-color 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
 }
 
-.btn:hover { background-color: #0069d9; box-shadow: 0 8px 18px rgba(0, 123, 255, 0.3); }
-.btn:active { transform: translateY(0.5px); }
-.btn:disabled { background-color: #a5b4fc; cursor: not-allowed; box-shadow: none; }
+.btn:hover {
+  background-color: #0069d9;
+  box-shadow: 0 8px 18px rgba(0, 123, 255, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0.5px);
+}
+
+.btn:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 </style>

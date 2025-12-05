@@ -17,14 +17,8 @@
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label class="form-label fw-bold">Amount (₹)</label>
-            <input
-              v-model="form.amount"
-              type="number"
-              min="0"
-              class="form-control"
-              placeholder="Enter amount"
-              required
-            />
+            <input v-model="form.amount" type="number" min="0" class="form-control" placeholder="Enter amount"
+              required />
           </div>
           <div class="col-md-6">
             <label class="form-label fw-bold">Date of Expense</label>
@@ -34,12 +28,7 @@
 
         <div class="mb-3">
           <label class="form-label fw-bold">Remarks</label>
-          <textarea
-            v-model="form.remarks"
-            rows="3"
-            class="form-control"
-            placeholder="Add any remarks..."
-          ></textarea>
+          <textarea v-model="form.remarks" rows="3" class="form-control" placeholder="Add any remarks..."></textarea>
         </div>
 
         <div class="d-flex justify-content-end">
@@ -102,15 +91,18 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(-15px);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateY(0);

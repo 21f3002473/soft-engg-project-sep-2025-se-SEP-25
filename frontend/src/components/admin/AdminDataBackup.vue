@@ -2,10 +2,9 @@
   <div class="dashboard">
 
     <main class="dashboard-content">
-      
+
       <h1>Backups</h1>
 
-      <!-- Main Table -->
       <div v-if="oldBackupConfig" class="dashboard-content backup-actions-section mt-4">
         <h2>Current Backup Details</h2>
         <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
@@ -27,63 +26,44 @@
       </div>
     </main>
 
-      <!-- ===== Actions Table ===== -->
-      <div class="dashboard-content backup-actions-section mt-4">
-        <h2>Take New Backup</h2>
-        <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Day</th>
-              <th>Backup Type</th>
-              <th>DateTime</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <!-- Day select with Bootstrap styles -->
-                <select
-                  v-model="day"
-                  class="form-select form-select-sm backup-select"
-                  required
-                >
-                  <option disabled value="">Select day</option>
-                  <option v-for="w in weekdays" :key="w" :value="w">{{ w }}</option>
-                </select>
-              </td>
-              <td>
-                <!-- Backup type select with Bootstrap styles -->
-                <select
-                  v-model="backup_type"
-                  class="form-select form-select-sm backup-select"
-                  required
-                >
-                  <option value="">Select Backup Type</option>
-                  <option value="FULL">Full Backup</option>
-                  <option value="INCREMENTAL">Incremental</option>
-                  <option value="DIFFERENTIAL">Differential</option>
-                </select>
-              </td>
-              <td>
-                <!-- DateTime field with Bootstrap form-control -->
-                <input
-                  type="datetime-local"
-                  required
-                  v-model="date_time"
-                  class="form-control form-control-sm backup-datetime"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div> 
+    <div class="dashboard-content backup-actions-section mt-4">
+      <h2>Take New Backup</h2>
+      <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Day</th>
+            <th>Backup Type</th>
+            <th>DateTime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <select v-model="day" class="form-select form-select-sm backup-select" required>
+                <option disabled value="">Select day</option>
+                <option v-for="w in weekdays" :key="w" :value="w">{{ w }}</option>
+              </select>
+            </td>
+            <td>
+              <select v-model="backup_type" class="form-select form-select-sm backup-select" required>
+                <option value="">Select Backup Type</option>
+                <option value="FULL">Full Backup</option>
+                <option value="INCREMENTAL">Incremental</option>
+                <option value="DIFFERENTIAL">Differential</option>
+              </select>
+            </td>
+            <td>
+              <input type="datetime-local" required v-model="date_time"
+                class="form-control form-control-sm backup-datetime" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Global actions -->
-      <div class="d-flex justify-content-center gap-2 mt-2">
-        <button class="btn btn-primary" @click="saveConfig">Take Backup</button>
-        <!-- <button class="btn btn-outline-danger" @click="resetToDefaults">Reset</button> -->
-      </div>
-      <!-- ===== End Actions Table ===== -->
+    <div class="d-flex justify-content-center gap-2 mt-2">
+      <button class="btn btn-primary" @click="saveConfig">Take Backup</button>
+    </div>
   </div>
 </template>
 
@@ -98,20 +78,17 @@ export default {
   },
   data() {
     return {
-      // Always ensure backups starts as an array
       backups: [],
       day: '',
       backup_type: '',
       date_time: '',
       datetimeLocal: '',
       weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      oldBackupConfig: null // to track changes
+      oldBackupConfig: null
     };
   },
   methods: {
-    // Fetch existing backup config from API
     async fetchBackups() {
-      // Logic to fetch existing backup config from API
       try {
         const res = await fetch(`http://localhost:8000/api/admin/backup-config`, {
           method: 'GET',
@@ -123,7 +100,6 @@ export default {
 
         if (!res.ok) {
           console.error('Failed to fetch backup config, status:', res.status);
-          // keep existing this.backups (safe) or set to empty array
           return;
         }
 
@@ -131,17 +107,13 @@ export default {
         this.oldBackupConfig = data || [];
       } catch (err) {
         console.error('Error fetching backups:', err);
-        // fallback to an empty array — prevents template render crash
         return this.oldBackupConfig = [];
       }
     },
-    // Save entire backup config
     async saveConfig() {
-      // 1. Validation
       if (!this.day) { alert('Pick a day'); return; }
       if (!this.backup_type) { alert('Pick a backup type'); return; }
 
-      // 2. Date Parsing — only use date_time (the bound field)
       let isoDatetime = null;
       if (this.date_time) {
         const d = new Date(this.date_time);
@@ -162,7 +134,6 @@ export default {
         datetime: isoDatetime
       };
 
-      // Merge with existing backups so history isn’t wiped
       const currentList = this.backups.map(b => ({
         day: b.day,
         type: b.type,
@@ -188,22 +159,18 @@ export default {
         }
 
         alert('Saved successfully');
-        
-        // Clear inputs
+
         this.day = '';
         this.backup_type = '';
         this.date_time = '';
 
-        // Refresh list
         await this.fetchBackups();
-        
+
       } catch (e) {
         console.error(e);
         alert(e.message || 'Save failed');
       }
     },
-
-    /* ---------------- New helper methods for actions table ---------------- */
 
     prettyType(type) {
       if (!type) return '—';
@@ -225,20 +192,16 @@ export default {
     },
 
     runBackup(item) {
-      // Guard
       if (!item) return;
       console.log('Triggering backup for', item.day, item);
 
-      // Ensure fields exist (we normalized them on fetch but be safe)
       if (typeof item.status === 'undefined') item.status = null;
       if (typeof item.lastRunAt === 'undefined') item.lastRunAt = null;
 
-      // Use direct assignments (Vue 3 reacts to these if props exist on object)
       item.status = 'Running';
 
-      // Simulated API call — replace with real API call
       setTimeout(() => {
-        const ok = Math.random() > 0.15; // simulated outcome
+        const ok = Math.random() > 0.15;
         if (ok) {
           item.status = 'Success';
           item.lastRunAt = new Date().toISOString();
@@ -266,7 +229,6 @@ export default {
     }
   },
   mounted() {
-    // fetch existing backup config
     const user = JSON.parse(localStorage.getItem('user'));
     if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
@@ -296,13 +258,11 @@ a:hover {
   color: #000;
 }
 
-/* Style for the active router link */
 .router-link-exact-active {
   color: #007bff;
   font-weight: bold;
 }
 
-/* 1. Header Navigation (Copied) */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -320,12 +280,10 @@ a:hover {
   font-weight: bold;
 }
 
-/* 2. Main Content Area (Copied) */
 .dashboard-content {
   padding: 25px 30px;
 }
 
-/* 2a. Content Header */
 .dashboard-content h1 {
   margin: 0;
   font-size: 28px;
@@ -333,7 +291,6 @@ a:hover {
   margin-bottom: 20px;
 }
 
-/* 2b. New Styles for Backup List */
 .backup-container {
   background-color: #ffffff;
   border: 1px solid #ddd;
@@ -357,17 +314,15 @@ a:hover {
 
 .day-label {
   font-weight: 600;
-  flex-basis: 20%; 
+  flex-basis: 20%;
 }
 
 .inputs-group {
   display: flex;
   gap: 15px;
-  flex-grow: 1; 
-  justify-content: flex-end; 
+  flex-grow: 1;
+  justify-content: flex-end;
 }
-
-/* === Field-specific styles (only for inputs/selects) === */
 
 .backup-select,
 .backup-datetime {
@@ -389,12 +344,10 @@ a:hover {
   outline: 0;
 }
 
-/* slightly tighter padding for sm controls, but keep it in sync */
 .backup-datetime::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
-/* existing styles kept as-is for any other usage */
 .backup-datetime {
   padding: 8px 12px;
   font-size: 14px;
@@ -408,15 +361,14 @@ a:hover {
 
 .backup-table {
   border-radius: 10px;
-  overflow: hidden; 
+  overflow: hidden;
   background: #fff;
 }
 
-.backup-table td, .backup-table th {
+.backup-table td,
+.backup-table th {
   vertical-align: middle !important;
 }
-
-/* ================= New styles for the actions table (matches existing aesthetic) ================= */
 
 .action-table {
   border-radius: 10px;
@@ -432,7 +384,6 @@ a:hover {
   font-size: 14px;
 }
 
-/* Status badges to mirror simple neutral -> success -> fail look */
 .status-badge {
   display: inline-block;
   padding: 6px 10px;
@@ -457,40 +408,39 @@ a:hover {
 .status-success {
   background: #e6f4ea;
   color: #0f5132;
-  border: 1px solid rgba(15,81,50,0.08);
+  border: 1px solid rgba(15, 81, 50, 0.08);
 }
 
 .status-failed {
   background: #fdecea;
   color: #7a1a1a;
-  border: 1px solid rgba(122,26,26,0.06);
+  border: 1px solid rgba(122, 26, 26, 0.06);
 }
 
-/* small responsive tweaks */
 @media (max-width: 720px) {
+
   .backup-table thead th,
   .action-table thead th {
     font-size: 13px;
   }
+
   .action-table td {
     font-size: 13px;
   }
+
   .backup-content-cta {
     flex-direction: column;
     gap: 8px;
   }
 }
 
-/* minor spacing adjustments to fit the project aesthetic */
 .backup-actions-section h2 {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-/* buttons gap helper (bootstrap has gap utilities but keep style self-contained) */
 .d-flex.gap-2 {
   gap: 8px;
 }
-
 </style>

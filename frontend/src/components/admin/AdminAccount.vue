@@ -21,7 +21,7 @@
               <td><span class="role-pill">{{ accounts.role }}</span></td>
             </tr>
           </tbody>
-      </table>
+        </table>
       </div>
     </main>
     <button type="button" class="btn btn-primary" @click="changeDetails()">change details</button>
@@ -33,7 +33,6 @@ export default {
   name: 'AdminAccount',
   data() {
     return {
-      // Data properties for account settings can be added here
       accounts: [],
     };
   },
@@ -47,17 +46,15 @@ export default {
         }
       });
       const data = await res.json();
-      // console.log(data);
       this.accounts = data;
     },
     async changeDetails() {
-      // alert('Change details functionality to be implemented.');
       this.$router.push('/admin/account/edit');
     }
   },
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if(!localStorage.getItem('token') || user.role !== 'root') {
+    if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
@@ -74,13 +71,55 @@ export default {
   height: 100vh;
   color: #333;
 }
-a { text-decoration: none; color: #555; font-size: 14px; }
-a:hover { color: #000; }
-.router-link-exact-active { color: #007bff; font-weight: bold; }
-.dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: #ffffff; border-bottom: 1px solid #ddd; }
-.nav-links a { margin-right: 25px; }
-.account-link a { font-weight: bold; }
-.dashboard-content { padding: 25px 30px; }
-.dashboard-content h1 { margin: 0; font-size: 28px; font-weight: 600; margin-bottom: 20px; }
-.content-placeholder { background-color: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; min-height: 200px; }
+
+a {
+  text-decoration: none;
+  color: #555;
+  font-size: 14px;
+}
+
+a:hover {
+  color: #000;
+}
+
+.router-link-exact-active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+.nav-links a {
+  margin-right: 25px;
+}
+
+.account-link a {
+  font-weight: bold;
+}
+
+.dashboard-content {
+  padding: 25px 30px;
+}
+
+.dashboard-content h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.content-placeholder {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 200px;
+}
 </style>

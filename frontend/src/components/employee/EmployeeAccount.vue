@@ -30,14 +30,8 @@
         <div v-else class="row g-3">
           <div class="col-md-6" v-for="(value, key) in editableFields" :key="key">
             <label :for="key" class="form-label fw-medium text-secondary">{{ keyLabels[key] }}</label>
-            <input
-              :id="key"
-              v-model="user[key]"
-              :readonly="key === 'department'"
-              :type="inputTypes[key]"
-              class="form-control"
-              :class="{ 'bg-light': key === 'department' }"
-            />
+            <input :id="key" v-model="user[key]" :readonly="key === 'department'" :type="inputTypes[key]"
+              class="form-control" :class="{ 'bg-light': key === 'department' }" />
           </div>
         </div>
       </div>
@@ -134,9 +128,9 @@ export default {
           name: this.user.name,
           email: this.user.email,
         };
-        
+
         await make_putrequest("/api/employee/account", payload);
-        
+
         this.originalUser = JSON.parse(JSON.stringify(this.user));
         useNotify().success("Profile updated successfully!");
       } catch (error) {
