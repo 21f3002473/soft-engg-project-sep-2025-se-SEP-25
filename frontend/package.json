@@ -18,8 +18,10 @@
     "katex": "^0.16.25",
     "markdown-it": "^14.1.0",
     "markdown-it-katex": "^2.0.3",
+    "pdfjs-dist": "^4.10.38",
     "vue": "^3.2.13",
     "vue-router": "^4.6.3",
+    "vue3-pdf": "^4.2.6",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
