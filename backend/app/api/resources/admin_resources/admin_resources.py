@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
 
-from requests import session
-
 from app.controllers import get_current_active_user
 from app.database import User, get_session
 from app.database.admin_models import Backup, BackupTypeEnum, Log
@@ -10,6 +8,7 @@ from app.middleware import RoleEnum, can_view_system_logs, require_root
 from fastapi import Depends, HTTPException, Query, status
 from fastapi_restful import Resource
 from pydantic import BaseModel, EmailStr, Field
+from requests import session
 from sqlmodel import Session, select
 
 # -----------------------------
@@ -530,6 +529,7 @@ class AdminBackupResource(Resource):
             "count": len(payload.backups),
         }
 
+
 class AdminLogsResource(Resource):
     """
     Admin System Logs Resource.
@@ -679,22 +679,28 @@ class AdminAccountResource(Resource):
         }
 
     def put(
-    self,
-    payload: AccountUpdatePayload,
-    current_user: User = Depends(get_current_active_user),
-    _: User = Depends(require_root()),
-    session: Session = Depends(get_session),
+        self,
+        payload: AccountUpdatePayload,
+        current_user: User = Depends(get_current_active_user),
+        _: User = Depends(require_root()),
+        session: Session = Depends(get_session),
     ):
         # Load the user using the same session we'll commit with
         db_user: User = session.get(User, current_user.id)
         if not db_user:
             # Defensive: should not happen because current_user was authenticated, but safe guard
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
 
         updated = False
 
         # Update name if different
-        if payload.name and payload.name.strip() and payload.name.strip() != db_user.name:
+        if (
+            payload.name
+            and payload.name.strip()
+            and payload.name.strip() != db_user.name
+        ):
             db_user.name = payload.name.strip()
             updated = True
 
@@ -717,7 +723,9 @@ class AdminAccountResource(Resource):
             updated = True
 
         if updated:
-            session.add(db_user)  # db_user is already bound to this session, but add() is harmless
+            session.add(
+                db_user
+            )  # db_user is already bound to this session, but add() is harmless
             session.commit()
             session.refresh(db_user)
 
@@ -728,6 +736,7 @@ class AdminAccountResource(Resource):
             "role": db_user.role,
             "updated": updated,
         }
+
 
 class AdminDeleteUserResource(Resource):
     """
@@ -778,6 +787,4 @@ class AdminDeleteUserResource(Resource):
         session.delete(user)
         session.commit()
 
-        return {
-            "message": f"User with ID {user_id} has been deleted successfully."
-        }
+        return {"message": f"User with ID {user_id} has been deleted successfully."}
