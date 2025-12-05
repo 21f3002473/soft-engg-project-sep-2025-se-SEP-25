@@ -44,7 +44,7 @@
           </div>
 
           <div class="col-md-9 d-flex flex-column">
-            <div v-if="error" class="alert alert-danger py-2 mb-3">{{ error }}</div>
+            
             
             <input 
               v-model="topic" 
@@ -61,7 +61,7 @@
             ></textarea>
 
             <div class="d-flex justify-content-end align-items-center gap-2">
-              <span v-if="saveMessage" class="text-success me-auto small fw-bold">{{ saveMessage }}</span>
+              
               <button @click="saveNote" class="btn btn-primary px-4" :disabled="saving">
                 {{ saving ? 'Saving...' : 'Save' }}
               </button>
@@ -77,6 +77,8 @@
 
 <script>
 import { make_getrequest, make_postrequest, make_putrequest, make_deleterequest } from '@/store/appState.js';
+import { useNotify } from "@/utils/useNotify.js";
+import Swal from 'sweetalert2';
 
 export default {
   name: 'EmployeeWriting',
@@ -88,8 +90,6 @@ export default {
       text: '',
       loading: false,
       saving: false,
-      error: null,
-      saveMessage: ''
     };
   },
   mounted() {
@@ -103,7 +103,7 @@ export default {
         this.notes = response.notes;
       } catch (err) {
         console.error('Failed to fetch notes:', err);
-        this.error = 'Failed to load notes.';
+        useNotify().error('Failed to load notes.');
       } finally {
         this.loading = false;
       }
@@ -112,15 +112,11 @@ export default {
       this.selectedNoteId = note.id;
       this.topic = note.topic;
       this.text = note.notes;
-      this.error = null;
-      this.saveMessage = '';
     },
     createNewNote() {
       this.selectedNoteId = null;
       this.topic = '';
       this.text = '';
-      this.error = null;
-      this.saveMessage = '';
     },
     getPreview(text) {
       if (!text) return 'No content';
@@ -128,13 +124,11 @@ export default {
     },
     async saveNote() {
       if (!this.text.trim()) {
-        this.error = 'Note content cannot be empty.';
+        useNotify().warn('Note content cannot be empty.');
         return;
       }
       
       this.saving = true;
-      this.error = null;
-      this.saveMessage = '';
 
       try {
         const payload = {
@@ -144,7 +138,7 @@ export default {
 
         if (this.selectedNoteId) {
           await make_putrequest(`/api/employee/writing/${this.selectedNoteId}`, payload);
-          this.saveMessage = 'Note updated successfully.';
+          useNotify().success('Note updated successfully.');
           
           const index = this.notes.findIndex(n => n.id === this.selectedNoteId);
           if (index !== -1) {
@@ -152,37 +146,56 @@ export default {
           }
         } else {
           const response = await make_postrequest('/api/employee/writing', payload);
-          this.saveMessage = 'Note saved successfully.';
+          useNotify().success('Note saved successfully.');
           this.selectedNoteId = response.id;
           
           this.notes.push({ id: response.id, ...payload });
         }
         
-        setTimeout(() => { this.saveMessage = ''; }, 3000);
-
       } catch (err) {
         console.error('Failed to save note:', err);
-        this.error = 'Failed to save note. Please try again.';
+        useNotify().error('Failed to save note. Please try again.');
       } finally {
         this.saving = false;
       }
     },
     async confirmDelete(id) {
-      if (confirm('Are you sure you want to delete this note?')) {
+      const result = await Swal.fire({
+        title: 'Delete Note?',
+        text: "Are you sure you want to delete this note?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
         try {
           await make_deleterequest(`/api/employee/writing/${id}`);
           this.notes = this.notes.filter(n => n.id !== id);
           if (this.selectedNoteId === id) {
             this.createNewNote();
           }
+          useNotify().info('Note deleted.');
         } catch (err) {
           console.error('Failed to delete note:', err);
-          alert('Failed to delete note.');
+          useNotify().error('Failed to delete note.');
         }
       }
     },
-    clearText() {
-      if (confirm('Clear current text?')) {
+    async clearText() {
+        const result = await Swal.fire({
+        title: 'Clear Text?',
+        text: "This will clear the current editor. Are you sure?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, clear it!'
+      });
+
+      if (result.isConfirmed) {
         this.text = '';
       }
     }

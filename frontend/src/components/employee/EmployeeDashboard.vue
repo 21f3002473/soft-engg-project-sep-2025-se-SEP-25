@@ -82,6 +82,7 @@
 
 <script>
 import { make_getrequest, make_putrequest, make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeDashboard',
@@ -181,7 +182,7 @@ export default {
         
       } catch (error) {
         console.error("Failed to add task:", error);
-        alert("Failed to add task");
+        useNotify().error("Failed to add task");
       }
     },
     async toggleTask(task) {
@@ -196,7 +197,7 @@ export default {
         console.error("Failed to update task:", error);
 
         task.status = originalStatus;
-        alert("Failed to update task status");
+        useNotify().error("Failed to update task status");
       }
     },
     updateLocalStats(oldStatus, newStatus) {

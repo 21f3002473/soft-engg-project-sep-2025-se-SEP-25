@@ -19,7 +19,7 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-      <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+
       <div v-else class="card border-0 shadow-sm rounded-3 overflow-hidden">
         <div class="list-group list-group-flush">
           <div
@@ -61,6 +61,7 @@
 
 <script>
 import { make_getrequest } from '@/store/appState.js';
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeHRFAQs',
@@ -69,8 +70,7 @@ export default {
       search: '',
       activeIndex: null,
       faqs: [],
-      loading: false,
-      error: null
+      loading: false
     };
   },
   computed: {
@@ -90,13 +90,12 @@ export default {
   methods: {
     async fetchFAQs() {
       this.loading = true;
-      this.error = null;
       try {
         const response = await make_getrequest('/api/employee/hr-faqs');
         this.faqs = response.faqs;
       } catch (err) {
         console.error('Failed to fetch FAQs:', err);
-        this.error = 'Failed to load FAQs. Please try again later.';
+        useNotify().error('Failed to load FAQs. Please try again later.');
       } finally {
         this.loading = false;
       }
@@ -105,7 +104,7 @@ export default {
       this.activeIndex = this.activeIndex === index ? null : index;
     },
     contactHR() {
-      alert('Redirecting to HR contact page...');
+      useNotify().info('Redirecting to HR contact page...');
     }
   }
 };

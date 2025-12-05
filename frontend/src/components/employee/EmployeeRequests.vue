@@ -82,6 +82,7 @@
 
 <script>
 import { make_getrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: "EmployeeRequests",
@@ -190,6 +191,7 @@ export default {
 
       } catch (error) {
         console.error("Failed to fetch requests", error);
+        useNotify().error("Failed to fetch requests.");
       } finally {
         this.loading = false;
       }

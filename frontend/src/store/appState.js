@@ -1,6 +1,5 @@
 import store from "@/store/store.js";
 import { useNotify } from '@/utils/useNotify.js';
-import { nextTick } from "vue";
 
 const notify = useNotify();
 
@@ -70,8 +69,6 @@ export async function submitLogin(params = {}, router) {
     }
 
     notify.success("Login successful!");
-
-    await nextTick();  
 
     const targetRoute = `/${role}/dashboard`;
     router.replace(targetRoute);
