@@ -47,6 +47,7 @@
 
 <script>
 import { make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeTransferForm',
@@ -83,11 +84,11 @@ export default {
         };
 
         await make_postrequest('/api/employee/requests/transfer', payload);
-        alert('Transfer request submitted successfully!');
+        useNotify().success('Transfer request submitted successfully!');
         this.$router.push('/employee/requests');
       } catch (error) {
         console.error("Failed to submit transfer request:", error);
-        alert('Failed to submit transfer request. Please try again.');
+        useNotify().error('Failed to submit transfer request. Please try again.');
       }
     }
   }

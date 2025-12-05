@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '@/store/store.js';
+import { useNotify } from '@/utils/useNotify.js';
+
+const notify = useNotify();
 
 const routes = [
     {
@@ -256,11 +259,13 @@ router.beforeEach((to, from, next) => {
 
     if (requiresAuth) {
         if (!token) {
+            notify.warn("Please log in to access this page.", { autoClose: 2000 });
             next('/login');
         } else {
             const requiredRole = to.matched.find(record => record.meta.role)?.meta.role;
 
             if (requiredRole && requiredRole !== userRole) {
+                notify.error("Unauthorized access. Redirecting to your dashboard.");
                 if (userRole === 'admin') next('/admin/dashboard');
                 else if (userRole === 'employee') next('/employee/dashboard');
                 else if (userRole === 'hr') next('/hr/dashboard');
@@ -272,6 +277,7 @@ router.beforeEach((to, from, next) => {
         }
     } else {
         if (token && (to.path === '/login' || to.path === '/')) {
+            notify.info("You are already logged in.", { autoClose: 2000 });
             if (userRole === 'admin') next('/admin/dashboard');
             else if (userRole === 'employee') next('/employee/dashboard');
             else if (userRole === 'hr') next('/hr/dashboard');

@@ -51,6 +51,7 @@
 
 <script>
 import { make_getrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeLearning',
@@ -98,6 +99,7 @@ export default {
         }
       } catch (error) {
         console.error("Failed to fetch learning data:", error);
+        useNotify().error("Failed to fetch learning resources.");
       } finally {
         this.loading = false;
       }
@@ -106,7 +108,7 @@ export default {
       if (item.course_link) {
         window.open(item.course_link, '_blank');
       } else {
-        alert(`Course: ${item.course_name} (No link available)`);
+        useNotify().info(`Course: ${item.course_name} (No link available)`);
       }
     }
   }

@@ -82,6 +82,8 @@
 
 <script>
 import { make_getrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
+import titleCase from "@/utils/titleCase.js";
 
 export default {
   name: "EmployeeRequests",
@@ -156,7 +158,7 @@ export default {
         const leaves = (leavesRes.leaves || []).map(l => ({
           uniqueKey: `leave-${l.request_id}`,
           type: 'Leave',
-          description: `${l.leave_type} Leave`,
+          description: `${titleCase(l.leave_type)} Leave`,
           details: `${l.reason || 'No reason provided'}`,
           date: l.created_date || l.from_date,
           status: l.status,
@@ -166,7 +168,7 @@ export default {
         const reimbursements = (reimbursementsRes.reimbursements || []).map(r => ({
           uniqueKey: `reimb-${r.request_id}`,
           type: 'Reimbursement',
-          description: `${r.expense_type}`,
+          description: `${titleCase(r.expense_type)} Reimbursement`,
           details: `Amount: $${r.amount} - ${r.remark || ''}`,
           date: r.date_expense,
           status: r.status,
@@ -176,7 +178,7 @@ export default {
         const transfers = (transfersRes.transfers || []).map(t => ({
           uniqueKey: `trans-${t.request_id}`,
           type: 'Transfer',
-          description: `Transfer to ${t.request_department}`,
+          description: `Transfer to ${titleCase(t.request_department)}`,
           details: `Reason: ${t.reason || 'None'}`,
           date: null, 
           status: t.status,
@@ -190,6 +192,7 @@ export default {
 
       } catch (error) {
         console.error("Failed to fetch requests", error);
+        useNotify().error("Failed to fetch requests.");
       } finally {
         this.loading = false;
       }

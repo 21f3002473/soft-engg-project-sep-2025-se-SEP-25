@@ -39,6 +39,7 @@
 
 <script>
 import { make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeLeaveForm',
@@ -73,11 +74,11 @@ export default {
         };
         
         await make_postrequest('/api/employee/requests/leave', payload);
-        alert('Leave request submitted successfully!');
+        useNotify().success('Leave request submitted successfully!');
         this.$router.push('/employee/requests');
       } catch (error) {
         console.error("Failed to submit leave request:", error);
-        alert('Failed to submit leave request. Please try again.');
+        useNotify().error('Failed to submit leave request. Please try again.');
       }
     }
   }
