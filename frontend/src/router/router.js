@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '@/store/store.js';
 
 const routes = [
     {
@@ -14,7 +15,7 @@ const routes = [
     {
         path: '/logout',
         name: 'Logout',
-        component: () => import('@/components/Landing/LoginPage.vue'), 
+        component: () => import('@/components/Landing/LoginPage.vue'),
     },
     {
         path: '/adminregister',
@@ -24,16 +25,21 @@ const routes = [
     {
         path: '/admin',
         component: () => import('@/components/admin/AdminLayout.vue'),
+        meta: { requiresAuth: true, role: 'admin' },
         children: [
             {
-            path: '', 
-            name: 'AdminDashboard',
-            component: () => import('@/components/admin/AdminDashboard.vue'),
+                path: '',
+                redirect: 'admin/dashboard',
             },
             {
-            path: 'backups',
-            name: 'AdminBackups',
-            component: () => import('@/components/admin/AdminDataBackup.vue'),
+                path: 'dashboard',
+                name: 'AdminDashboard',
+                component: () => import('@/components/admin/AdminDashboard.vue'),
+            },
+            {
+                path: 'backups',
+                name: 'AdminBackups',
+                component: () => import('@/components/admin/AdminDataBackup.vue'),
             },
             {
                 path: 'add-employee',
@@ -60,7 +66,12 @@ const routes = [
     {
         path: '/employee',
         component: () => import('@/components/employee/EmployeeLayout.vue'),
+        meta: { requiresAuth: true, role: 'employee' },
         children: [
+            {
+                path: '',
+                redirect: 'employee/dashboard',
+            },
             {
                 path: 'dashboard',
                 name: 'EmployeeDashboard',
@@ -103,7 +114,7 @@ const routes = [
                         name: 'EmployeeTransferDetail',
                         component: () => import('@/components/employee/fragments/EmployeeTransferDetail.vue'),
                         props: (route) => ({ transferID: route.params.transfer_id })
-                    } 
+                    }
                 ]
             },
             {
@@ -131,8 +142,12 @@ const routes = [
     {
         path: '/productmanager',
         component: () => import('@/components/productmanager/fragments/ProductManagerNavBar.vue'),
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, role: 'productmanager' },
         children: [
+            {
+                path: '',
+                redirect: 'productmanager/dashboard',
+            },
             {
                 path: 'dashboard',
                 name: 'ProductManagerDashboard',
@@ -173,37 +188,42 @@ const routes = [
             }
         ],
     },
-    
+
     {
         path: '/hr',
         component: () => import('@/components/hr/HRLayout.vue'),
+        meta: { requiresAuth: true, role: 'hr' },
         children: [
-        {
-            path: 'dashboard',
-            name: 'HRDashboard',
-            component: () => import('@/components/hr/HRDashboard.vue'),
-        },
-        {
-            path: 'chatbot',
-            name: 'HRChatbot',
-            component: () => import('@/components/hr/HRChatbot.vue'),
-        },
-        {
-            path: 'employees',
-            name: 'HREmployees',
-            component: () => import('@/components/hr/HREmployees.vue'),
-        },
-        {
-            path: 'hrpolicies',
-            name: 'HRPolicies',
-            component: () => import('@/components/hr/HRPolicies.vue'),
-        },
-        {
-            path: 'projects',
-            name: 'HRProjects',
-            component: () => import('@/components/hr/HRProjects.vue'),
-        },
-    ],
+            {
+                path: '',
+                redirect: 'hr/dashboard',
+            },
+            {
+                path: 'dashboard',
+                name: 'HRDashboard',
+                component: () => import('@/components/hr/HRDashboard.vue'),
+            },
+            {
+                path: 'chatbot',
+                name: 'HRChatbot',
+                component: () => import('@/components/hr/HRChatbot.vue'),
+            },
+            {
+                path: 'employees',
+                name: 'HREmployees',
+                component: () => import('@/components/hr/HREmployees.vue'),
+            },
+            {
+                path: 'hrpolicies',
+                name: 'HRPolicies',
+                component: () => import('@/components/hr/HRPolicies.vue'),
+            },
+            {
+                path: 'projects',
+                name: 'HRProjects',
+                component: () => import('@/components/hr/HRProjects.vue'),
+            },
+        ],
     },
 ]
 
@@ -211,5 +231,44 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes
 })
+
+router.beforeEach((to, from, next) => {
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const token = store.state.TOKEN || localStorage.getItem('token');
+
+    let userRole = store.state.role;
+    if (!userRole && token) {
+        const user = localStorage.getItem('user');
+        if (user) {
+            try {
+                const parsed = JSON.parse(user);
+                let r = parsed.role;
+                if (r === "root") r = "admin";
+                else if (r === "pm") r = "productmanager";
+                userRole = r;
+            } catch (e) { }
+        }
+    }
+
+    if (requiresAuth) {
+        if (!token) {
+            next('/login');
+        } else {
+            const requiredRole = to.matched.find(record => record.meta.role)?.meta.role;
+
+            if (requiredRole && requiredRole !== userRole) {
+                if (userRole === 'admin') next('/admin/dashboard');
+                else if (userRole === 'employee') next('/employee/dashboard');
+                else if (userRole === 'hr') next('/hr/dashboard');
+                else if (userRole === 'productmanager') next('/productmanager/dashboard');
+                else next('/login');
+            } else {
+                next();
+            }
+        }
+    } else {
+        next();
+    }
+});
 
 export default router;
