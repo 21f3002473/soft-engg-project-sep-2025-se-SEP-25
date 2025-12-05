@@ -42,7 +42,7 @@
               </div>
             </div>
 
-            <div class="card-footer text-muted small">Need more help? Contact HR.</div>
+            <div class="card-footer text-muted small">AI Assistant Chatbot</div>
           </div>
         </div>
       </div>
