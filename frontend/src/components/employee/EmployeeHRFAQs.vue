@@ -2,13 +2,8 @@
   <div class="user-hr-faqs container-fluid p-0">
     <div class="d-flex justify-content-end mb-4">
       <div class="w-100" style="max-width: 360px;">
-        <input
-          type="text"
-          class="form-control rounded-pill shadow-sm"
-          placeholder="Search FAQs..."
-          v-model="search"
-          style="border-color: #d2d8f3;"
-        />
+        <input type="text" class="form-control rounded-pill shadow-sm" placeholder="Search FAQs..." v-model="search"
+          style="border-color: #d2d8f3;" />
       </div>
     </div>
 
@@ -22,21 +17,18 @@
 
       <div v-else class="card border-0 shadow-sm rounded-3 overflow-hidden">
         <div class="list-group list-group-flush">
-          <div
-            class="list-group-item list-group-item-action p-0 border-bottom-0"
-            v-for="(faq, i) in filteredFaqs"
-            :key="i"
-            @click="toggleFAQ(i)"
-            style="cursor: pointer;"
-          >
-            <div class="d-flex justify-content-between align-items-center p-3 fw-medium text-dark bg-white hover-bg-light transition-bg">
+          <div class="list-group-item list-group-item-action p-0 border-bottom-0" v-for="(faq, i) in filteredFaqs"
+            :key="i" @click="toggleFAQ(i)" style="cursor: pointer;">
+            <div
+              class="d-flex justify-content-between align-items-center p-3 fw-medium text-dark bg-white hover-bg-light transition-bg">
               <span>{{ faq.question }}</span>
               <span class="fs-5 fw-bold text-primary">
                 {{ activeIndex === i ? "−" : "+" }}
               </span>
             </div>
             <transition name="fade">
-              <div v-if="activeIndex === i" class="px-3 pb-3 text-secondary" style="font-size: 0.95rem; line-height: 1.5;">
+              <div v-if="activeIndex === i" class="px-3 pb-3 text-secondary"
+                style="font-size: 0.95rem; line-height: 1.5;">
                 {{ faq.answer }}
               </div>
             </transition>
@@ -50,7 +42,7 @@
       <h2 class="h4 text-primary fw-semibold mb-3">Need More Help?</h2>
       <div class="help-box p-4 text-center rounded-3 shadow-sm">
         <p class="mb-3 text-dark">
-          Still can’t find what you’re looking for?  
+          Still can’t find what you’re looking for?
           Reach out to our HR support team for assistance.
         </p>
         <button class="btn btn-primary fw-medium px-4 py-2 shadow-sm" @click="contactHR">Contact HR</button>
@@ -132,6 +124,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.25s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -142,6 +135,7 @@ export default {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

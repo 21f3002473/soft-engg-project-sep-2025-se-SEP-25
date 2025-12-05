@@ -16,12 +16,14 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                  <input type="email" id="email" v-model="email" class="form-control" placeholder="jane@company.com" required />
+                  <input type="email" id="email" v-model="email" class="form-control" placeholder="jane@company.com"
+                    required />
                   <label for="email">Work Email</label>
                 </div>
 
                 <div class="form-floating mb-4">
-                  <input type="password" id="password" v-model="password" class="form-control" placeholder="Password" required />
+                  <input type="password" id="password" v-model="password" class="form-control" placeholder="Password"
+                    required />
                   <label for="password">Password</label>
                 </div>
                 <div class="form-text mb-4">Use 8+ characters with a mix of letters, numbers, and symbols.</div>
@@ -57,4 +59,3 @@ export default {
   }
 };
 </script>
-

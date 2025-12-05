@@ -5,7 +5,7 @@
         <h2 class="h3 fw-bold text-dark mb-0">Transfer Details</h2>
         <span class="badge rounded-pill text-capitalize" :class="getStatusClass(status)">{{ status }}</span>
       </div>
-      
+
       <div class="d-flex flex-column gap-4">
         <div class="row">
           <div class="col-md-6">
@@ -54,7 +54,7 @@ export default {
     if (history.state && history.state.requestData) {
       const data = history.state.requestData;
       const raw = data.raw;
-      
+
       this.requestId = data.uniqueKey.split('-')[1];
       this.currentDept = raw.current_department;
       this.requestedDept = raw.request_department;
@@ -79,15 +79,18 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(-15px);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateY(0);

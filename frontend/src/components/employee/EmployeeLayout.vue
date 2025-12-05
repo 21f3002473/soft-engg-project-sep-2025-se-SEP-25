@@ -10,17 +10,15 @@
         </div>
       </transition>
 
-      <section class="page-body shadow p-4 rounded-4 bg-white bg-opacity-75" style="backdrop-filter: blur(5px); min-height: 250px;">
+      <section class="page-body shadow p-4 rounded-4 bg-white bg-opacity-75"
+        style="backdrop-filter: blur(5px); min-height: 250px;">
         <router-view />
       </section>
     </main>
 
-    <button
-      class="chat-toggle btn position-fixed shadow-lg d-flex align-items-center justify-content-center border-0"
-      @click="toggleChat"
-      :class="isChatOpen ? 'btn-danger rounded-circle' : 'btn-primary rounded-pill'"
-      :style="chatButtonStyle"
-    >
+    <button class="chat-toggle btn position-fixed shadow-lg d-flex align-items-center justify-content-center border-0"
+      @click="toggleChat" :class="isChatOpen ? 'btn-danger rounded-circle' : 'btn-primary rounded-pill'"
+      :style="chatButtonStyle">
       <span v-if="!isChatOpen" class="fw-semibold d-flex align-items-center">
         <i class="bi bi-robot me-2 fs-5"></i>AI Assistant
       </span>
@@ -52,7 +50,7 @@ export default {
         zIndex: 1000,
         transition: 'all 0.3s ease'
       };
-      
+
       if (this.isChatOpen) {
         return {
           ...baseStyle,
@@ -61,7 +59,7 @@ export default {
           padding: '0'
         };
       }
-      
+
       return {
         ...baseStyle,
         padding: '14px 28px',
@@ -91,10 +89,12 @@ export default {
 .fade-slide-leave-active {
   transition: all 0.3s ease;
 }
+
 .fade-slide-enter-from {
   opacity: 0;
   transform: translateY(-8px);
 }
+
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(8px);

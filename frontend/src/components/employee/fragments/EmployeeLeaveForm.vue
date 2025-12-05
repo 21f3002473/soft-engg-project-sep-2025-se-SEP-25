@@ -26,7 +26,8 @@
 
         <div class="mb-3">
           <label class="form-label fw-bold">Reason</label>
-          <textarea v-model="form.reason" rows="3" class="form-control" placeholder="State your reason..." required></textarea>
+          <textarea v-model="form.reason" rows="3" class="form-control" placeholder="State your reason..."
+            required></textarea>
         </div>
 
         <div class="d-flex justify-content-end">
@@ -64,7 +65,7 @@ export default {
   methods: {
     async submitForm() {
       if (this.isViewMode) return;
-      
+
       try {
         const payload = {
           leave_type: this.form.type,
@@ -72,7 +73,7 @@ export default {
           to_date: this.form.to,
           reason: this.form.reason
         };
-        
+
         await make_postrequest('/api/employee/requests/leave', payload);
         useNotify().success('Leave request submitted successfully!');
         this.$router.push('/employee/requests');
@@ -89,15 +90,18 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(-15px);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateY(0);

@@ -31,44 +31,46 @@ const routes = [
         meta: { requiresAuth: true, role: 'admin' },
         children: [
             {
-            path: 'dashboard', 
-            name: 'AdminDashboard',
-            component: () => import('@/components/admin/AdminDashboard.vue'),
-            },
-            {
                 path: 'dashboard',
                 name: 'AdminDashboard',
                 component: () => import('@/components/admin/AdminDashboard.vue'),
+                meta: { title: 'Super Admin Dashboard' }
             },
             {
                 path: 'backups',
                 name: 'AdminBackups',
                 component: () => import('@/components/admin/AdminDataBackup.vue'),
+                meta: { title: 'Data Backup' }
             },
             {
                 path: 'add-employee',
                 name: 'AdminAddEmployee',
                 component: () => import('@/components/admin/AdminAddEmployee.vue'),
+                meta: { title: 'Add Employee' }
             },
             {
                 path: 'logs',
                 name: 'AdminLogs',
                 component: () => import('@/components/admin/AdminLogs.vue'),
+                meta: { title: 'System Logs' }
             },
             {
                 path: 'updates',
                 name: 'AdminUpdates',
                 component: () => import('@/components/admin/AdminUpdates.vue'),
+                meta: { title: 'System Updates' }
             },
             {
                 path: 'account',
                 name: 'AdminAccount',
                 component: () => import('@/components/admin/AdminAccount.vue'),
+                meta: { title: 'Account Settings' }
             },
             {
                 path: 'account/edit',
                 name: 'AdminAccountEdit',
                 component: () => import('@/components/admin/AdminAccountEdit.vue'),
+                meta: { title: 'Edit Account' }
             },
         ],
     },

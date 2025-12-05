@@ -22,11 +22,9 @@ export async function submitLogin(params = {}, router) {
       body: JSON.stringify({ email, password }),
     });
 
-    console.log("Login response status:", res.status);
     const maybeJson = await (async () => {
       try { return await res.json(); } catch { return null; }
     })();
-    console.log("Login response data:", maybeJson);
 
     if (!res.ok) {
       const message =
