@@ -246,7 +246,10 @@ router.beforeEach((to, from, next) => {
                 if (r === "root") r = "admin";
                 else if (r === "pm") r = "productmanager";
                 userRole = r;
-            } catch (e) { }
+            } catch (e) { 
+                console.log(e);
+                userRole = null;
+            }
         }
     }
 
