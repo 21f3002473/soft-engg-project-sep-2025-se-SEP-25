@@ -267,7 +267,15 @@ router.beforeEach((to, from, next) => {
             }
         }
     } else {
-        next();
+        if (token && (to.path === '/login' || to.path === '/')) {
+            if (userRole === 'admin') next('/admin/dashboard');
+            else if (userRole === 'employee') next('/employee/dashboard');
+            else if (userRole === 'hr') next('/hr/dashboard');
+            else if (userRole === 'productmanager') next('/productmanager/dashboard');
+            else next();
+        } else {
+            next();
+        }
     }
 });
 
