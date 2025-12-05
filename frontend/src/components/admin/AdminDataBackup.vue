@@ -222,7 +222,6 @@ export default {
       if (!result.isConfirmed) return;
 
       this.backups = [];
-      // Note: Actual implementation would likely need an API call here to clear backend as well
       useNotify().success('Backup schedules reset (Client-side only).');
     },
   },

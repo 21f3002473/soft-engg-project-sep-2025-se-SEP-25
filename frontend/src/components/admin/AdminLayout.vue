@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   name: 'AdminLayout',
   props: {
@@ -65,8 +67,20 @@ export default {
       this.draft = '';
     },
     async logout() {
-      this.$store.dispatch('logout');
-      this.$router.push({ name: 'Login' });
+      const result = await Swal.fire({
+        title: 'Logout?',
+        text: "Are you sure you want to logout?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout!'
+      });
+
+      if (result.isConfirmed) {
+        this.$store.dispatch('logout');
+        this.$router.push({ name: 'Login' });
+      }
     },
   }
 };
@@ -79,7 +93,6 @@ export default {
 
 .router-link-exact-active {
   color: #0d6efd !important;
-  /* Bootstrap primary color */
   font-weight: 700 !important;
   position: relative;
 }
