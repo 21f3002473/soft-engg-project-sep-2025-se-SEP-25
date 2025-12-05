@@ -18,7 +18,7 @@
       <router-view />
     </main>
 
-    <div class="chat-float">
+    <!-- <div class="chat-float">
       <button
         class="chat-trigger"
         @click="isChatbotOpen = !isChatbotOpen"
@@ -56,7 +56,7 @@
           </form>
         </section>
       </transition>
-    </div>
+    </div> -->
   </div>
 </template>
 

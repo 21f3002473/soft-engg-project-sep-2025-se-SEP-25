@@ -31,8 +31,9 @@ const routes = [
         meta: { requiresAuth: true, role: 'admin' },
         children: [
             {
-                path: '',
-                redirect: 'admin/dashboard',
+            path: 'dashboard', 
+            name: 'AdminDashboard',
+            component: () => import('@/components/admin/AdminDashboard.vue'),
             },
             {
                 path: 'dashboard',
@@ -63,6 +64,11 @@ const routes = [
                 path: 'account',
                 name: 'AdminAccount',
                 component: () => import('@/components/admin/AdminAccount.vue'),
+            },
+            {
+                path: 'account/edit',
+                name: 'AdminAccountEdit',
+                component: () => import('@/components/admin/AdminAccountEdit.vue'),
             },
         ],
     },

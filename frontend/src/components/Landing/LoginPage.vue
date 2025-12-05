@@ -18,7 +18,7 @@
 
     <main class="d-flex flex-column justify-content-center align-items-center flex-grow-1 container" style="max-width: 500px;">
       
-      <h1 class="display-4 fw-bold text-center mb-4">
+      <h1 class="display-4 fw-bold text-center mb-4"> 
         Log in to Sync'em
       </h1>
       
@@ -40,19 +40,49 @@
           />
         </div>
 
+        <!-- Password field with eye toggle -->
         <div class="mb-3">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label for="password" class="form-label mb-0">Password</label>
             <a href="#" class="text-decoration-none" style="color: #93c5fd;">Forgot password?</a>
           </div>
-          <input
-            id="password"
-            type="password"
-            v-model="password"
-            placeholder="Enter your password..."
-            required
-            class="form-control form-control-lg"
-          />
+
+          <div class="input-with-eye">
+            <input
+              id="password"
+              :type="showPassword ? 'text' : 'password'"
+              v-model="password"
+              placeholder="Enter your password..."
+              required
+              class="form-control form-control-lg with-eye-input"
+              autocomplete="current-password"
+            />
+
+            <button
+              type="button"
+              class="eye-btn"
+              @click="showPassword = !showPassword"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+              :title="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <!-- eye open -->
+              <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+
+              <!-- eye slash -->
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.32 20.32 0 0 1 5.17-5.94"/>
+                <path d="M1 1l22 22"/>
+                <path d="M9.53 9.53A3 3 0 0 0 14.47 14.47"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <button
@@ -86,6 +116,7 @@ export default {
       password: '',
       loading: false,
       error: '',
+      showPassword: false, // <- added toggle state
     };
   },
   computed: {
@@ -108,7 +139,7 @@ export default {
         return;
       }
       this.loading = true;
-      console.log('Attempting login with', this.email, this.password);
+      // console.log('Attempting login with', this.email, this.password);
       try {
         let response = await submitLogin({ email: this.email, password: this.password }, router);
         console.log('Login response:', response);
@@ -121,8 +152,6 @@ export default {
   },
 };
 </script>
-
-
 
 <style scoped>
 /* root stacking context so bg-layer z-index:-1 sits behind everything */
@@ -176,5 +205,41 @@ export default {
   opacity: 0.6;
   cursor: not-allowed;
 }
-</style>
 
+/* --- password eye styles --- */
+.input-with-eye {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.with-eye-input {
+  padding-right: 42px !important; /* leave space for the eye button */
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 34px;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  color: black;
+}
+
+.eye-btn svg {
+  pointer-events: none;
+}
+
+.eye-btn:focus {
+  outline: 2px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+}
+</style>
