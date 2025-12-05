@@ -31,6 +31,3 @@ class Backup(SQLModel, table=True):
         )
     )
     date_time: datetime = Field(default_factory=current_utc_time)
-
-
-    
