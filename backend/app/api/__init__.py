@@ -57,7 +57,6 @@ class API:
         self.register_router(
             HRReviewDetailResource, f"{hr_base_url}/review/{{review_id}}"
         )
-
         self.register_router(HRPolicyCollectionResource, f"{hr_base_url}/policies")
         self.register_router(
             HRPolicyDetailResource, f"{hr_base_url}/policy/{{policy_id}}"
