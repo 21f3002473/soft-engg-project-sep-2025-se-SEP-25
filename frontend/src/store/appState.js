@@ -1,4 +1,8 @@
 import store from "@/store/store.js";
+import { useNotify } from '@/utils/useNotify.js';
+import { nextTick } from "vue";
+
+const notify = useNotify();
 
 export async function submitLogin(params = {}, router) {
   const { email, password } = params || {};
@@ -64,6 +68,11 @@ export async function submitLogin(params = {}, router) {
       store.dispatch("updateRole", role);
       store.dispatch("updateAuthentication", true);
     }
+
+    notify.success("Login successful!");
+
+    await nextTick();  
+
     const targetRoute = `/${role}/dashboard`;
     router.replace(targetRoute);
 
@@ -71,7 +80,9 @@ export async function submitLogin(params = {}, router) {
   } catch (err) {
     localStorage.removeItem("token");
     store.dispatch("clearAll");
-    throw err instanceof Error ? err : new Error("Unable to login");
+    const errorMessage = err instanceof Error ? err.message : "Unable to login";
+    notify.error(errorMessage);
+    throw err instanceof Error ? err : new Error(errorMessage);
   }
 }
 

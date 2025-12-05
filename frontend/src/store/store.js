@@ -1,4 +1,7 @@
 import { createStore } from 'vuex';
+import { useNotify } from '@/utils/useNotify.js';
+
+const notify = useNotify();
 
 const store = createStore({
     state: {
@@ -73,6 +76,7 @@ const store = createStore({
             commit('clearAll');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            notify.success("Logged out successfully");
         },
     },
 });
