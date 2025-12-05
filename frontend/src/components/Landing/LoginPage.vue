@@ -18,7 +18,7 @@
 
     <main class="d-flex flex-column justify-content-center align-items-center flex-grow-1 container" style="max-width: 500px;">
       
-      <h1 class="display-4 fw-bold text-center mb-4">
+      <h1 class="display-4 fw-bold text-center mb-4"> 
         Log in to Sync'em
       </h1>
       
