@@ -109,7 +109,7 @@ export default {
       }
       this.loading = true;
       try {
-        let response = await submitLogin({ email: this.email, password: this.password }, router);
+        await submitLogin({ email: this.email, password: this.password }, router);
       } catch (e) {
         this.error = e?.message || 'Login failed. Please try again.';
       } finally {
