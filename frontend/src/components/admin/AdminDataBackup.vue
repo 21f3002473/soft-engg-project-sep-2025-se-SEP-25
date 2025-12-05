@@ -5,24 +5,59 @@
       
       <h1>Backups</h1>
 
+      <!-- Main Table -->
+      <div v-if="oldBackupConfig" class="dashboard-content backup-actions-section mt-4">
+        <h2>Current Backup Details</h2>
+        <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Day</th>
+              <th>Backup Type</th>
+              <th>DateTime</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="backup in oldBackupConfig" :key="backup.id">
+              <td>{{ backup.day }}</td>
+              <td>{{ prettyType(backup.type) }}</td>
+              <td>{{ formattedDatetime(backup.datetime) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
       <!-- ===== Actions Table ===== -->
-      <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Day</th>
-            <th>Backup Type</th>
-            <th>DateTime</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div class="dashboard-content backup-actions-section mt-4">
+        <h2>Take New Backup</h2>
+        <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Day</th>
+              <th>Backup Type</th>
+              <th>DateTime</th>
+            </tr>
+          </thead>
+          <tbody>
             <tr>
               <td>
-                <select v-model="day" class="" required>
+                <!-- Day select with Bootstrap styles -->
+                <select
+                  v-model="day"
+                  class="form-select form-select-sm backup-select"
+                  required
+                >
+                  <option disabled value="">Select day</option>
                   <option v-for="w in weekdays" :key="w" :value="w">{{ w }}</option>
                 </select>
               </td>
               <td>
-                <select v-model="backup_type" class="" required>
+                <!-- Backup type select with Bootstrap styles -->
+                <select
+                  v-model="backup_type"
+                  class="form-select form-select-sm backup-select"
+                  required
+                >
                   <option value="">Select Backup Type</option>
                   <option value="FULL">Full Backup</option>
                   <option value="INCREMENTAL">Incremental</option>
@@ -30,39 +65,25 @@
                 </select>
               </td>
               <td>
-                <input type="datetime-local" required v-model="date_time" class="backup-datetime" />
+                <!-- DateTime field with Bootstrap form-control -->
+                <input
+                  type="datetime-local"
+                  required
+                  v-model="date_time"
+                  class="form-control form-control-sm backup-datetime"
+                />
               </td>
             </tr>
-        </tbody>
-      </table>
-        <!-- Global actions -->
-        <div class="d-flex justify-content-end gap-2 mt-2">
-          <button class="btn btn-primary" @click="saveConfig">Take Backup</button>
-          <button class="btn btn-outline-danger" @click="resetToDefaults">Reset</button>
-        </div>
+          </tbody>
+        </table>
+      </div> 
+
+      <!-- Global actions -->
+      <div class="d-flex justify-content-center gap-2 mt-2">
+        <button class="btn btn-primary" @click="saveConfig">Take Backup</button>
+        <!-- <button class="btn btn-outline-danger" @click="resetToDefaults">Reset</button> -->
+      </div>
       <!-- ===== End Actions Table ===== -->
-    </main>
-
-    <div v-if="oldBackupConfig && oldBackupConfig.length">
-      <h2>Backup History</h2>
-      <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Day</th>
-            <th>Backup Type</th>
-            <th>DateTime</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="backup in backups" :key="backup.id">
-            <td>{{ backup.day }}</td>
-            <td>{{ prettyType(backup.type) }}</td>
-            <td>{{ formattedDatetime(backup.datetime) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
   </div>
 </template>
 
@@ -91,7 +112,6 @@ export default {
     // Fetch existing backup config from API
     async fetchBackups() {
       // Logic to fetch existing backup config from API
-      console.log('Fetching backup config...');
       try {
         const res = await fetch(`http://localhost:8000/api/admin/backup-config`, {
           method: 'GET',
@@ -108,12 +128,11 @@ export default {
         }
 
         const data = await res.json();
-        console.log('Backup config data:', data);
-        this.backups = data || [];
+        this.oldBackupConfig = data || [];
       } catch (err) {
         console.error('Error fetching backups:', err);
         // fallback to an empty array — prevents template render crash
-        this.oldBackupConfig = this.oldBackupConfig || [];
+        return this.oldBackupConfig = [];
       }
     },
     // Save entire backup config
@@ -135,7 +154,6 @@ export default {
         alert('Please choose a valid date and time.');
         return;
       }
-      console.log(this.backups.length + 1, this.day, this.backup_type.toLocaleLowerCase(), isoDatetime);
 
       const newBackupItem = {
         id: this.backups.length + 1,
@@ -154,8 +172,6 @@ export default {
       const fullPayloadList = [...currentList, newBackupItem];
       const payload = { backups: fullPayloadList };
 
-      console.log('Sending payload:', payload);
-
       try {
         const res = await fetch('http://localhost:8000/api/admin/backup-config', {
           method: 'PUT',
@@ -167,8 +183,8 @@ export default {
         });
 
         if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(`Save failed: ${res.status} - ${errText}`);
+          const errText = await res.text();
+          throw new Error(`Save failed: ${res.status} - ${errText}`);
         }
 
         alert('Saved successfully');
@@ -252,7 +268,7 @@ export default {
   mounted() {
     // fetch existing backup config
     const user = JSON.parse(localStorage.getItem('user'));
-    if(!localStorage.getItem('token') || user.role !== 'root') {
+    if (!localStorage.getItem('token') || user.role !== 'root') {
       alert('Please login to access the admin dashboard.');
       this.$router.push('/login');
       return;
@@ -351,16 +367,45 @@ a:hover {
   justify-content: flex-end; 
 }
 
+/* === Field-specific styles (only for inputs/selects) === */
+
 .backup-select,
 .backup-datetime {
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.backup-select:focus,
+.backup-datetime:focus {
+  background-color: #ffffff;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+  outline: 0;
+}
+
+/* slightly tighter padding for sm controls, but keep it in sync */
+.backup-datetime::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* existing styles kept as-is for any other usage */
+.backup-datetime {
   padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
   font-size: 14px;
   font-family: inherit;
   min-width: 200px;
 }
+
+.backup-select {
+  min-width: 200px;
+}
+
 .backup-table {
   border-radius: 10px;
   overflow: hidden; 
@@ -447,4 +492,5 @@ a:hover {
 .d-flex.gap-2 {
   gap: 8px;
 }
+
 </style>

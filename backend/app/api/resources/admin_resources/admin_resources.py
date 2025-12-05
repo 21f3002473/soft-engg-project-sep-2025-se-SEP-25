@@ -514,7 +514,6 @@ class AdminBackupResource(Resource):
             session.delete(item)
         session.commit()
 
-        print(payload.backups)
         for item in payload.backups:
             backup = Backup(
                 day=item.day,
@@ -522,6 +521,11 @@ class AdminBackupResource(Resource):
                 date_time=item.datetime,
             )
             session.add(backup)
+            log = Log(
+                user_id=current_user.id,
+                text_log=f"{backup.backup_type.value.capitalize()} backup scheduled on {backup.day}",
+            )
+            session.add(log)
         session.commit()
 
         return {

@@ -33,10 +33,4 @@ class Backup(SQLModel, table=True):
     date_time: datetime = Field(default_factory=current_utc_time)
 
 
-@event.listens_for(Backup, "after_insert", propagate=True)
-def log_backup_creation(mapper, connection, target):
-    log = Log(
-        user_id="admin",
-        text_log=f"{target.backup_type.value.capitalize()} backup performed on {target.day}",
-    )
-    connection.execute(Log.__table__.insert(), log.model_dump())
+    
