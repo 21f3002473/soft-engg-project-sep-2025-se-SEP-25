@@ -93,11 +93,25 @@ export default {
   methods: {
     async loadData() {
       const base = "http://localhost:8000/api/hr";
+      const token = localStorage.getItem("hr_token");
+
+      if (!token) {
+        console.error("No HR token found");
+        this.$router.push("/login");
+        return;
+      }
+
+      const auth = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
       try {
         const [empRes, polRes, revRes] = await Promise.all([
-          axios.get(`${base}/employees`),
-          axios.get(`${base}/policies`),
-          axios.get(`${base}/reviews`)
+          axios.get(`${base}/employees`, auth),
+          axios.get(`${base}/policies`, auth),
+          axios.get(`${base}/reviews`, auth)
         ]);
 
         this.employees = empRes.data.slice(0, 5);

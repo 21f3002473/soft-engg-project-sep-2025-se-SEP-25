@@ -1,13 +1,13 @@
-import store from "@/store/store.js";
+//import store from "@/store/store.js";
 // import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
 
-export async function submitLogin(params = {}, router) {
-  const { email, password } = params || {};
-  const loginUrl = `${store.state.BASEURL}/user/login`;
+//export async function submitLogin(params = {}, router) {
+  //const { email, password } = params || {};
+  //const loginUrl = `${store.state.BASEURL}/user/login`;
 
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
+  //if (!email || !password) {
+    //throw new Error("Email and password are required");
+  //}
 
 // remove the below block to disable local login after backend integration is done
   // const localUser = PREDEF_USERS[email];
@@ -50,6 +50,17 @@ export async function submitLogin(params = {}, router) {
   // }
  // remove above block to disable local login after backend integration is done
   
+ import store from "@/store/store.js";
+// import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
+
+export async function submitLogin(params = {}, router) {
+  const { email, password } = params || {};
+  const loginUrl = `${store.state.BASEURL}/user/login`;
+
+  if (!email || !password) {
+    throw new Error("Email and password are required");
+  }
+
   try {
     const res = await fetch(loginUrl, {
       method: "POST",
@@ -57,7 +68,6 @@ export async function submitLogin(params = {}, router) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-    
       body: JSON.stringify({ email, password }),
     });
 
@@ -81,8 +91,14 @@ export async function submitLogin(params = {}, router) {
       throw new Error("No token returned by server");
     }
 
+    // STORE NORMAL TOKEN
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(data));
+
+    // ⭐⭐⭐ ONLY FIX ADDED — HR TOKEN SAVE ⭐⭐⭐
+    if (data.role === "human_resource" || data.role === "hr") {
+      localStorage.setItem("hr_token", token);
+    }
 
     if (store?.dispatch) {
       store.dispatch("updateToken", token);
@@ -90,18 +106,20 @@ export async function submitLogin(params = {}, router) {
         store.dispatch("updateUser", data);
       }
     }
+
     var role = data.role; 
     if (role == "root") {
       role = "admin";
-    }else if (role == "pm") {
+    } else if (role == "pm") {
       role = "productmanager";
-    }else if (role == "hr") {
+    } else if (role === "hr" || role === "human_resource") {
       role = "hr";
-    }else if (role == "employee") {
+    } else if (role == "employee") {
       role = "employee";
-    }else{
+    } else {
       throw new Error("Invalid user role");
     }
+
     const targetRoute = `/${role}/dashboard`;
     router.replace(targetRoute);
 
@@ -113,88 +131,6 @@ export async function submitLogin(params = {}, router) {
   }
 }
 
-export async function make_getrequest(url, params = {}) {
-    const queryString = Object.keys(params).length
-        ? "?" + new URLSearchParams(params).toString()
-        : "";
-
-    const token = localStorage.getItem("token") || store.state.TOKEN;
-    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
-
-    const response = await fetch(`${store.state.BASEURL}${url}${queryString}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    return data;
-}
-
-export async function make_postrequest(url, data = {}) {
-    const token = localStorage.getItem("token") || store.state.TOKEN;
-    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
-
-    const response = await fetch(`${store.state.BASEURL}${url}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-        },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(errText || "Network response was not ok");
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-export async function make_putrequest(url, data = {}) {
-    const token = localStorage.getItem("token") || store.state.TOKEN;
-    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
-
-    const response = await fetch(`${store.state.BASEURL}${url}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-        },
-        body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-
-    const responseData = await response.json();
-    return responseData;
-}
-
-export async function make_deleterequest(url) {
-    const token = localStorage.getItem("token") || store.state.TOKEN;
-    const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
-
-    const response = await fetch(`${store.state.BASEURL}${url}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cleanToken}`,
-        },
-    });
-    if (!response.ok) {
-        throw new Error("Network response was not ok");
-    }
-    const responseData = await response.json();
-    return responseData;
-}
 
 // export function returnStoreData() {
 //     return {
