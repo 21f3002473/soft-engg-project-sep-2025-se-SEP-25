@@ -1,16 +1,97 @@
-from datetime import datetime
 from logging import getLogger
 
-import httpx
+from app.agents.employee.rag.qa_chain import get_rag_answer
 from app.api.validators import ChatMessage, ChatResponse
-from app.config import Config
-from app.database import Chat, User, get_session
+from app.database import *
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
 
 logger = getLogger(__name__)
+
+
+def build_employee_context(user: User, session: Session) -> str:
+    """Build a rich employee context block for the RAG system."""
+
+    dept_obj = None
+    dept_name = None
+    if user.department_id:
+        dept_obj = session.get(
+            type(user).department.property.mapper.class_, user.department_id
+        )
+        dept_name = dept_obj.name if dept_obj else None
+
+    manager_name = None
+    if user.reporting_manager:
+        manager = session.get(User, user.reporting_manager)
+        manager_name = manager.name if manager else None
+
+    attendance_records = session.exec(
+        select(Attendance).where(Attendance.user_id == user.id)
+    ).all()
+
+    present = sum(
+        1 for a in attendance_records if a.status == AttendanceStatusEnum.PRESENT
+    )
+    absent = sum(
+        1 for a in attendance_records if a.status == AttendanceStatusEnum.ABSENT
+    )
+    leave = sum(1 for a in attendance_records if a.status == AttendanceStatusEnum.LEAVE)
+    remote = sum(
+        1 for a in attendance_records if a.status == AttendanceStatusEnum.REMOTE
+    )
+
+    todos = session.exec(select(ToDo).where(ToDo.user_id == user.id)).all()
+    pending_tasks = [t.task for t in todos if t.status == StatusTypeEnum.PENDING]
+    completed_tasks = [t.task for t in todos if t.status == StatusTypeEnum.COMPLETED]
+
+    user_courses = session.exec(
+        select(UserCourse).where(UserCourse.user_id == user.id)
+    ).all()
+    assigned_courses = [uc.course.course_name for uc in user_courses if uc.course]
+    completed_courses = [
+        uc.course.course_name
+        for uc in user_courses
+        if uc.course and uc.status == StatusTypeEnum.COMPLETED
+    ]
+
+    leave_requests = session.exec(select(Leave).where(Leave.user_id == user.id)).all()
+
+    reimbursements = session.exec(
+        select(Reimbursement).where(Reimbursement.user_id == user.id)
+    ).all()
+
+    return f"""
+EMPLOYEE CONTEXT:
+
+IDENTITY:
+- Name: {user.name}
+- Email: {user.email}
+- Role: {user.role}
+- Department: {dept_name}
+- Reporting Manager: {manager_name}
+
+ATTENDANCE SUMMARY:
+- Present: {present}
+- Absent: {absent}
+- Leave: {leave}
+- Remote: {remote}
+
+TASK SUMMARY:
+- Pending Tasks: {pending_tasks}
+- Completed Tasks: {completed_tasks}
+
+LEARNING SUMMARY:
+- Assigned Courses: {assigned_courses}
+- Completed Courses: {completed_courses}
+
+LEAVE REQUESTS:
+- Total Leave Requests: {len(leave_requests)}
+
+REIMBURSEMENTS:
+- Total Claims Submitted: {len(reimbursements)}
+"""
 
 
 class AIAssistantResource(Resource):
@@ -110,40 +191,12 @@ class AIAssistantResource(Resource):
             session.commit()
             session.refresh(user_chat)
 
-            url = (
-                "https://generativelanguage.googleapis.com/v1beta/models/"
-                "gemini-2.0-flash:generateContent"
-                f"?key={Config.GEMINI_API_KEY}"
+            employee_context = build_employee_context(current_user, session)
+
+            reply = get_rag_answer(
+                user_question=payload.message,
+                employee_context=employee_context,
             )
-
-            body = {
-                "contents": [
-                    {
-                        "role": "user",
-                        "parts": [
-                            {
-                                "text": (
-                                    "You are Sync'em AI Assistant, a professional HR support chatbot.\n"
-                                    f"User: {payload.message}"
-                                )
-                            }
-                        ],
-                    }
-                ]
-            }
-
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                res = await client.post(
-                    url, headers={"Content-Type": "application/json"}, json=body
-                )
-
-            if res.status_code != 200:
-                logger.error(res.text)
-                raise HTTPException(500, "LLM request failed")
-
-            data = res.json()
-
-            reply = data["candidates"][0]["content"]["parts"][0]["text"]
 
             assistant_chat = Chat(
                 user_id=current_user.id,
@@ -157,6 +210,7 @@ class AIAssistantResource(Resource):
 
         except HTTPException:
             raise
+
         except Exception as e:
             logger.error("AI Assistant Error", exc_info=True)
             raise HTTPException(500, "Internal server error")

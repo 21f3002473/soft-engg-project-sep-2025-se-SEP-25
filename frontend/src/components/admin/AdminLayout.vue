@@ -90,28 +90,7 @@ export default {
       this.draft = '';
     },
     async logout() {
-      console.log('Logging out...');
-      // 1. Clear tokens & session data
-      localStorage.removeItem('token');
-      sessionStorage.clear();
-
-      // API call to invalidate session on server (if applicable)
-      
-      // using axios
-      // await this.$axios.post('/api/logout');
-      
-      // using fetch
-      // await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      // or
-      // await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
-
-      // 2. If you're using Vuex or Pinia
-      if (this.$store) {
-        this.$store.commit('logout');  // example for Vuex mutation
-        // or for Pinia: useAuthStore().$reset();
-      }
-
-      // 3. Redirect to login
+      this.$store.dispatch('logout');
       this.$router.push({ name: 'Login' });
     },
   }
@@ -148,7 +127,6 @@ a:hover {
   background-color: #eee;
 }
 
-/* 1. Header Navigation */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -167,12 +145,10 @@ a:hover {
 
 }
 
-/* 2. Main Content Area */
 .dashboard-content {
   padding: 25px 30px;
 }
 
-/* 2a. Content Header (Title + Search) */
 .content-header {
   display: flex;
   justify-content: space-between;
@@ -186,13 +162,11 @@ a:hover {
   font-weight: 600;
 }
 
-/* 2b. Main Area (List + Chat) */
 .main-area {
   display: flex;
   gap: 25px; 
 }
 
-/* Employee List (Left) */
 .employee-list {
   flex: 3; 
   background-color: #ffffff;
@@ -244,7 +218,6 @@ a:hover {
   flex-grow: 1; 
 }
 
-/* Chatbot Panel (Right) */
 .chatbot-panel {
   flex: 1; 
   background-color: #ffffff;
@@ -285,7 +258,6 @@ a:hover {
   margin-top: auto; 
 }
 
-/* Floating trigger button */
 .chat-trigger {
   position: fixed;
   right: 24px;
@@ -294,7 +266,7 @@ a:hover {
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: #111827; /* near-black */
+  background: #111827;
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -309,7 +281,6 @@ a:hover {
   background: #0b1220;
 }
 
-/* Chat window container */
 .chat-window {
   position: fixed;
   right: 24px;
@@ -319,19 +290,18 @@ a:hover {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border: 1px solid #e5e7eb; /* gray-200 */
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
   overflow: hidden;
   z-index: 2000;
 }
 
-/* Header */
 .chat-header {
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  background: #f8fafc; /* slate-50 */
+  background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
 }
 .chat-header .title {
@@ -347,13 +317,12 @@ a:hover {
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
-  color: #6b7280; /* gray-500 */
+  color: #6b7280;
 }
 .chat-header .close:hover {
-  color: #111827; /* gray-900 */
+  color: #111827;
 }
 
-/* Body */
 .chat-body {
   padding: 12px;
   gap: 8px;
@@ -372,18 +341,17 @@ a:hover {
 }
 .message.ai {
   align-self: flex-start;
-  background: #f1f5f9; /* slate-100 */
-  color: #0f172a;       /* slate-900 */
+  background: #f1f5f9;
+  color: #0f172a;
   border-top-left-radius: 4px;
 }
 .message.user {
   align-self: flex-end;
-  background: #2563eb; /* blue-600 */
+  background: #2563eb;
   color: #ffffff;
   border-top-right-radius: 4px;
 }
 
-/* Input area */
 .chat-input {
   display: flex;
   gap: 8px;
@@ -400,8 +368,8 @@ a:hover {
   outline: none;
 }
 .chat-input input:focus {
-  border-color: #93c5fd; /* blue-300 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* blue-500/15% */
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 .chat-input button {
   border: none;
@@ -417,7 +385,6 @@ a:hover {
   cursor: not-allowed;
 }
 
-/* Open/close transition */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: opacity 0.18s ease, transform 0.18s ease;
@@ -427,7 +394,6 @@ a:hover {
   opacity: 0;
   transform: translateY(6px) scale(0.995);
 }
-/* .router-link-exact-active { color: #007bff; font-weight: bold; } */
 .logout-btn {
   margin-left: 20px;
   padding: 6px 12px;

@@ -121,7 +121,6 @@ class API:
             f"{hr_base_url}/annoucement/edit/{{ann_id}}",
         )
 
-        self.register_router(LearningResource, f"{emp_base_url}/learning")
         self.register_router(
             CourseAssignmentEmployeeResource, f"{emp_base_url}/courses"
         )
