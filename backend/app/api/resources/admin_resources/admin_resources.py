@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
+from requests import session
+
 from app.controllers import get_current_active_user
 from app.database import User, get_session
 from app.database.admin_models import Backup, BackupTypeEnum, Log
@@ -513,10 +515,11 @@ class AdminBackupResource(Resource):
             session.delete(item)
         session.commit()
 
+        print(payload.backups)
         for item in payload.backups:
             backup = Backup(
                 day=item.day,
-                backup_type=_backup_type_from_str(item.type),
+                backup_type=_backup_type_from_str(item.type.lower()),
                 date_time=item.datetime,
             )
             session.add(backup)
@@ -526,7 +529,6 @@ class AdminBackupResource(Resource):
             "message": "Backup configuration updated",
             "count": len(payload.backups),
         }
-
 
 class AdminLogsResource(Resource):
     """
@@ -677,76 +679,53 @@ class AdminAccountResource(Resource):
         }
 
     def put(
-        self,
-        payload: AccountUpdatePayload,
-        current_user: User = Depends(get_current_active_user),
-        _: User = Depends(require_root()),
-        session: Session = Depends(get_session),
+    self,
+    payload: AccountUpdatePayload,
+    current_user: User = Depends(get_current_active_user),
+    _: User = Depends(require_root()),
+    session: Session = Depends(get_session),
     ):
-        """
-        Update admin account information.
+        # Load the user using the same session we'll commit with
+        db_user: User = session.get(User, current_user.id)
+        if not db_user:
+            # Defensive: should not happen because current_user was authenticated, but safe guard
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        Updates admin name and/or password. Password updates require verification
-        of the old password. Changes are persisted to database only if at least
-        one field was actually modified.
-
-        Args:
-            payload: AccountUpdatePayload with optional name and password fields
-            current_user: Currently authenticated user dependency
-            _: ROOT role verification dependency
-            session: Database session dependency
-
-        Returns:
-            dict: Updated account information with keys:
-                - id: User ID
-                - name: Updated user name
-                - email: User email
-                - role: User role
-                - updated: Boolean indicating if any changes were made
-
-        Raises:
-            HTTPException: 403 FORBIDDEN if user is not ROOT role
-            HTTPException: 422 UNPROCESSABLE_ENTITY if new password attempted without old password
-                - Detail: "Old password is required to set a new password"
-            HTTPException: 403 FORBIDDEN if old password verification fails
-                - Detail: "Old password is incorrect"
-        """
         updated = False
 
-        if (
-            payload.name
-            and payload.name.strip()
-            and payload.name.strip() != current_user.name
-        ):
-            current_user.name = payload.name.strip()
+        # Update name if different
+        if payload.name and payload.name.strip() and payload.name.strip() != db_user.name:
+            db_user.name = payload.name.strip()
             updated = True
 
+        # Handle password change
         if payload.new_password:
             if not payload.old_password:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Old password is required to set a new password",
                 )
-            if not current_user.verify_password(payload.old_password):
+            # Verify against the database-bound user
+            if not db_user.verify_password(payload.old_password):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Old password is incorrect",
                 )
             password_hash, salt = User.hash_password(payload.new_password)
-            current_user.password_hash = password_hash
-            current_user.salt = salt
+            db_user.password_hash = password_hash
+            db_user.salt = salt
             updated = True
 
         if updated:
-            session.add(current_user)
+            session.add(db_user)  # db_user is already bound to this session, but add() is harmless
             session.commit()
-            session.refresh(current_user)
+            session.refresh(db_user)
 
         return {
-            "id": current_user.id,
-            "name": current_user.name,
-            "email": current_user.email,
-            "role": current_user.role,
+            "id": db_user.id,
+            "name": db_user.name,
+            "email": db_user.email,
+            "role": db_user.role,
             "updated": updated,
         }
 

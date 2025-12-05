@@ -55,6 +55,11 @@ const routes = [
                 name: 'AdminAccount',
                 component: () => import('@/components/admin/AdminAccount.vue'),
             },
+            {
+                path: 'account/edit',
+                name: 'AdminAccountEdit',
+                component: () => import('@/components/admin/AdminAccountEdit.vue'),
+            },
         ],
     },
     {

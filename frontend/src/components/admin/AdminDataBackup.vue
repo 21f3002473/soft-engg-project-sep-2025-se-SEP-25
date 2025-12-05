@@ -5,120 +5,64 @@
       
       <h1>Backups</h1>
 
-      <table v-if="backups && backups.length" class="table table-striped table-hover table-bordered align-middle backup-table">
+      <!-- ===== Actions Table ===== -->
+      <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
         <thead class="table-dark">
           <tr>
-            <th style="width: 120px;">Day</th>
-            <th style="width: 200px;">Backup Type</th>
-            <th>Date & Time</th>
+            <th>Day</th>
+            <th>Backup Type</th>
+            <th>DateTime</th>
           </tr>
         </thead>
-
         <tbody>
-          <tr v-for="item in backups" :key="item.day">
-            <!-- Day -->
-            <td class="fw-bold">{{ item.day }}</td>
+            <tr>
+              <td>
+                <select v-model="day" class="" required>
+                  <option v-for="w in weekdays" :key="w" :value="w">{{ w }}</option>
+                </select>
+              </td>
+              <td>
+                <select v-model="backup_type" class="" required>
+                  <option value="">Select Backup Type</option>
+                  <option value="FULL">Full Backup</option>
+                  <option value="INCREMENTAL">Incremental</option>
+                  <option value="DIFFERENTIAL">Differential</option>
+                </select>
+              </td>
+              <td>
+                <input type="datetime-local" required v-model="date_time" class="backup-datetime" />
+              </td>
+            </tr>
+        </tbody>
+      </table>
+        <!-- Global actions -->
+        <div class="d-flex justify-content-end gap-2 mt-2">
+          <button class="btn btn-primary" @click="saveConfig">Take Backup</button>
+          <button class="btn btn-outline-danger" @click="resetToDefaults">Reset</button>
+        </div>
+      <!-- ===== End Actions Table ===== -->
+    </main>
 
-            <!-- Backup Type -->
-            <td>
-              <select v-model="item.type" class="form-select">
-                <option value="" disabled>Select Backup Type</option>
-                <option value="full">Full Backup</option>
-                <option value="incremental">Incremental Backup</option>
-                <option value="differential">Differential Backup</option>
-              </select>
-            </td>
-
-            <!-- Datetime -->
-            <td>
-              <input 
-                type="datetime-local" 
-                v-model="item.datetime" 
-                class="form-control"
-              />
-            </td>
+    <div v-if="oldBackupConfig && oldBackupConfig.length">
+      <h2>Backup History</h2>
+      <table class="table table-striped table-hover table-bordered shadow-sm custom-table align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Day</th>
+            <th>Backup Type</th>
+            <th>DateTime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="backup in backups" :key="backup.id">
+            <td>{{ backup.day }}</td>
+            <td>{{ prettyType(backup.type) }}</td>
+            <td>{{ formattedDatetime(backup.datetime) }}</td>
           </tr>
         </tbody>
       </table>
+    </div>
 
-      <!-- ===== New Actions Table: Take Backup / Status / Run ===== -->
-      <section class="mt-4 backup-actions-section">
-        <h2 class="mt-3 mb-2">Take Backup — Actions</h2>
-
-        <table class="table table-sm table-hover table-bordered align-middle action-table">
-          <thead class="table-secondary">
-            <tr>
-              <th style="width: 120px;">Day</th>
-              <th style="width: 200px;">Type</th>
-              <th>Scheduled (Local)</th>
-              <th style="width: 140px;">Status</th>
-              <th style="width: 200px;">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr v-for="item in backups" :key="`action-${item.day}`">
-              <td class="fw-bold">{{ item.day }}</td>
-              <td>{{ prettyType(item.type) }}</td>
-              <td>{{ formattedDatetime(item.datetime) }}</td>
-              <td>
-                <span 
-                  class="status-badge"
-                  :class="{
-                    'status-idle': !item.status || item.status === 'Idle',
-                    'status-running': item.status === 'Running',
-                    'status-success': item.status === 'Success',
-                    'status-failed': item.status === 'Failed'
-                  }"
-                >
-                  {{ item.status || 'Idle' }}
-                </span>
-              </td>
-              <td>
-                <div class="d-flex gap-2">
-                  <button
-                    class="btn btn-sm btn-outline-primary"
-                    :disabled="item.status === 'Running'"
-                    @click="runBackup(item)"
-                  >
-                    Run Now
-                  </button>
-
-                  <button
-                    class="btn btn-sm btn-outline-secondary"
-                    @click="downloadLatest(item)"
-                  >
-                    Download
-                  </button>
-
-                  <button
-                    class="btn btn-sm btn-outline-success"
-                    @click="saveSingleConfig(item)"
-                  >
-                    Save
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- If no backups configured show helpful CTA row -->
-            <tr v-if="!backups || backups.length === 0">
-              <td colspan="5" class="text-center py-4">
-                No backup schedule configured yet. Configure the days above, set types and schedule, then press Save.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Global actions -->
-        <div class="d-flex justify-content-end gap-2 mt-2">
-          <button class="btn btn-primary" @click="saveConfig">Save All Config</button>
-          <button class="btn btn-outline-danger" @click="resetToDefaults">Reset</button>
-        </div>
-      </section>
-      <!-- ===== End Actions Table ===== -->
-
-    </main>
   </div>
 </template>
 
@@ -134,13 +78,17 @@ export default {
   data() {
     return {
       // Always ensure backups starts as an array
-      backups: [
-        // defaults commented out for sample:
-        // { day: 'Monday', type: 'full', datetime: '2025-10-30T03:00', status: null, lastRunAt: null },
-      ]
+      backups: [],
+      day: '',
+      backup_type: '',
+      date_time: '',
+      datetimeLocal: '',
+      weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      oldBackupConfig: null // to track changes
     };
   },
   methods: {
+    // Fetch existing backup config from API
     async fetchBackups() {
       // Logic to fetch existing backup config from API
       console.log('Fetching backup config...');
@@ -161,38 +109,81 @@ export default {
 
         const data = await res.json();
         console.log('Backup config data:', data);
-
-        // Defensive: ensure backups is always an array and every entry has required reactive fields
-        const raw = (data && Array.isArray(data.backups)) ? data.backups : [];
-        this.backups = raw.map(entry => ({
-          day: entry.day ?? 'Unnamed',
-          type: entry.type ?? '',
-          datetime: entry.datetime ?? '',
-          // ensure reactive properties exist
-          status: entry.status ?? null,
-          lastRunAt: entry.lastRunAt ?? null
-        }));
+        this.backups = data || [];
       } catch (err) {
         console.error('Error fetching backups:', err);
         // fallback to an empty array — prevents template render crash
-        this.backups = this.backups || [];
+        this.oldBackupConfig = this.oldBackupConfig || [];
       }
     },
+    // Save entire backup config
     async saveConfig() {
-      console.log('Saving backup config:', this.backups);
+      // 1. Validation
+      if (!this.day) { alert('Pick a day'); return; }
+      if (!this.backup_type) { alert('Pick a backup type'); return; }
+
+      // 2. Date Parsing — only use date_time (the bound field)
+      let isoDatetime = null;
+      if (this.date_time) {
+        const d = new Date(this.date_time);
+        if (isNaN(d)) {
+          alert('Please choose a valid date and time.');
+          return;
+        }
+        isoDatetime = d.toISOString();
+      } else {
+        alert('Please choose a valid date and time.');
+        return;
+      }
+      console.log(this.backups.length + 1, this.day, this.backup_type.toLocaleLowerCase(), isoDatetime);
+
+      const newBackupItem = {
+        id: this.backups.length + 1,
+        day: this.day,
+        type: this.backup_type.toLocaleLowerCase(),
+        datetime: isoDatetime
+      };
+
+      // Merge with existing backups so history isn’t wiped
+      const currentList = this.backups.map(b => ({
+        day: b.day,
+        type: b.type,
+        datetime: b.datetime
+      }));
+
+      const fullPayloadList = [...currentList, newBackupItem];
+      const payload = { backups: fullPayloadList };
+
+      console.log('Sending payload:', payload);
+
       try {
         const res = await fetch('http://localhost:8000/api/admin/backup-config', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
-          body: JSON.stringify({ backups: this.backups })
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(payload)
         });
+
         if (!res.ok) {
-          throw new Error('Save failed');
+            const errText = await res.text();
+            throw new Error(`Save failed: ${res.status} - ${errText}`);
         }
+
         alert('Saved successfully');
+        
+        // Clear inputs
+        this.day = '';
+        this.backup_type = '';
+        this.date_time = '';
+
+        // Refresh list
+        await this.fetchBackups();
+        
       } catch (e) {
         console.error(e);
-        alert('Save failed');
+        alert(e.message || 'Save failed');
       }
     },
 
@@ -260,6 +251,12 @@ export default {
   },
   mounted() {
     // fetch existing backup config
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(!localStorage.getItem('token') || user.role !== 'root') {
+      alert('Please login to access the admin dashboard.');
+      this.$router.push('/login');
+      return;
+    }
     this.fetchBackups();
   }
 };

@@ -24,6 +24,7 @@
       </table>
       </div>
     </main>
+    <button type="button" class="btn btn-primary" @click="changeDetails()">change details</button>
   </div>
 </template>
 
@@ -48,9 +49,19 @@ export default {
       const data = await res.json();
       // console.log(data);
       this.accounts = data;
+    },
+    async changeDetails() {
+      // alert('Change details functionality to be implemented.');
+      this.$router.push('/admin/account/edit');
     }
   },
   mounted() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(!localStorage.getItem('token') || user.role !== 'root') {
+      alert('Please login to access the admin dashboard.');
+      this.$router.push('/login');
+      return;
+    }
     this.fetchAccountSettings();
   }
 };
