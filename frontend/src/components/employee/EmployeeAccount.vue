@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { make_getrequest, make_putrequest, make_deleterequest } from "@/store/appState.js";
+import { make_getrequest, make_putrequest } from "@/store/appState.js";
 
 export default {
   name: "EmployeeAccount",
