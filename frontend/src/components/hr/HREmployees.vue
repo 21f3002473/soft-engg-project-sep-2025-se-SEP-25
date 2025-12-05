@@ -1,14 +1,19 @@
 <template>
   <div class="employees-root container-fluid py-4">
     <div class="container">
-      <!-- Main Section -->
       <section class="employees-section">
         <div class="row">
-          <!-- Left: Performance Review Table -->
+
+          <!-- LEFT: TABLE -->
           <div class="col-md-8 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h1 class="h4 mb-0">Performance Reviews</h1>
-              <input type="text" class="form-control form-control-sm w-50" placeholder="Search Employee..." />
+              <input
+                v-model="search"
+                type="text"
+                class="form-control form-control-sm w-50"
+                placeholder="Search Employee..."
+              />
             </div>
 
             <div class="table-responsive">
@@ -17,23 +22,36 @@
                   <tr>
                     <th>Employee</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  <tr v-for="(emp, index) in employees" :key="index">
+                  <tr v-for="emp in filteredEmployees" :key="emp.id">
                     <td>{{ emp.name }}</td>
+
                     <td>
-                      <span class="badge" :class="emp.status === 'Done' ? 'bg-success' : 'bg-secondary'">
+                      <span
+                        class="badge"
+                        :class="emp.status === 'Done' ? 'bg-success' : 'bg-secondary'"
+                      >
                         {{ emp.status }}
                       </span>
                     </td>
+
                     <td>
                       <button
-                        :class="['btn btn-sm', emp.status === 'Done' ? 'btn-success' : 'btn-primary']"
-                        type="button"
+                        class="btn btn-sm btn-primary me-2"
+                        @click="openViewModal(emp)"
                       >
-                        {{ emp.status === 'Upcoming' ? 'Auto Review' : 'Re-Auto Review' }}
+                        View
+                      </button>
+
+                      <button
+                        class="btn btn-sm btn-success"
+                        @click="openAddModal(emp)"
+                      >
+                        Add Review
                       </button>
                     </td>
                   </tr>
@@ -42,46 +60,247 @@
             </div>
           </div>
 
-          <!-- Right: Review Gen Panel -->
+          <!-- RIGHT: PANEL -->
           <div class="col-md-4">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">Review Gen</h5>
                 <p class="card-text">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet lacus a justo viverra tristique.
-                  Morbi blandit accumsan eros, nec elementum eros posuere eget.
+                  Auto-generate and manage employee performance assessments.
                 </p>
               </div>
             </div>
           </div>
+
         </div>
       </section>
-
-      <!-- Footer -->
-      <!-- <footer class="footer text-center mt-4">
-        <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
-      </footer> -->
     </div>
+
+    <!-- MODAL: VIEW REVIEW -->
+    <div class="modal fade" id="viewModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">Review – {{ selectedEmployee?.name }}</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div v-if="reviews.length === 0">
+              <p class="text-muted">No reviews available.</p>
+            </div>
+
+            <div
+              v-for="rev in reviews"
+              :key="rev.id"
+              class="mb-3 p-2 border rounded"
+            >
+              <p><strong>Rating:</strong> ⭐ {{ rev.rating }}</p>
+              <p><strong>Comments:</strong> {{ rev.comments || 'None' }}</p>
+              <small class="text-muted">
+                Created: {{ new Date(rev.created_at).toLocaleString() }}
+              </small>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: ADD REVIEW -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">Add Review – {{ selectedEmployee?.name }}</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <form @submit.prevent="submitReview">
+
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <select v-model="newReview.rating" class="form-select" required>
+                  <option disabled value="">Select rating</option>
+                  <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Comments</label>
+                <textarea
+                  v-model="newReview.comments"
+                  rows="3"
+                  class="form-control"
+                  placeholder="Enter comments (optional)"
+                ></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">
+                Submit Review
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
+
 export default {
-  name: 'HREmployees',
+  name: "HREmployees",
+
   data() {
     return {
-      employees: [
-        { name: 'EMP1', status: 'Upcoming' },
-        { name: 'EMP2', status: 'Upcoming' },
-        { name: 'EMP3', status: 'Upcoming' },
-        { name: 'EMP4', status: 'Done' },
-        { name: 'EMP5', status: 'Done' },
-        { name: 'EMP6', status: 'Done' }
-      ]
+      employees: [],
+      search: "",
+      selectedEmployee: null,
+      reviews: [],
+      newReview: {
+        rating: "",
+        comments: ""
+      },
+      BASE: "http://localhost:8000/api/hr",
+    };
+  },
+
+  computed: {
+    filteredEmployees() {
+      return this.employees.filter((e) =>
+        e.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+    }
+  },
+
+  mounted() {
+    this.fetchEmployees();
+  },
+
+  methods: {
+    // 🔐 AUTH HEADERS
+    getAuthHeaders() {
+      const token = localStorage.getItem("hr_token"); // FIXED
+      if (!token) {
+        console.warn("No token found, redirecting to login");
+        window.location.href = "/login";
+      }
+      return {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+    },
+
+    // ✔️ FETCH EMPLOYEES + STATUS
+    async fetchEmployees() {
+      try {
+        //const res = await axios.get(`${this.BASE}/employees`, this.getAuthHeaders());
+        //const list = res.data;
+        const res = await axios.get(`${this.BASE}/employees`, this.getAuthHeaders());
+        const list = res.data.employees || [];
+        
+
+        // Fetch review status for each employee in parallel
+        const statusRequests = list.map((emp) =>
+          axios
+            .get(`${this.BASE}/reviews/${emp.id}`, this.getAuthHeaders())
+            .then((r) => ({
+              id: emp.id,
+              //status: r.data.length > 0 ? "Done" : "Upcoming"
+              status: (r.data.reviews && r.data.reviews.length > 0) ? "Done" : "Upcoming"
+            }))
+        );
+
+        const results = await Promise.all(statusRequests);
+
+        // Merge statuses into employees list
+        list.forEach((emp) => {
+          const found = results.find((r) => r.id === emp.id);
+          emp.status = found.status;
+        });
+
+        this.employees = list;
+
+      } catch (err) {
+        console.error("Error fetching employees:", err);
+
+        if (err.response && err.response.status === 401) {
+          console.warn("Token expired. Redirecting...");
+          localStorage.removeItem("hr_token");
+          window.location.href = "/login";
+        }
+      }
+    },
+
+    // ✔️ OPEN VIEW MODAL
+    async openViewModal(emp) {
+      try {
+        this.selectedEmployee = emp;
+
+        const res = await axios.get(
+          `${this.BASE}/reviews/${emp.id}`,
+          this.getAuthHeaders()
+        );
+
+        //this.reviews = res.data;
+        this.reviews = res.data.reviews || [];
+
+
+        new bootstrap.Modal("#viewModal").show();
+      } catch (err) {
+        console.error("Error loading review:", err);
+      }
+    },
+
+    // ✔️ OPEN ADD MODAL
+    openAddModal(emp) {
+      this.selectedEmployee = emp;
+      this.newReview = { rating: "", comments: "" };
+
+      new bootstrap.Modal("#addModal").show();
+    },
+
+    // ✔️ SUBMIT NEW REVIEW
+    async submitReview() {
+      try {
+        await axios.post(
+          `${this.BASE}/review/create`,
+          {
+            user_id: this.selectedEmployee.id,
+            rating: this.newReview.rating,
+            comments: this.newReview.comments
+          },
+          this.getAuthHeaders()
+        );
+
+        alert("Review Submitted!");
+        bootstrap.Modal.getInstance(document.getElementById("addModal")).hide();
+
+        this.fetchEmployees();
+      } catch (err) {
+        console.error("Error submitting review:", err);
+      }
     }
   }
-}
+};
 </script>
+
+<style scoped>
+.badge {
+  font-size: 0.85rem;
+}
+</style>
+
 
 <!-- <style scoped>
 .employees-root {
