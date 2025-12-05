@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { make_getrequest, make_putrequest, make_deleterequest } from "@/store/appState.js";
+import { make_getrequest, make_putrequest } from "@/store/appState.js";
 
 export default {
   name: "EmployeeAccount",
@@ -153,16 +153,9 @@ export default {
       if (!confirm("Are you sure you want to logout?")) return;
       
       this.loading = true;
-      try {
-        await make_deleterequest("/api/employee/account");
-      } catch (error) {
-        console.warn("Logout API call failed, proceeding with client-side logout:", error);
-      } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        this.$router.push({ name: "Login" });
-        this.loading = false;
-      }
+      this.$store.dispatch('logout');
+      this.$router.push({ name: "Login" });
+      this.loading = false;
     },
   },
 };

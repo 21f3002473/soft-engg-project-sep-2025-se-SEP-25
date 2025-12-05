@@ -4,5 +4,10 @@ import router from './router/router.js'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'katex/dist/katex.min.css'
+import store from './store/store.js'
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+app.use(store)
+app.use(router)
+store.dispatch('initializeStore')
+app.mount('#app')

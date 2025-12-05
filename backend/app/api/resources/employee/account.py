@@ -143,27 +143,3 @@ class AccountResource(Resource):
         except Exception as e:
             logger.error("Account Update error", exc_info=True)
             raise HTTPException(500, "Internal server error")
-
-    def delete(
-        self,
-        current_user: User = Depends(require_employee()),
-    ):
-        """
-        Client-side logout endpoint.
-
-        This is a symbolic endpoint for logout workflow. In practice, logout is handled
-        client-side by deleting the authentication token. This endpoint acknowledges the
-        logout request and can be used for server-side cleanup or audit logging if needed.
-
-        Args:
-            current_user (User): Authenticated employee user object
-
-        Returns:
-            dict: Logout confirmation message
-                - message (str): "Logged out successfully"
-
-        Note:
-            Authentication token deletion is performed on the client side. This endpoint
-            serves as a confirmation point and potential hook for server-side logging.
-        """
-        return {"message": "Logged out successfully"}
