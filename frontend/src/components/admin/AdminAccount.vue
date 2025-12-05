@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { make_getrequest } from '@/store/appState';
+
 export default {
   name: 'AdminAccount',
   data() {
@@ -38,15 +40,12 @@ export default {
   },
   methods: {
     async fetchAccountSettings() {
-      const res = await fetch(`http://localhost:8000/api/admin/account`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await res.json();
-      this.accounts = data;
+      try {
+        const data = await make_getrequest('/api/admin/account');
+        this.accounts = data;
+      } catch (error) {
+        console.error('Failed to fetch account settings', error);
+      }
     },
     async changeDetails() {
       this.$router.push('/admin/account/edit');

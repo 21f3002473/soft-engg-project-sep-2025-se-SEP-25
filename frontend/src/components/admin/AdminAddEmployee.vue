@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import { make_postrequest } from '@/store/appState';
+
 export default {
   name: 'AdminAddEmployee',
   data() {
@@ -41,27 +43,19 @@ export default {
   },
   methods: {
     async AddEmployee() {
-      const res = await fetch(`http://localhost:8000/api/admin/employees`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
+      try {
+        const data = await make_postrequest('/api/admin/employees', {
           name: this.employeeName,
           role: this.employeeType
-        })
-      });
-      if (!res.ok) {
-        console.error('Failed to add employee');
-        return;
-      }
-      const data = await res.json();
-      alert(`Employee added successfully: ${data.name}, 
+        });
+        alert(`Employee added successfully: ${data.name}, 
         Employee Details:
         ID: ${data.id}, Role: ${data.role}, Email: ${data.email}, Password: ${data.temporary_password}`);
-      this.employeeName = '';
-      this.employeeType = '';
+        this.employeeName = '';
+        this.employeeType = '';
+      } catch (error) {
+        console.error('Failed to add employee', error);
+      }
     }
   },
   mounted() {

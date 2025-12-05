@@ -130,6 +130,8 @@
 </template>
 
 <script>
+import { make_getrequest, make_putrequest } from '@/store/appState';
+
 export default {
   name: 'AdminAccountEdit',
   data() {
@@ -146,38 +148,29 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      const res = await fetch(`http://localhost:8000/api/admin/account`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
+      try {
+        await make_putrequest('/api/admin/account', {
           name: this.name,
           old_password: this.old_password,
           new_password: this.new_password
-        })
-      });
-      if (res.ok) {
+        });
         alert('Account details updated successfully.');
         this.$router.push('/admin/account');
-      } else {
+      } catch (error) {
         alert('Failed to update account details.');
+        console.error(error);
       }
     },
     async fetchAccountDetails() {
-      const res = await fetch(`http://localhost:8000/api/admin/account`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await res.json();
-      this.name = data.name;
-      this.id = data.id;
-      this.email = data.email;
-      this.role = data.role;
+      try {
+        const data = await make_getrequest('/api/admin/account');
+        this.name = data.name;
+        this.id = data.id;
+        this.email = data.email;
+        this.role = data.role;
+      } catch (error) {
+        console.error('Failed to fetch account details', error);
+      }
     }
   },
   mounted() {

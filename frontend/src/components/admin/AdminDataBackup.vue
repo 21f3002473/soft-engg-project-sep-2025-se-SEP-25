@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import { make_getrequest, make_putrequest } from '@/store/appState';
+
 export default {
   name: 'AdminDataBackup',
   props: {
@@ -90,24 +92,11 @@ export default {
   methods: {
     async fetchBackups() {
       try {
-        const res = await fetch(`http://localhost:8000/api/admin/backup-config`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-        });
-
-        if (!res.ok) {
-          console.error('Failed to fetch backup config, status:', res.status);
-          return;
-        }
-
-        const data = await res.json();
+        const data = await make_getrequest('/api/admin/backup-config');
         this.oldBackupConfig = data || [];
       } catch (err) {
         console.error('Error fetching backups:', err);
-        return this.oldBackupConfig = [];
+        this.oldBackupConfig = [];
       }
     },
     async saveConfig() {
@@ -144,20 +133,7 @@ export default {
       const payload = { backups: fullPayloadList };
 
       try {
-        const res = await fetch('http://localhost:8000/api/admin/backup-config', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`Save failed: ${res.status} - ${errText}`);
-        }
-
+        await make_putrequest('/api/admin/backup-config', payload);
         alert('Saved successfully');
 
         this.day = '';

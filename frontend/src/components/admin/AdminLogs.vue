@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { make_getrequest } from '@/store/appState';
+
 export default {
   name: 'AdminLogs',
   data() {
@@ -45,22 +47,14 @@ export default {
   },
   methods: {
     async fetchLogs() {
-      const res = await fetch(`http://localhost:8000/api/admin/summary`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      try {
+        const data = await make_getrequest('/api/admin/summary');
         this.logs = data;
         this.currentAdminID = this.logs.currentAdmin.id;
         this.currentAdminEmail = this.logs.currentAdmin.email;
         this.currentAdminName = this.logs.currentAdmin.name;
-      } else {
-        console.error('Failed to fetch logs');
-        return;
+      } catch (error) {
+        console.error('Failed to fetch logs', error);
       }
     },
   },

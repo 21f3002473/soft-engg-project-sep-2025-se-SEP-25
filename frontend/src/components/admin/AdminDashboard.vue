@@ -38,7 +38,7 @@
                 <td>
                   Active
                 </td>
-                
+
                 <td>
                   <button class="btn btn-sm btn-outline-danger" @click="deleteUser(emp)" aria-label="Delete employee">
                     Delete Employee
@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { make_getrequest, make_deleterequest } from '@/store/appState';
+
 export default {
   name: 'AdminDashboard',
   props: {
@@ -100,41 +102,29 @@ export default {
       );
     }
   },
+
   methods: {
     async fetchData() {
-      const res = await fetch(`http://localhost:8000/api/admin/employees`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (!res.ok) {
-        console.error('Failed to fetch employees');
-        return;
+      try {
+        const data = await make_getrequest('/api/admin/employees');
+        this.employees = data;
+        this.originalEmployees = Array.isArray(data) ? data.slice() : [];
+      } catch (error) {
+        console.error('Failed to fetch employees', error);
       }
-      const data = await res.json();
-      this.employees = data;
-      this.originalEmployees = Array.isArray(data) ? data.slice() : [];
     },
     async deleteUser(emp) {
       if (!confirm(`Are you sure you want to delete user ${emp.name}?`)) {
         return;
       }
-      const res = await fetch(`http://localhost:8000/api/admin/deleteusers/${emp.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (!res.ok) {
-        console.error('Failed to delete user');
-        return;
+      try {
+        await make_deleterequest(`/api/admin/deleteusers/${emp.id}`);
+        this.employees = this.employees.filter(e => e.id !== emp.id);
+        this.originalEmployees = this.originalEmployees.filter(e => e.id !== emp.id);
+        alert(`User ${emp.name} deleted successfully.`);
+      } catch (error) {
+        console.error('Failed to delete user', error);
       }
-      this.employees = this.employees.filter(e => e.id !== emp.id);
-      this.originalEmployees = this.originalEmployees.filter(e => e.id !== emp.id);
-      alert(`User ${emp.name} deleted successfully.`);
     }
   },
   mounted() {

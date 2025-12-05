@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import { make_getrequest } from '@/store/appState';
+
 export default {
   name: 'AdminUpdates',
   data() {
@@ -48,15 +50,12 @@ export default {
   },
   methods: {
     async adminUpdates() {
-      const res = await fetch(`http://localhost:8000/api/admin/updates`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await res.json();
-      this.adminUpdatesData = data;
+      try {
+        const data = await make_getrequest('/api/admin/updates');
+        this.adminUpdatesData = data;
+      } catch (error) {
+        console.error('Failed to fetch admin updates', error);
+      }
     },
     formatDate(dateStr) {
       return new Date(dateStr).toLocaleString();
