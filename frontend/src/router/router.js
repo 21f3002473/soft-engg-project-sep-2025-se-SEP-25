@@ -177,6 +177,7 @@ const routes = [
     {
         path: '/hr',
         component: () => import('@/components/hr/HRLayout.vue'),
+        meta: { requiresHRAuth: true },
         children: [
         {
             path: 'dashboard',
@@ -211,5 +212,18 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes
 })
+router.beforeEach((to, from, next) => {
+  const hrToken = localStorage.getItem("hr_token"); // replace with your token key
+
+  if (to.matched.some(record => record.meta.requiresHRAuth)) {
+    if (!hrToken) {
+      alert("Please log in to access HR dashboard.");
+      return next("/login");
+    }
+  }
+
+  next();
+});
+
 
 export default router;
