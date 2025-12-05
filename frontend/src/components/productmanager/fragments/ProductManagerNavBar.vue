@@ -29,9 +29,9 @@
                         </router-link>
                     </li>
                     <li class="nav-item ms-2">
-                        <router-link class="btn btn-outline-light btn-sm" :to="{ name: 'Login' }">
+                        <button class="btn btn-outline-light btn-sm" @click="logout">
                             Logout
-                        </router-link>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -44,6 +44,12 @@
 <script>
 export default {
     name: 'ProductMangerNavBar',
+    methods: {
+        logout() {
+            this.$store.dispatch('logout');
+            this.$router.push({ name: 'Login' });
+        }
+    }
 };
 </script>
 

@@ -60,7 +60,8 @@ const store = createStore({
 
                     let role = parsedUser.role;
                     if (role === "root") role = "admin";
-                    else if (role === "pm") role = "productmanager";
+                    else if (role === "product_manager") role = "productmanager";
+                    else if (role === "human_resource") role = "hr";
 
                     commit('setRole', role);
                 } catch (e) {

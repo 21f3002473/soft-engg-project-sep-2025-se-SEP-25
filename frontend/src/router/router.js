@@ -244,9 +244,10 @@ router.beforeEach((to, from, next) => {
                 const parsed = JSON.parse(user);
                 let r = parsed.role;
                 if (r === "root") r = "admin";
-                else if (r === "pm") r = "productmanager";
+                else if (r === "product_manager") r = "productmanager";
+                else if (r === "human_resource") r = "hr";
                 userRole = r;
-            } catch (e) { 
+            } catch (e) {
                 console.log(e);
                 userRole = null;
             }
