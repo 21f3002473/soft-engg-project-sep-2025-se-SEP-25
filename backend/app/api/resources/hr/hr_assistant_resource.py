@@ -1,10 +1,10 @@
+# Import the existing function from your agent
+from app.agents.hr.ask_questions import answer_question
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi_restful import Resource
 from pydantic import BaseModel
 
-# Import the existing function from your agent
-from app.agents.hr.ask_questions import answer_question
 
 class QuestionRequest(BaseModel):
     question: str
