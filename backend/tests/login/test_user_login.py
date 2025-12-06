@@ -124,5 +124,3 @@ def test_post_bad_login(client):
 
     assert "detail" in data
     assert data.get("detail") == "Invalid email or password"
-
-

@@ -54,4 +54,3 @@ def test_account_update_unauthorized(base_url):
     payload = {"name": "Not allowed"}
     r = httpx.put(f"{base_url}/employee/account", json=payload)
     assert r.status_code in (401, 403)
-

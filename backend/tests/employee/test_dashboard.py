@@ -202,10 +202,13 @@ def test_get_hr_announcements_unauthorized(base_url):
     response = httpx.get(f"{base_url}/hr/annoucements")
     assert response.status_code in [401, 403]
 
+
 @pytest.fixture
 def client():
     import requests
+
     return requests
+
 
 # 6) /hr/annoucement (AnnouncementAdminListCreateResource)
 def test_post_hr_announcement_success(base_url, auth_hr):
@@ -246,8 +249,7 @@ def test_get_hr_announcement_detail_not_found(base_url, auth_hr):
 
 def test_get_hr_announcement_detail_unauthorized(base_url, auth_hr):
     payload = {"announcement": "Office will remain closed on Friday"}
-    res = httpx.post(f"{base_url}/hr/annoucement",
-                     json=payload, headers=auth_hr)
+    res = httpx.post(f"{base_url}/hr/annoucement", json=payload, headers=auth_hr)
     assert res.status_code in [200, 201]
     list_resp = httpx.get(f"{base_url}/hr/annoucements", headers=auth_hr)
     assert list_resp.status_code == 200
@@ -257,20 +259,17 @@ def test_get_hr_announcement_detail_unauthorized(base_url, auth_hr):
         pytest.skip("No announcements available to test GET detail")
 
     ann_id = announcements[-1]["id"]
-    response = httpx.get(
-        f"{base_url}/hr/annoucement/edit/{ann_id}", headers={})
+    response = httpx.get(f"{base_url}/hr/annoucement/edit/{ann_id}", headers={})
 
     assert response.status_code in [401, 403]
 
 
 def test_post_hr_announcement_missing_field(base_url, auth_hr):
-    response = httpx.post(f"{base_url}/hr/annoucement",
-                          json={}, headers=auth_hr)
+    response = httpx.post(f"{base_url}/hr/annoucement", json={}, headers=auth_hr)
 
     assert response.status_code == 400
     data = assert_json(response)
     assert data.get("detail") == "announcement field is required"
-
 
 
 def test_put_hr_announcement_success(base_url, auth_hr):
