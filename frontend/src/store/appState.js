@@ -66,8 +66,7 @@ try {
 
   const targetRoute = `/${role}/dashboard`;
   router.replace(targetRoute);
-
-  return { ok: true, data };
+  
 } catch (err) {
   localStorage.removeItem("token");
   store.dispatch("clearAll");
