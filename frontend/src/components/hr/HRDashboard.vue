@@ -3,7 +3,7 @@
     <!-- HEADER -->
     <header class="dash-header">
       <h1 class="title">HR Dashboard</h1>
-      <p class="subtitle">Overview of employees, performance reviews, and policies</p>
+      <p class="subtitle">Overview of employees and performance reviews</p>
     </header>
 
     <!-- STATS GRID -->
@@ -20,15 +20,7 @@
         <div class="stat-icon bg-green"></div>
         <div class="stat-info">
           <h2>{{ reviewCount }}</h2>
-          <p>Total Reviews</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon bg-purple"></div>
-        <div class="stat-info">
-          <h2>{{ policyCount }}</h2>
-          <p>Company Policies</p>
+          <p>Total Reviews Submitted</p>
         </div>
       </div>
 
@@ -36,7 +28,7 @@
         <div class="stat-icon bg-orange"></div>
         <div class="stat-info">
           <h2>{{ avgRating.toFixed(1) }}</h2>
-          <p>Average Review Rating</p>
+          <p>Average Rating</p>
         </div>
       </div>
 
@@ -44,7 +36,15 @@
         <div class="stat-icon bg-red"></div>
         <div class="stat-info">
           <h2>{{ employeesWithoutReviews }}</h2>
-          <p>Employees without Reviews</p>
+          <p>Employees Without Reviews</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-purple"></div>
+        <div class="stat-info">
+          <h2>{{ employeesWithReviews }}</h2>
+          <p>Employees With Reviews</p>
         </div>
       </div>
     </section>
@@ -84,22 +84,6 @@
           </li>
         </ul>
       </div>
-
-      <!-- POLICIES PANEL -->
-      <div class="panel-card">
-        <h3>Latest Policies</h3>
-        <ul class="list">
-          <li v-for="policy in recentPolicies" :key="policy.id" class="list-item">
-            <div class="list-left">
-              <span class="dot bg-purple"></span>
-              <div>
-                <strong>{{ policy.title }}</strong>
-                <p class="muted small-text">{{ policy.content?.slice(0, 50) || 'No description' }}...</p>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
     </section>
   </div>
 </template>
@@ -112,13 +96,12 @@ export default {
   data() {
     return {
       employees: [],
-      policies: [],
       reviews: [],
       employeeCount: 0,
-      policyCount: 0,
       reviewCount: 0,
       avgRating: 0,
-      employeesWithoutReviews: 0
+      employeesWithoutReviews: 0,
+      employeesWithReviews: 0
     };
   },
   computed: {
@@ -127,9 +110,6 @@ export default {
     },
     recentReviews() {
       return this.reviews.slice(0, 5);
-    },
-    recentPolicies() {
-      return this.policies.slice(0, 5);
     }
   },
   mounted() {
@@ -146,7 +126,6 @@ export default {
       const token = localStorage.getItem("hr_token");
 
       if (!token) {
-        console.error("No HR token found");
         this.$router.push("/login");
         return;
       }
@@ -154,9 +133,8 @@ export default {
       const auth = { headers: { Authorization: `Bearer ${token}` } };
 
       try {
-        const [empRes, polRes, revRes] = await Promise.all([
+        const [empRes, revRes] = await Promise.all([
           axios.get(`${base}/employees`, auth),
-          axios.get(`${base}/policies`, auth),
           axios.get(`${base}/reviews`, auth)
         ]);
 
@@ -164,22 +142,26 @@ export default {
           ...emp,
           reporting_manager_name: emp.reporting_manager?.name || null
         }));
-        this.policies = polRes.data;
+
         this.reviews = revRes.data.map(r => ({
           ...r,
           user_name: r.user?.name || "N/A"
         }));
 
+        // Stats
         this.employeeCount = this.employees.length;
-        this.policyCount = this.policies.length;
         this.reviewCount = this.reviews.length;
 
-        if (this.reviews.length > 0) {
-          this.avgRating = this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
+        if (this.reviewCount > 0) {
+          this.avgRating =
+            this.reviews.reduce((sum, r) => sum + r.rating, 0) /
+            this.reviewCount;
         }
 
         const reviewedUserIds = new Set(this.reviews.map(r => r.user_id));
-        this.employeesWithoutReviews = this.employees.filter(e => !reviewedUserIds.has(e.id)).length;
+
+        this.employeesWithReviews = reviewedUserIds.size;
+        this.employeesWithoutReviews = this.employeeCount - reviewedUserIds.size;
 
       } catch (err) {
         console.error("Dashboard Error:", err);
@@ -188,6 +170,8 @@ export default {
   }
 };
 </script>
+
+
 
 <style scoped>
 .dashboard-container {
