@@ -117,7 +117,7 @@ class API:
         )
         self.register_router(
             AnnouncementAdminListCreateResource,
-            f"{hr_base_url}/annoucement/{{user_id}}",
+            f"{hr_base_url}/annoucement",
         )
         self.register_router(
             AnnouncementAdminDetailResource,
