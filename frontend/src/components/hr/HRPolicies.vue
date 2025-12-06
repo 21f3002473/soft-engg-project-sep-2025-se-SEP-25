@@ -1,7 +1,9 @@
+
 <template>
   <div class="container-fluid py-4">
     <div class="container">
       <div class="row g-4">
+
         <!-- PDF Viewer -->
         <div class="col-12 col-md-6">
           <div class="card h-100"> 
@@ -18,14 +20,49 @@
           </div>
         </div>
 
-        <!-- HR Assistant Chat -->
+        <!-- HR Policies Management & Chat -->
         <div class="col-12 col-md-6 d-flex flex-column">
+
+          <!-- Policy Buttons Section -->
+          <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+              HR Policies Management
+            </div>
+            <div class="card-body d-flex flex-column gap-2">
+
+              <div class="d-flex gap-2 flex-wrap">
+                <button
+                  v-for="policy in policies"
+                  :key="policy.id"
+                  class="btn btn-outline-primary"
+                  @click="viewPolicy(policy)"
+                >
+                  {{ policy.title }}
+                </button>
+              </div>
+
+              <!-- New Policy Form (visible only if HR) -->
+              <div v-if="isHR" class="mt-3">
+                <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2"/>
+                <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2" rows="3"></textarea>
+                <button class="btn btn-success" @click="addPolicy">Add Policy</button>
+              </div>
+
+              <!-- Display selected policy -->
+              <div v-if="selectedPolicy" class="mt-3 p-3 border rounded bg-light">
+                <h5>{{ selectedPolicy.title }}</h5>
+                <p>{{ selectedPolicy.content }}</p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- HR Assistant Chat (unchanged) -->
           <div class="chat-card card flex-grow-1 d-flex flex-column">
             <div class="card-header bg-primary text-white">
               HR Policies — Ask Here
             </div>
 
-            <!-- Chat messages container -->
             <div class="chat-body flex-grow-1 p-3" ref="chatBody">
               <div
                 v-for="(msg, index) in messages"
@@ -36,7 +73,6 @@
               </div>
             </div>
 
-            <!-- Input box -->
             <div class="card-footer p-3 bg-light d-flex gap-2">
               <textarea
                 v-model="query"
@@ -54,8 +90,8 @@
               </button>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   </div>
@@ -67,15 +103,64 @@ export default {
   data() {
     return {
       query: "",
-      messages: [], // Stores chat messages with role 'user' or 'ai'
+      messages: [],
       loading: false,
+      policies: [],
+      selectedPolicy: null,
+      newPolicy: { title: "", content: "" },
+      isHR: true, // Set dynamically based on user role
     };
   },
+  mounted() {
+    this.fetchPolicies();
+  },
   methods: {
+    async fetchPolicies() {
+      try {
+        //const res = await fetch("http://127.0.0.1:8000/api/hr/policies");
+        const res = await fetch("http://127.0.0.1:8000/api/hr/policies", {
+        headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const data = await res.json();
+        this.policies = data.policies || [];
+      } catch (err) {
+        console.error("Failed to fetch policies", err);
+      }
+    },
+    viewPolicy(policy) {
+      this.selectedPolicy = policy;
+    },
+    async addPolicy() {
+      if (!this.newPolicy.title || !this.newPolicy.content) return;
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/hr/policy/create", {
+          method: "POST",
+          //headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+
+          body: JSON.stringify(this.newPolicy),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          this.policies.push(data.policy);
+          this.newPolicy = { title: "", content: "" };
+        } else {
+          alert(data.error || "Failed to create policy");
+        }
+      } catch (err) {
+        console.error("Error creating policy", err);
+      }
+    },
     async submitQuery() {
       if (!this.query.trim()) return;
 
-      // Add user message
       this.messages.push({ role: "user", text: this.query });
       const userQuery = this.query;
       this.query = "";
@@ -84,17 +169,20 @@ export default {
       try {
         const res = await fetch("http://127.0.0.1:8000/api/hr/assistant", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          //headers: { "Content-Type": "application/json" },
+          headers: {
+          "Content-Type": "application/json",
+           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+
           body: JSON.stringify({ question: userQuery }),
         });
 
         const data = await res.json();
         const answer = res.ok ? data.answer : data.error || "No response.";
 
-        // Add AI response
         this.messages.push({ role: "ai", text: answer });
 
-        // Scroll to bottom
         this.$nextTick(() => {
           const chat = this.$refs.chatBody;
           chat.scrollTop = chat.scrollHeight;
@@ -109,59 +197,6 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.chat-card {
-  display: flex;
-  flex-direction: column;
-  height: 60vh;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #d1d5db;
-  background-color: #f8fafc;
-}
-
-.chat-body {
-  flex-grow: 1;
-  overflow-y: auto;
-  background-color: #ffffff;
-}
-
-.chat-message {
-  margin-bottom: 12px;
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 12px;
-  word-wrap: break-word;
-}
-
-.chat-message.user {
-  align-self: flex-end;
-  background-color: #e5e7eb; /* Light gray */
-  color: #111827;
-  border-bottom-right-radius: 0;
-}
-
-.chat-message.ai {
-  align-self: flex-start;
-  background-color: #3b82f6; /* Blue */
-  color: #ffffff;
-  border-bottom-left-radius: 0;
-}
-
-.card-footer textarea {
-  resize: none;
-  border-radius: 12px;
-}
-
-.card-footer button {
-  height: fit-content;
-  border-radius: 12px;
-}
-</style>
-
-
-
 
 
 <!-- <style scoped>
