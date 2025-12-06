@@ -25,7 +25,6 @@ class HRProjectListResource(Resource):
             for p in projects:
                 manager_name = None
                 if p.manager_id:
-                    # Fetch manager from User table
                     manager = session.get(User, p.manager_id)
                     manager_name = manager.name if manager else None
 

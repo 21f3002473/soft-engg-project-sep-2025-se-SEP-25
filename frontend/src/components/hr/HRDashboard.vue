@@ -176,8 +176,7 @@ export default {
         }));
 
         const reviews = (revRes.reviews || []).map(r => ({
-          ...r,
-          user_name: r.user?.name || "N/A"
+          ...r
         }));
 
         this.employees = employees;
@@ -203,6 +202,7 @@ export default {
         this.recentReviews = [...reviews]
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
           .slice(0, 5);
+        console.log(this.recentReviews);
 
       } catch (err) {
         console.error("Dashboard Error:", err);
