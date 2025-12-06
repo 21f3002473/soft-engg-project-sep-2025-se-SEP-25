@@ -122,7 +122,7 @@
           </div>
           <div class="modal-body p-4">
             <h6 class="text-muted mb-3 text-uppercase small ls-1">Employee: <span class="text-dark fw-bold">{{
-                selectedEmployee?.name }}</span></h6>
+              selectedEmployee?.name }}</span></h6>
 
             <div v-if="reviews.length === 0" class="alert alert-secondary border-0 d-flex align-items-center"
               role="alert">
@@ -198,6 +198,7 @@
 <script>
 import { make_getrequest, make_postrequest } from "@/store/appState.js";
 import { useNotify } from "@/utils/useNotify.js";
+import Swal from "sweetalert2";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import HRAnnouncements from "./fragments/HRAnnouncements.vue";
 import HRFAQs from "./fragments/HRFAQs.vue";
@@ -286,6 +287,18 @@ export default {
     },
 
     async submitReview() {
+      const result = await Swal.fire({
+        title: "Submit Review?",
+        text: "Are you sure you want to submit this performance review?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#0d6efd",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, submit it!"
+      });
+
+      if (!result.isConfirmed) return;
+
       try {
         await make_postrequest("/api/hr/review/create", {
           user_id: this.selectedEmployee.id,

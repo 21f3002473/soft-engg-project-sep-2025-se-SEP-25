@@ -38,9 +38,14 @@
 
 <script>
 import { make_getrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: "HRProjects",
+
+  setup() {
+    return { notify: useNotify() };
+  },
 
   data() {
     return {
@@ -72,6 +77,7 @@ export default {
         this.projects = data.projects || [];
       } catch (err) {
         console.error("Error fetching projects:", err);
+        this.notify.error("Failed to load projects");
       }
     },
   },

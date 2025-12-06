@@ -85,9 +85,14 @@
 
 <script>
 import { make_getrequest, make_postrequest, make_putrequest, make_deleterequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
+import Swal from "sweetalert2";
 
 export default {
   name: "HRPolicies",
+  setup() {
+    return { notify: useNotify() };
+  },
   data() {
     return {
       query: "",
@@ -129,9 +134,10 @@ export default {
         const data = await make_postrequest("/api/hr/policy/create", this.newPolicy);
         this.policies.push(data.policy);
         this.newPolicy = { title: "", content: "" };
+        this.notify.success("Policy created successfully");
       } catch (err) {
         console.error("Error creating policy", err);
-        alert(err.message || "Failed to create policy");
+        this.notify.error(err.message || "Failed to create policy");
       }
     },
 
@@ -141,17 +147,27 @@ export default {
       try {
         const data = await make_putrequest(`/api/hr/policy/${this.selectedPolicy.id}`, this.selectedPolicyEdit);
         Object.assign(this.selectedPolicy, data.policy);
-        alert("Policy updated successfully");
+        this.notify.success("Policy updated successfully");
       } catch (err) {
         console.error("Update error:", err);
-        alert(err.message || "Failed to update");
+        this.notify.error(err.message || "Failed to update");
       }
     },
 
     async deletePolicy() {
       if (!this.selectedPolicy) return;
 
-      if (!confirm("Are you sure you want to delete this policy?")) return;
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you really want to delete this policy?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!"
+      });
+
+      if (!result.isConfirmed) return;
 
       try {
         await make_deleterequest(`/api/hr/policy/${this.selectedPolicy.id}`);
@@ -162,10 +178,10 @@ export default {
         this.selectedPolicy = null;
         this.selectedPolicyEdit = { title: "", content: "" };
 
-        alert("Policy deleted");
+        this.notify.success("Policy deleted successfully");
       } catch (err) {
         console.error("Delete error:", err);
-        alert(err.message || "Failed to delete");
+        this.notify.error(err.message || "Failed to delete");
       }
     },
 
