@@ -58,21 +58,20 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "HRProjects",
+
   data() {
     return {
       searchProject: "",
       searchManager: "",
-      projects: [
-        { name: "P1", manager: "M1" },
-        { name: "P2", manager: "M2" },
-        { name: "P3", manager: "M3" },
-        { name: "P4", manager: "M4" },
-        { name: "P5", manager: "M5" },
-      ],
+      projects: [],
+      BASE: "http://localhost:8000/api/hr",
     };
   },
+
   computed: {
     filteredProjects() {
       return this.projects.filter(
@@ -80,6 +79,35 @@ export default {
           p.name.toLowerCase().includes(this.searchProject.toLowerCase()) &&
           p.manager.toLowerCase().includes(this.searchManager.toLowerCase())
       );
+    },
+  },
+
+  mounted() {
+    this.fetchProjects();
+  },
+
+  methods: {
+    getAuthHeaders() {
+      const token = localStorage.getItem("hr_token");
+      return { headers: { Authorization: `Bearer ${token}` } };
+    },
+
+    async fetchProjects() {
+      try {
+        const res = await axios.get(
+          `${this.BASE}/projects-overview`,
+          this.getAuthHeaders()
+        );
+
+        this.projects = res.data.projects || [];
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+
+        if (err.response?.status === 401) {
+          localStorage.removeItem("hr_token");
+          window.location.href = "/login";
+        }
+      }
     },
   },
 };
