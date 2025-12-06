@@ -26,7 +26,11 @@ from app.api.resources.pm_resources.employee import (
     EmployeePerformanceResource,
     EmployeesResource,
 )
-from app.api.resources.pm_resources.project import ProjectsResource
+from app.api.resources.pm_resources.project import (
+    ProjectsResource,
+    ProjectsDashboardResource,
+    ProjectViewResource,
+)
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -87,6 +91,15 @@ class API:
             ClientRequirementResource,
             f"{pm_base_url}/client/requirements/{{client_id}}",
         )
+
+        self.register_router(
+            ProjectsDashboardResource, f"{pm_base_url}/projects/dashboard"
+        )
+
+        self.register_router(
+            ProjectViewResource, f"{pm_base_url}/project/{{project_id}}"
+        )
+
         self.register_router(
             ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
         )

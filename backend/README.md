@@ -176,3 +176,60 @@ pytest tests/test_user_login.py -vv
 ### How to run Pytest for a pytest function
 
 pytest tests/test_user_login.py::test_post_admin_login -vv
+
+#!/bin/bash
+# filepath: start_worker.sh
+
+# Start Celery worker
+echo "Starting Celery worker..."
+
+cd "$(dirname "$0")/.."
+
+celery -A app.celery_app worker \
+    --loglevel=info \
+    --concurrency=4 \
+    --max-tasks-per-child=1000 \
+    --time-limit=1800 \
+    --soft-time-limit=1500 \
+    -n worker@%h
+
+
+#!/bin/bash
+# filepath: start_beat.sh
+
+# Start Celery beat scheduler
+echo "Starting Celery beat scheduler..."
+
+cd "$(dirname "$0")/.."
+
+celery -A app.celery_app beat \
+    --loglevel=info \
+    --pidfile=/tmp/celerybeat.pid \
+    --schedule=/tmp/celerybeat-schedule
+
+
+#!/bin/bash
+# filepath: start_beat.sh
+
+# Start Celery beat scheduler
+echo "Starting Celery beat scheduler..."
+
+cd "$(dirname "$0")/.."
+
+celery -A app.celery_app beat \
+    --loglevel=info \
+    --pidfile=/tmp/celerybeat.pid \
+    --schedule=/tmp/celerybeat-schedule
+
+
+#!/bin/bash
+# filepath: start_flower.sh
+
+# Start Flower monitoring dashboard
+echo "Starting Flower monitoring dashboard..."
+
+cd "$(dirname "$0")/.."
+
+celery -A app.celery_app flower \
+    --port=5555 \
+    --broker="${CELERY_BROKER_URL:-redis://localhost:6379/0}"

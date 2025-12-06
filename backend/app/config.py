@@ -21,6 +21,21 @@ class Config:
             "Set SECRET_KEY in .env file for persistent authentication."
         )
 
+    # Redis Configuration
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+    REDIS_URL = (
+        f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+        if REDIS_PASSWORD
+        else f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+    )
+
+    # Celery Configuration
+    CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", REDIS_URL)
+    CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", REDIS_URL)
+
     ROOT_USER_EMAIL = os.getenv("ROOT_USER_EMAIL", "admin@example.com")
     ROOT_USER_PASSWORD = os.getenv("ROOT_USER_PASSWORD", "admin")
 
@@ -41,6 +56,10 @@ class Config:
         os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    if GROQ_API_KEY:
+        os.environ["GROQ_API_KEY"] = GROQ_API_KEY
+
     MODE = get_key(".env", "MODE")
 
     POSTGRES = {
@@ -52,3 +71,14 @@ class Config:
     }
     DATABASE_URL = f"postgresql://{POSTGRES['user']}:{POSTGRES['password']}@{POSTGRES['host']}:{POSTGRES['port']}/{POSTGRES['db']}"
     print("DATABASE_URL:", DATABASE_URL)
+
+    # MailHog SMTP Configuration
+    SMTP_HOST = os.getenv("SMTP_HOST", "localhost")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "1025"))
+    SMTP_USER = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "noreply@example.com")
+    SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Project Management System")
+
+    # MailHog Web UI (for development)
+    MAILHOG_UI_URL = os.getenv("MAILHOG_UI_URL", "http://localhost:8025")

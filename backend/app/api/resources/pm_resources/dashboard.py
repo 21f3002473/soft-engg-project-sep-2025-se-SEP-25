@@ -1,13 +1,23 @@
 from logging import getLogger
+from typing import Optional
 
 from app.database import User, get_session
 from app.database.product_manager_models import Client, Project, StatusTypeEnum
 from app.middleware import require_pm
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session, func, select
+from pydantic import BaseModel
+from sqlmodel import Session, select
+from sqlalchemy.exc import IntegrityError
 
 logger = getLogger(__name__)
+
+
+class ClientCreateModel(BaseModel):
+    client_id: str
+    client_name: str
+    email: str
+    image_base64: Optional[str] = None
 
 
 class PRDashboardResource(Resource):
@@ -72,8 +82,7 @@ class PRDashboardResource(Resource):
                 {
                     "id": client.id,
                     "clientname": client.client_name,
-                    "description": client.detail_base64
-                    or f"Details about {client.client_name}",
+                    "image": client.image_base64,
                 }
                 for client in clients
             ]
@@ -134,3 +143,53 @@ class PRDashboardResource(Resource):
                 "error": str(e),
                 "status": "error",
             }, 500
+
+    def post(
+        self,
+        client: ClientCreateModel,
+        current_user: User = Depends(require_pm()),
+        session: Session = Depends(get_session),
+    ):
+        """PM Dashboard this is api is to create new clients"""
+        try:
+            # Check if client_id already exists
+            existing = session.exec(
+                select(Client).where(Client.client_id == client.client_id)
+            ).first()
+            if existing:
+                raise HTTPException(status_code=400, detail="Client ID already exists")
+
+            new_client = Client(
+                client_id=client.client_id,
+                client_name=client.client_name,
+                email=client.email,
+                image_base64=client.image_base64,
+            )
+
+            session.add(new_client)
+            session.commit()
+            session.refresh(new_client)
+
+            return {
+                "message": "Client created successfully",
+                "data": {
+                    "id": new_client.id,
+                    "client_id": new_client.client_id,
+                    "client_name": new_client.client_name,
+                    "email": new_client.email,
+                    "image": new_client.image_base64,
+                },
+            }
+        except HTTPException:
+            raise
+        except IntegrityError as e:
+            session.rollback()
+            logger.error(f"Integrity error creating client: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail="Database integrity error. Please contact administrator.",
+            )
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error creating client: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")

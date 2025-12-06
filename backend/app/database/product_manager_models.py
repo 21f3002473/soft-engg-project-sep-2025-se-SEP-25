@@ -1,4 +1,5 @@
 from datetime import datetime
+from email.mime import image
 from enum import Enum
 from typing import List, Optional
 
@@ -19,7 +20,7 @@ class Client(SQLModel, table=True):
     client_id: str = Field(index=True, unique=True, nullable=False)
     client_name: str = Field(nullable=False)
     email: str = Field(nullable=False)
-    detail_base64: Optional[str] = Field(
+    image_base64: Optional[str] = Field(
         default=None, description="Client detail encoded in Base64"
     )
 
@@ -65,6 +66,10 @@ class Requirement(SQLModel, table=True):
     requirements: str = Field(nullable=False)
     project_id: int = Field(foreign_key="project.id", nullable=False)
     client_id: int = Field(foreign_key="client.id", nullable=False)
+    status: StatusTypeEnum = Field(
+        default=StatusTypeEnum.PENDING,
+        sa_column=Column(SQLEnum(StatusTypeEnum, native_enum=False, length=20)),
+    )
 
     project: Optional["Project"] = Relationship(back_populates="requirements")
     client: Optional["Client"] = Relationship(back_populates="requirements")

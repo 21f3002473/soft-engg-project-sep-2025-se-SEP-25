@@ -8,6 +8,7 @@ from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from pydantic import BaseModel
 from sqlmodel import Session, select
+from sqlalchemy.exc import IntegrityError
 
 logger = getLogger(__name__)
 
@@ -16,24 +17,24 @@ class ClientCreateModel(BaseModel):
     client_id: str
     client_name: str
     email: str
-    detail_base64: Optional[str] = None
+    image_base64: Optional[str] = None
 
 
 class ClientUpdateModel(BaseModel):
     client_name: Optional[str] = None
     email: Optional[str] = None
-    detail_base64: Optional[str] = None
+    image_base64: Optional[str] = None
 
 
 class RequirementCreateModel(BaseModel):
     requirement_id: str
     requirements: str
-    project_id: int
+    project_id: str  # Changed to str to accept project_id like "PRJ001"
 
 
 class RequirementUpdateModel(BaseModel):
     requirements: Optional[str] = None
-    project_id: Optional[int] = None
+    project_id: Optional[str] = None  # Changed to str
 
 
 class UpdateCreateModel(BaseModel):
@@ -81,19 +82,16 @@ class ClientsResource(Resource):
         try:
             logger.info(f"Fetching all clients by {current_user.email}")
 
-            # Query all clients
             statement = select(Client)
             clients = session.exec(statement).all()
 
-            # Format client data
             client_list = [
                 {
                     "id": client.id,
                     "client_id": client.client_id,
                     "client_name": client.client_name,
                     "email": client.email,
-                    "description": client.detail_base64
-                    or f"Details about {client.client_name}",
+                    "image": client.image_base64,
                 }
                 for client in clients
             ]
@@ -120,19 +118,17 @@ class ClientsResource(Resource):
         try:
             logger.info(f"Creating client by {current_user.email}")
 
-            # Check if client_id already exists
             existing = session.exec(
                 select(Client).where(Client.client_id == data.client_id)
             ).first()
             if existing:
                 raise HTTPException(status_code=400, detail="Client ID already exists")
 
-            # Create new client
             new_client = Client(
                 client_id=data.client_id,
                 client_name=data.client_name,
                 email=data.email,
-                detail_base64=data.detail_base64,
+                image_base64=data.image_base64,
             )
             session.add(new_client)
             session.commit()
@@ -150,6 +146,13 @@ class ClientsResource(Resource):
 
         except HTTPException:
             raise
+        except IntegrityError as e:
+            session.rollback()
+            logger.error(f"Integrity error creating client: {str(e)}", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail="Database integrity error. Please contact administrator to reset the sequence.",
+            )
         except Exception as e:
             session.rollback()
             logger.error(f"Error creating client: {str(e)}", exc_info=True)
@@ -174,8 +177,8 @@ class ClientsResource(Resource):
                 client.client_name = data.client_name
             if data.email is not None:
                 client.email = data.email
-            if data.detail_base64 is not None:
-                client.detail_base64 = data.detail_base64
+            if data.image_base64 is not None:
+                client.image_base64 = data.image_base64
 
             session.add(client)
             session.commit()
@@ -277,26 +280,24 @@ class ClientRequirementResource(Resource):
                 f"Fetching requirements for client {client_id} by {current_user.email}"
             )
 
-            # Query client by primary key
             client_statement = select(Client).where(Client.id == client_id)
             client = session.exec(client_statement).first()
 
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
-            # Query requirements for the client
             requirement_statement = select(Requirement).where(
                 Requirement.client_id == client_id
             )
             requirements = session.exec(requirement_statement).all()
 
-            # Format requirements data
             requirement_list = [
                 {
                     "id": req.id,
                     "requirement_id": req.requirement_id,
                     "description": req.requirements,
                     "project_id": req.project_id,
+                    "status": req.status,
                 }
                 for req in requirements
             ]
@@ -309,7 +310,7 @@ class ClientRequirementResource(Resource):
                         "client_id": client.client_id,
                         "client_name": client.client_name,
                         "email": client.email,
-                        "details": client.detail_base64,
+                        "image": client.image_base64,
                     },
                     "requirements": requirement_list,
                     "total_requirements": len(requirement_list),
@@ -334,12 +335,10 @@ class ClientRequirementResource(Resource):
                 f"Creating requirement for client {client_id} by {current_user.email}"
             )
 
-            # Verify client exists
             client = session.exec(select(Client).where(Client.id == client_id)).first()
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
-            # Check if requirement_id already exists
             existing = session.exec(
                 select(Requirement).where(
                     Requirement.requirement_id == data.requirement_id
@@ -350,10 +349,17 @@ class ClientRequirementResource(Resource):
                     status_code=400, detail="Requirement ID already exists"
                 )
 
+            # Find project by project_id (string) to get the actual id (int)
+            project = session.exec(
+                select(Project).where(Project.project_id == data.project_id)
+            ).first()
+            if not project:
+                raise HTTPException(status_code=404, detail="Project not found")
+
             new_requirement = Requirement(
                 requirement_id=data.requirement_id,
                 requirements=data.requirements,
-                project_id=data.project_id,
+                project_id=project.id,  # Use the integer id from the project
                 client_id=client_id,
             )
             session.add(new_requirement)
@@ -366,7 +372,7 @@ class ClientRequirementResource(Resource):
                     "id": new_requirement.id,
                     "requirement_id": new_requirement.requirement_id,
                     "description": new_requirement.requirements,
-                    "project_id": new_requirement.project_id,
+                    "project_id": data.project_id,  # Return the string project_id
                 },
             }
 
@@ -402,7 +408,13 @@ class ClientRequirementResource(Resource):
             if data.requirements is not None:
                 requirement.requirements = data.requirements
             if data.project_id is not None:
-                requirement.project_id = data.project_id
+                # Find project by project_id (string) to get the actual id (int)
+                project = session.exec(
+                    select(Project).where(Project.project_id == data.project_id)
+                ).first()
+                if not project:
+                    raise HTTPException(status_code=404, detail="Project not found")
+                requirement.project_id = project.id
 
             session.add(requirement)
             session.commit()
@@ -507,19 +519,16 @@ class ClientUpdatesResource(Resource):
                 f"Fetching updates for client {client_id} by {current_user.email}"
             )
 
-            # Query client by primary key
             client_statement = select(Client).where(Client.id == client_id)
             client = session.exec(client_statement).first()
 
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
-            # Query all projects for this client
             project_statement = select(Project).where(Project.client_id == client_id)
             projects = session.exec(project_statement).all()
             project_ids = [p.id for p in projects]
 
-            # Query updates for all client projects
             updates = []
             if project_ids:
                 update_statement = select(Update).where(
@@ -527,7 +536,6 @@ class ClientUpdatesResource(Resource):
                 )
                 updates = session.exec(update_statement).all()
 
-            # Format updates data
             update_list = [
                 {
                     "id": update.id,
@@ -549,8 +557,7 @@ class ClientUpdatesResource(Resource):
                         "client_id": client.client_id,
                         "client_name": client.client_name,
                         "email": client.email,
-                        "details": client.detail_base64
-                        or f"Details about Client with ID: {client.client_id}",
+                        "image": client.image_base64,
                     },
                     "updates": update_list,
                     "total_updates": len(update_list),
@@ -576,12 +583,10 @@ class ClientUpdatesResource(Resource):
                 f"Creating update for client {client_id} by {current_user.email}"
             )
 
-            # Verify client exists
             client = session.exec(select(Client).where(Client.id == client_id)).first()
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
-            # Verify project belongs to client
             project = session.exec(
                 select(Project).where(
                     Project.id == data.project_id, Project.client_id == client_id
@@ -631,7 +636,6 @@ class ClientUpdatesResource(Resource):
         try:
             logger.info(f"Updating update {update_id} by {current_user.email}")
 
-            # Verify update belongs to client's projects
             update = session.exec(
                 select(Update)
                 .join(Project)
@@ -674,7 +678,6 @@ class ClientUpdatesResource(Resource):
         try:
             logger.info(f"Deleting update {update_id} by {current_user.email}")
 
-            # Verify update belongs to client's projects
             update = session.exec(
                 select(Update)
                 .join(Project)
