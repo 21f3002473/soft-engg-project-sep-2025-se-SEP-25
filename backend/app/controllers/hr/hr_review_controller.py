@@ -6,10 +6,19 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 
 
-def get_all_reviews(session: Session) -> List[PerformanceReview]:
-    return session.exec(
-        select(PerformanceReview).order_by(PerformanceReview.created_at.desc())
+def get_all_reviews(session: Session) -> List[Dict[str, Any]]:
+    results = session.exec(
+        select(PerformanceReview, User.name)
+        .join(User, PerformanceReview.user_id == User.id)
+        .order_by(PerformanceReview.created_at.desc())
     ).all()
+
+    reviews = []
+    for review, user_name in results:
+        r_dict = review.model_dump()
+        r_dict["user_name"] = user_name
+        reviews.append(r_dict)
+    return reviews
 
 
 def get_reviews_by_user(user_id: int, session: Session) -> List[PerformanceReview]:

@@ -5,3 +5,6 @@ admin_api_docs.md
 requests.http
 imp_requests.http
 vectorstore.pkl
+chunks/
+faiss.index
+vectors.npz
