@@ -1,13 +1,13 @@
-#def get_client():
-    #api_key = os.getenv("GEMINI_API_KEY")
-    #if not api_key:
-        #raise RuntimeError("Set GEMINI_API_KEY environment variable.")
-    #return genai.Client(api_key=api_key)
+# def get_client():
+# api_key = os.getenv("GEMINI_API_KEY")
+# if not api_key:
+# raise RuntimeError("Set GEMINI_API_KEY environment variable.")
+# return genai.Client(api_key=api_key)
 
-#THIS ONE Client thing has depraceted. DO NOT USE THIS.
+# THIS ONE Client thing has depraceted. DO NOT USE THIS.
 
-#EMBED_MODEL = "text-embedding-004"  
- 
+# EMBED_MODEL = "text-embedding-004"
+
 
 import json
 import os
@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-EMBED_MODEL = "gemini-embedding-001" 
+EMBED_MODEL = "gemini-embedding-001"
 LLM_MODEL = "gemini-2.0-flash"
 
 CHUNKS_DIR = "chunks"
@@ -34,7 +34,7 @@ def get_client():
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
 
     genai.configure(api_key=api_key)
-    return genai   # return module
+    return genai  # return module
 
 
 def embed_query(client, query):
@@ -101,5 +101,3 @@ if __name__ == "__main__":
 
     question = " ".join(sys.argv[1:])
     answer_question(question)
-
-
