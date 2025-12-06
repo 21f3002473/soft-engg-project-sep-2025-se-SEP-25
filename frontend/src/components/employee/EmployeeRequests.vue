@@ -74,9 +74,6 @@ import { make_getrequest } from "@/store/appState.js";
 import { useNotify } from "@/utils/useNotify.js";
 import titleCase from "@/utils/titleCase.js";
 
-const toTitleCase = str =>
-  str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-
 export default {
   name: "EmployeeRequests",
   data() {
