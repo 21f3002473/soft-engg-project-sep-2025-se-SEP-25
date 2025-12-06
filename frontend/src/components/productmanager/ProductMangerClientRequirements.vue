@@ -39,10 +39,20 @@
             </div>
 
             <div class="mt-3 pt-3 border-top">
-              <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="text-muted small">Total Requirements:</span>
                 <span class="badge bg-primary rounded-pill">{{ totalRequirements }}</span>
               </div>
+              
+              <!-- Add Requirement Button -->
+              <button 
+                type="button" 
+                class="btn btn-primary btn-sm w-100"
+                data-bs-toggle="modal" 
+                data-bs-target="#addRequirementModal"
+              >
+                <i class="bi bi-plus-lg me-1"></i>Add Requirement
+              </button>
             </div>
           </div>
         </div>
@@ -77,13 +87,39 @@
                     <li 
                       v-for="req in requirements" 
                       :key="req.id"
-                      class="list-group-item px-0"
+                      class="list-group-item px-0 py-3 requirement-item"
                     >
-                      <div class="d-flex align-items-start">
-                        <span class="badge bg-secondary me-2 mt-1">{{ req.requirement_id }}</span>
-                        <div class="flex-fill">
-                          <p class="mb-0 small">{{ req.description }}</p>
-                          <small class="text-muted">Project ID: {{ req.project_id }}</small>
+                      <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <span class="badge bg-secondary">{{ req.requirement_id }}</span>
+                          <div class="d-flex gap-2">
+                            <span :class="getStatusBadgeClass(req.status)">
+                              {{ formatStatus(req.status) }}
+                            </span>
+                            <div class="d-flex gap-1">
+                              <button 
+                                class="btn btn-sm btn-outline-primary" 
+                                @click="editRequirement(req)"
+                                title="Edit"
+                              >
+                                <i class="bi bi-pencil"></i>
+                              </button>
+                              <button 
+                                class="btn btn-sm btn-outline-danger" 
+                                @click="confirmDeleteRequirement(req)"
+                                title="Delete"
+                              >
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <p class="mb-2 requirement-description">{{ req.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                          <small class="text-muted">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            {{ req.project_id }}
+                          </small>
                         </div>
                       </div>
                     </li>
@@ -106,12 +142,132 @@
         </div>
       </div>
     </div>
+
+    <!-- Add Requirement Modal -->
+    <AddRequirementModal 
+      :clientId="clientId" 
+      @requirement-created="onRequirementCreated" 
+    />
+
+    <!-- Edit Requirement Modal -->
+    <div class="modal fade" id="editRequirementModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-pencil me-2"></i>Edit Requirement
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Success/Error Messages -->
+            <div v-if="editSuccessMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-2"></i>{{ editSuccessMessage }}
+              <button type="button" class="btn-close" @click="editSuccessMessage = null"></button>
+            </div>
+            <div v-if="editErrorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-triangle me-2"></i>{{ editErrorMessage }}
+              <button type="button" class="btn-close" @click="editErrorMessage = null"></button>
+            </div>
+
+            <form @submit.prevent="saveRequirement">
+              <div class="mb-3">
+                <label class="form-label">Requirement ID</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  v-model="editForm.requirement_id"
+                  readonly
+                >
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Project <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select" 
+                  v-model="editForm.project_id"
+                  required
+                  :disabled="editProjectsLoading"
+                >
+                  <option value="" disabled>
+                    {{ editProjectsLoading ? 'Loading projects...' : 'Select a project' }}
+                  </option>
+                  <option 
+                    v-for="project in editProjects" 
+                    :key="project.id" 
+                    :value="project.project_id"
+                  >
+                    {{ project.project_name }} ({{ project.project_id }})
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Description <span class="text-danger">*</span></label>
+                <textarea 
+                  class="form-control" 
+                  v-model="editForm.requirements"
+                  rows="4"
+                  required
+                  placeholder="Enter requirement description"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="saveRequirement"
+              :disabled="editSaving"
+            >
+              <span v-if="editSaving" class="spinner-border spinner-border-sm me-1"></span>
+              {{ editSaving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteRequirementModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this requirement?</p>
+            <p class="fw-bold mb-0">{{ requirementToDelete?.requirement_id }}</p>
+            <p class="text-muted small mt-1">{{ requirementToDelete?.description }}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              @click="deleteRequirement"
+              :disabled="deleting"
+            >
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+              {{ deleting ? 'Deleting...' : 'Delete' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import ProductMangerChatbot from './fragments/ProductMangerChatbot.vue';
-import { make_getrequest } from '@/store/appState';
+import AddRequirementModal from './fragments/AddRequirementModal.vue';
+import { make_getrequest, make_putrequest, make_deleterequest } from '@/store/appState';
+import { Modal } from 'bootstrap';
 
 export default {
   name: 'ProductMangerClientRequirements',
@@ -122,7 +278,8 @@ export default {
     }
   },
   components: {
-    ProductMangerChatbot
+    ProductMangerChatbot,
+    AddRequirementModal
   },
   data() {
     return {
@@ -130,7 +287,22 @@ export default {
       requirements: [],
       totalRequirements: 0,
       loading: true,
-      error: null
+      error: null,
+      editForm: {
+        id: null,
+        requirement_id: '',
+        project_id: '',
+        requirements: ''
+      },
+      editProjects: [],
+      editProjectsLoading: false,
+      editSaving: false,
+      deleting: false,
+      editSuccessMessage: null,
+      editErrorMessage: null,
+      requirementToDelete: null,
+      editModal: null,
+      deleteModal: null
     };
   },
   computed: {
@@ -171,6 +343,121 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchEditProjects() {
+      this.editProjectsLoading = true;
+      try {
+        const response = await make_getrequest(`/api/pm/projects?id_client=${this.clientId}`);
+        
+        if (response && response.data && response.data.projects) {
+          this.editProjects = response.data.projects;
+        } else {
+          this.editProjects = [];
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        this.editProjects = [];
+      } finally {
+        this.editProjectsLoading = false;
+      }
+    },
+    editRequirement(requirement) {
+      this.editForm = {
+        id: requirement.id,
+        requirement_id: requirement.requirement_id,
+        project_id: requirement.project_id,
+        requirements: requirement.description
+      };
+      
+      this.fetchEditProjects();
+      
+      if (!this.editModal) {
+        this.editModal = new Modal(document.getElementById('editRequirementModal'));
+      }
+      this.editModal.show();
+    },
+    async saveRequirement() {
+      this.editSaving = true;
+      this.editSuccessMessage = null;
+      this.editErrorMessage = null;
+
+      try {
+        const response = await make_putrequest(
+          `/api/pm/client/requirements/${this.clientId}/${this.editForm.id}`,
+          {
+            requirements: this.editForm.requirements,
+            project_id: this.editForm.project_id
+          }
+        );
+
+        if (response && response.data) {
+          this.editSuccessMessage = response.message || 'Requirement updated successfully!';
+          this.fetchClientDetails();
+          setTimeout(() => {
+            this.editModal?.hide();
+          }, 1500);
+        } else {
+          this.editErrorMessage = response.message || 'Failed to update requirement';
+        }
+      } catch (error) {
+        console.error('Error updating requirement:', error);
+        this.editErrorMessage = error.message || 'An error occurred while updating the requirement';
+      } finally {
+        this.editSaving = false;
+      }
+    },
+    confirmDeleteRequirement(requirement) {
+      this.requirementToDelete = requirement;
+      
+      if (!this.deleteModal) {
+        this.deleteModal = new Modal(document.getElementById('deleteRequirementModal'));
+      }
+      this.deleteModal.show();
+    },
+    async deleteRequirement() {
+      this.deleting = true;
+
+      try {
+        const response = await make_deleterequest(
+          `/api/pm/client/requirements/${this.clientId}/${this.requirementToDelete.id}`
+        );
+
+        if (response && response.message) {
+          this.deleteModal?.hide();
+          this.fetchClientDetails();
+        } else {
+          this.error = response.message || 'Failed to delete requirement';
+        }
+      } catch (error) {
+        console.error('Error deleting requirement:', error);
+        this.error = error.message || 'An error occurred while deleting the requirement';
+      } finally {
+        this.deleting = false;
+        this.requirementToDelete = null;
+      }
+    },
+    getStatusBadgeClass(status) {
+      const statusLower = status?.toLowerCase() || '';
+      
+      if (statusLower === 'completed') {
+        return 'badge bg-success';
+      } else if (statusLower === 'in_progress') {
+        return 'badge bg-primary';
+      } else if (statusLower === 'pending') {
+        return 'badge bg-warning text-dark';
+      } else if (statusLower === 'cancelled' || statusLower === 'on_hold') {
+        return 'badge bg-danger';
+      }
+      return 'badge bg-secondary';
+    },
+    formatStatus(status) {
+      if (!status) return 'N/A';
+      return status.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+    },
+    onRequirementCreated(newRequirement) {
+      console.log('New requirement created:', newRequirement);
+      // Refresh the requirements list
+      this.fetchClientDetails();
     }
   },
   mounted() {
@@ -211,6 +498,34 @@ export default {
 
 .list-group-item:hover {
   background-color: #f8f9fa;
+}
+
+.requirement-item {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.requirement-item:hover {
+  background-color: #f8f9fa;
+  border-left-color: #0d6efd;
+  transform: translateX(2px);
+}
+
+.requirement-description {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  font-weight: 600;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

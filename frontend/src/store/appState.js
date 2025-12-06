@@ -133,6 +133,7 @@ export async function make_getrequest(url, params = {}) {
     }
 
     const data = await response.json();
+    console.log('GET request data:', data);
     return data;
 }
 
@@ -169,6 +170,8 @@ export async function make_putrequest(url, data = {}) {
         },
         body: JSON.stringify(data),
     });
+
+    console.log('PUT request response status:', response);
 
     if (!response.ok) {
         throw new Error("Network response was not ok");

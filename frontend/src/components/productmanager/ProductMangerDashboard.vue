@@ -3,9 +3,19 @@
         <div class="container-fluid">
             <!-- Page Header -->
             <div class="row mb-4">
-                <div class="col-12">
-                    <h2 class="fw-bold mb-3">Product Manager Dashboard</h2>
-                    <p class="text-muted">Overview of projects and client information</p>
+                <div class="col-12 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-3">Product Manager Dashboard</h2>
+                        <p class="text-muted">Overview of projects and client information</p>
+                    </div>
+                    <button 
+                        type="button" 
+                        class="btn btn-primary"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#newClientModal"
+                    >
+                        <i class="bi bi-plus-lg me-2"></i>Add New Client
+                    </button>
                 </div>
             </div>
 
@@ -29,7 +39,8 @@
                             <ProductMangerClientCard 
                                 :id="Client.id" 
                                 :clientname="Client.clientname" 
-                                :description="Client.description" 
+                                :description="Client.description"
+                                :image="Client.image"
                             />
                         </RouterLink>
                     </div>
@@ -115,6 +126,9 @@
             <!-- Client List Section -->
             
         </div>
+
+        <!-- New Client Modal -->
+        <NewClientModal @client-created="onClientCreated" />
     </div>
 </template>
 
@@ -122,6 +136,7 @@
 <script>
 
 import ProductMangerClientCard from './fragments/ProductMangerClientCard.vue';
+import NewClientModal from './fragments/NewClientModal.vue';
 import { make_getrequest } from '@/store/appState';
 import { Chart, registerables } from 'chart.js';
 
@@ -141,7 +156,8 @@ export default {
         };
     },
     components: {
-        ProductMangerClientCard
+        ProductMangerClientCard,
+        NewClientModal
     },
     methods: {
         async fetchClientList() {
@@ -152,11 +168,13 @@ export default {
                 const dashboardData = response?.data || {};
                 
                 // Map ClientList to match the card component props
-                const rawClients = dashboardData?.ClientList || dashboardData?.clients || dashboardData?.projects || [];
+                // API returns: { id, clientname, image } where image is image_base64
+                const rawClients = dashboardData?.ClientList || dashboardData?.clients || [];
                 this.ClientList = rawClients.map(client => ({
                     id: client.id,
-                    clientname: client.client_name || client.clientname,
-                    description: this.decodedDescription(client.description || client.detail_base64)
+                    clientname: client.clientname || client.client_name,
+                    description: 'Click to view details',
+                    image: client.image || null
                 }));
                 
                 this.stats = dashboardData?.stats || null;
@@ -282,6 +300,11 @@ export default {
                     }
                 });
             }
+        },
+        onClientCreated(newClient) {
+            console.log('New client created:', newClient);
+            // Refresh the client list after a new client is created
+            this.fetchClientList();
         }
     },
     mounted() {

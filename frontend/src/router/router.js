@@ -152,6 +152,20 @@ const routes = [
                 name: 'ProductManagerPerformanceDetails',
                 component: () => import('@/components/productmanager/ProductMangerEmployeePerformance.vue'),
                 props: (route) => ({ employeeId: route.params.id })
+            },
+            {
+                // projects dashboard all projects view
+                path: 'projects/dashboard',
+                name: 'ProductManagerProjectDetails',
+                component: () => import('@/components/productmanager/ProductMangerProjectsView.vue'),
+                props: (route) => ({ projectId: route.params.projectId }),
+            },
+            {
+                // single project view
+                path: 'project/:projectId',
+                name: 'ProductManagerSingleProject',
+                component: () => import('@/components/productmanager/fragments/SingleProjectview.vue'),
+                props: (route) => ({ projectId: route.params.projectId })
             }
         ],
     },
