@@ -234,6 +234,11 @@ const routes = [
                 name: 'HRProjects',
                 component: () => import('@/components/hr/HRProjects.vue'),
             },
+            {
+                path: 'account',
+                name: 'HRAccount',
+                component: () => import('@/components/hr/HRAccount.vue'),
+            },
         ],
     },
 ]

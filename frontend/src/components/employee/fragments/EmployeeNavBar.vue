@@ -9,23 +9,29 @@
 
           <ul class="nav nav-pills d-flex gap-2">
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeDashboard' }" class="nav-link"
-                active-class="active">Dashboard</router-link>
+              <router-link :to="{ name: 'EmployeeDashboard' }" class="nav-link" active-class="active">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+              </router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeLearning' }" class="nav-link"
-                active-class="active">Learning</router-link>
+              <router-link :to="{ name: 'EmployeeLearning' }" class="nav-link" active-class="active">
+                <i class="bi bi-mortarboard me-2"></i>Learning
+              </router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeRequests' }" class="nav-link"
-                active-class="active">Requests</router-link>
+              <router-link :to="{ name: 'EmployeeRequests' }" class="nav-link" active-class="active">
+                <i class="bi bi-file-earmark-plus me-2"></i>Requests
+              </router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeHRFAQs' }" class="nav-link" active-class="active">HR FAQs</router-link>
+              <router-link :to="{ name: 'EmployeeHRFAQs' }" class="nav-link" active-class="active">
+                <i class="bi bi-question-circle me-2"></i>HR FAQs
+              </router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeWriting' }" class="nav-link"
-                active-class="active">Writing</router-link>
+              <router-link :to="{ name: 'EmployeeWriting' }" class="nav-link" active-class="active">
+                <i class="bi bi-pencil-square me-2"></i>Writing
+              </router-link>
             </li>
           </ul>
         </div>
@@ -33,11 +39,11 @@
         <div class="d-flex align-items-center gap-3">
           <router-link :to="{ name: 'EmployeeAccount' }"
             class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
-            <i class="fas fa-user-circle fs-5"></i>
+            <i class="bi bi-person-circle fs-5"></i>
             <span>Account</span>
           </router-link>
           <button class="btn d-flex align-items-center gap-2 fw-semibold account-btn" @click="logout">
-            <i class="fas fa-sign-out-alt fs-5"></i>
+            <i class="bi bi-box-arrow-right fs-5"></i>
             <span>Logout</span>
           </button>
         </div>

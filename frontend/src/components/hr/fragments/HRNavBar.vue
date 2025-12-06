@@ -8,7 +8,6 @@
                     <div class="navbar-brand fw-bold text-primary fs-4 me-0" style="letter-spacing: 0.5px;">Sync'em
                     </div>
 
-                    <!-- Mobile Toggle Button -->
                     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
                         aria-label="Toggle navigation">
@@ -18,37 +17,44 @@
                     <div class="collapse navbar-collapse" id="navbarContent">
                         <ul class="nav nav-pills d-flex gap-2">
                             <li class="nav-item">
-                                <router-link :to="{ name: 'HRDashboard' }" class="nav-link"
-                                    active-class="active">Dashboard</router-link>
+                                <router-link :to="{ name: 'HRDashboard' }" class="nav-link" active-class="active">
+                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link :to="{ name: 'HREmployees' }" class="nav-link"
-                                    active-class="active">Employees</router-link>
+                                <router-link :to="{ name: 'HREmployees' }" class="nav-link" active-class="active">
+                                    <i class="bi bi-people me-2"></i>Employees
+                                </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link :to="{ name: 'HRProjects' }" class="nav-link"
-                                    active-class="active">Projects</router-link>
+                                <router-link :to="{ name: 'HRProjects' }" class="nav-link" active-class="active">
+                                    <i class="bi bi-kanban me-2"></i>Projects
+                                </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link :to="{ name: 'HRPolicies' }" class="nav-link" active-class="active">HR
-                                    Policies</router-link>
+                                <router-link :to="{ name: 'HRPolicies' }" class="nav-link" active-class="active">
+                                    <i class="bi bi-file-earmark-text me-2"></i>HR Policies
+                                </router-link>
                             </li>
                             <li class="nav-item">
-                                <router-link :to="{ name: 'HRChatbot' }" class="nav-link"
-                                    active-class="active">Chatbot</router-link>
+                                <router-link :to="{ name: 'HRChatbot' }" class="nav-link" active-class="active">
+                                    <i class="bi bi-chat-dots me-2"></i>Chatbot
+                                </router-link>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <div class="d-none d-lg-block">
-                        <!-- Placeholder for account if needed, currently HR doesn't have a separate Account page in the links provided, but we can stick to Logout -->
-                        <button class="btn d-flex align-items-center gap-2 fw-semibold account-btn" @click="logout">
-                            <i class="bi bi-box-arrow-right fs-5"></i>
-                            <span>Logout</span>
-                        </button>
-                    </div>
+                    <router-link :to="{ name: 'HRAccount' }"
+                        class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
+                        <i class="bi bi-person-circle fs-5"></i>
+                        <span>Account</span>
+                    </router-link>
+                    <button class="btn d-flex align-items-center gap-2 fw-semibold account-btn" @click="logout">
+                        <i class="bi bi-box-arrow-right fs-5"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
 
             </div>
@@ -124,5 +130,11 @@ export default {
 .account-btn:hover {
     background: rgba(37, 99, 235, 0.1);
     color: #1e3a8a;
+}
+
+.account-btn.active {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 </style>
