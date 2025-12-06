@@ -715,8 +715,7 @@ class AnnouncementEmployeeResource(Resource):
 
         try:
             ann_list = session.exec(
-                select(Announcement)
-                .order_by(Announcement.created_at.desc())
+                select(Announcement).order_by(Announcement.created_at.desc())
             ).all()
 
             return [
