@@ -108,11 +108,14 @@ export default {
       employees: [],
       reviews: [],
       employeeCount: 0,
+      policyCount: 0,
       reviewCount: 0,
       avgRating: 0,
+      employeesWithReviews: 0,
       employeesWithoutReviews: 0,
       recentEmployees: [],
-      recentReviews: []
+      recentReviews: [],
+      policies: []
     };
   },
   computed: {

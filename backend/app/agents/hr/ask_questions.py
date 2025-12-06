@@ -93,7 +93,7 @@ from pathlib import Path
 import faiss
 import numpy as np
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 from PyPDF2 import PdfReader
 
 load_dotenv()
