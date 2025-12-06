@@ -67,7 +67,7 @@ export default {
   },
   mounted() {
     this.messages.push({
-      text: "Hello! I am your HR Assistant. How can I help you regarding company policies and documents?",
+      text: "Hello! I am your HR Assistant. How can I help you?",
       sender: "bot",
       time: new Date()
     });
