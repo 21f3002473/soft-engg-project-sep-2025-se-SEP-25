@@ -4,7 +4,7 @@ import os
 import faiss
 import numpy as np
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 
 load_dotenv()
 

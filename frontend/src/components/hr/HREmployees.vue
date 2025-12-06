@@ -109,90 +109,94 @@
 
       </div>
     </div>
-    <div class="modal fade" id="viewModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-          <div class="modal-header bg-light border-bottom-0">
-            <h5 class="modal-title fw-bold">Performance Review</h5>
-            <button class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body p-4">
-            <h6 class="text-muted mb-3 text-uppercase small ls-1">Employee: <span class="text-dark fw-bold">{{
-              selectedEmployee?.name }}</span></h6>
 
-            <div v-if="reviews.length === 0" class="alert alert-secondary border-0 d-flex align-items-center"
-              role="alert">
-              <i class="bi bi-info-circle-fill me-2 fs-5"></i>
-              <div>No reviews available for this employee.</div>
+    <Teleport to="body">
+      <div class="modal fade" id="viewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-bottom-0">
+              <h5 class="modal-title fw-bold">Performance Review</h5>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <div class="modal-body p-4">
+              <h6 class="text-muted mb-3 text-uppercase small ls-1">Employee: <span class="text-dark fw-bold">{{
+                selectedEmployee?.name }}</span></h6>
 
-            <div v-for="rev in reviews" :key="rev.id" class="card mb-3 border bg-light shadow-sm">
-              <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                  <div class="text-warning">
-                    <i v-for="n in 5" :key="n" class="bi" :class="n <= rev.rating ? 'bi-star-fill' : 'bi-star'"></i>
+              <div v-if="reviews.length === 0" class="alert alert-secondary border-0 d-flex align-items-center"
+                role="alert">
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                <div>No reviews available for this employee.</div>
+              </div>
+
+              <div v-for="rev in reviews" :key="rev.id" class="card mb-3 border bg-light shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between mb-2">
+                    <div class="text-warning">
+                      <i v-for="n in 5" :key="n" class="bi" :class="n <= rev.rating ? 'bi-star-fill' : 'bi-star'"></i>
+                    </div>
+                    <small class="text-muted">{{ new Date(rev.created_at).toLocaleDateString() }}</small>
                   </div>
-                  <small class="text-muted">{{ new Date(rev.created_at).toLocaleDateString() }}</small>
+                  <p class="mb-0 text-secondary">{{ rev.comments || 'No comments provided.' }}</p>
                 </div>
-                <p class="mb-0 text-secondary">{{ rev.comments || 'No comments provided.' }}</p>
               </div>
             </div>
-          </div>
-          <div class="modal-footer border-top-0 pt-0">
-            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer border-top-0 pt-0">
+              <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Teleport>
 
-    <div class="modal fade" id="addModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+    <Teleport to="body">
+      <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow">
 
-          <div class="modal-header bg-primary text-white border-bottom-0">
-            <h5 class="modal-title fw-bold">Add Review</h5>
-            <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
+            <div class="modal-header bg-primary text-white border-bottom-0">
+              <h5 class="modal-title fw-bold">Add Review</h5>
+              <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
 
-          <div class="modal-body p-4">
-            <p class="mb-3 text-secondary">Adding review for <strong class="text-dark">{{ selectedEmployee?.name
-                }}</strong></p>
-            <form @submit.prevent="submitReview">
+            <div class="modal-body p-4">
+              <p class="mb-3 text-secondary">Adding review for <strong class="text-dark">{{ selectedEmployee?.name
+              }}</strong></p>
+              <form @submit.prevent="submitReview">
 
-              <div class="mb-3">
-                <label class="form-label fw-medium">Rating</label>
-                <div class="d-flex gap-2">
-                  <button type="button" v-for="n in 5" :key="n"
-                    class="btn btn-outline-warning d-flex align-items-center justify-content-center flex-grow-1"
-                    :class="{ 'active': newReview.rating === n }" @click="newReview.rating = n">
-                    <i class="bi bi-star-fill"></i>
-                    <span class="d-none d-sm-inline ms-1">{{ n }}</span>
-                  </button>
+                <div class="mb-3">
+                  <label class="form-label fw-medium">Rating</label>
+                  <div class="d-flex gap-2">
+                    <button type="button" v-for="n in 5" :key="n"
+                      class="btn btn-outline-warning d-flex align-items-center justify-content-center flex-grow-1"
+                      :class="{ 'active': newReview.rating === n }" @click="newReview.rating = n">
+                      <i class="bi bi-star-fill"></i>
+                      <span class="d-none d-sm-inline ms-1">{{ n }}</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div class="mb-3">
-                <label class="form-label fw-medium">Comments</label>
-                <textarea v-model="newReview.comments" rows="4" class="form-control bg-light"
-                  placeholder="Share your feedback regarding the employee's performance..."></textarea>
-              </div>
+                <div class="mb-3">
+                  <label class="form-label fw-medium">Comments</label>
+                  <textarea v-model="newReview.comments" rows="4" class="form-control bg-light"
+                    placeholder="Share your feedback regarding the employee's performance..."></textarea>
+                </div>
 
-              <button type="submit" class="btn btn-primary w-100 py-2 fw-medium shadow-sm">
-                Submit Review
-              </button>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-medium shadow-sm">
+                  Submit Review
+                </button>
 
-            </form>
+              </form>
+            </div>
+
           </div>
-
         </div>
       </div>
-    </div>
+    </Teleport>
 
   </div>
 </template>
 
 <script>
-
 import { make_getrequest, make_postrequest } from "@/store/appState.js";
 import { useNotify } from "@/utils/useNotify.js";
 import Swal from "sweetalert2";
@@ -227,6 +231,7 @@ export default {
 
   computed: {
     filteredEmployees() {
+      if (!this.employees) return [];
       return this.employees.filter((e) =>
         e.name.toLowerCase().includes(this.search.toLowerCase())
       );
@@ -271,7 +276,10 @@ export default {
         this.selectedEmployee = emp;
         const res = await make_getrequest(`/api/hr/reviews/${emp.id}`);
         this.reviews = res.reviews || [];
-        new bootstrap.Modal("#viewModal").show();
+        const modalEl = document.getElementById("viewModal");
+        if (modalEl) {
+          new bootstrap.Modal(modalEl).show();
+        }
       } catch (err) {
         console.error("Error loading review:", err);
       }
@@ -280,7 +288,10 @@ export default {
     openAddModal(emp) {
       this.selectedEmployee = emp;
       this.newReview = { rating: 5, comments: "" };
-      new bootstrap.Modal("#addModal").show();
+      const modalEl = document.getElementById("addModal");
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
     },
 
     async submitReview() {
@@ -304,7 +315,10 @@ export default {
         });
 
         this.notify.success("Review Submitted!");
-        bootstrap.Modal.getInstance(document.getElementById("addModal")).hide();
+
+        const modalEl = document.getElementById("addModal");
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
 
         this.fetchEmployees();
       } catch (err) {

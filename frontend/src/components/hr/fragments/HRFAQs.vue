@@ -44,36 +44,39 @@
             </div>
         </div>
 
-        <div class="modal fade" id="faqModal" tabindex="-1" ref="modal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-primary text-white border-bottom-0">
-                        <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} FAQ</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <form @submit.prevent="submitForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Question</label>
-                                <input v-model="form.question" type="text" class="form-control" required
-                                    placeholder="E.g., What is the leave policy?">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Answer</label>
-                                <textarea v-model="form.answer" class="form-control" rows="5" required
-                                    placeholder="Enter the detailed answer..."></textarea>
-                            </div>
-                            <div class="d-flex justify-content-end pt-2">
-                                <button type="button" class="btn btn-secondary me-2" @click="closeModal">Cancel</button>
-                                <button type="submit" class="btn btn-primary shadow-sm">
-                                    {{ isEditing ? 'Update FAQ' : 'Save FAQ' }}
-                                </button>
-                            </div>
-                        </form>
+        <Teleport to="body">
+            <div class="modal fade" id="faqModal" tabindex="-1" ref="modal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-primary text-white border-bottom-0">
+                            <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} FAQ</h5>
+                            <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <form @submit.prevent="submitForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Question</label>
+                                    <input v-model="form.question" type="text" class="form-control" required
+                                        placeholder="E.g., What is the leave policy?">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Answer</label>
+                                    <textarea v-model="form.answer" class="form-control" rows="5" required
+                                        placeholder="Enter the detailed answer..."></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end pt-2">
+                                    <button type="button" class="btn btn-secondary me-2"
+                                        @click="closeModal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary shadow-sm">
+                                        {{ isEditing ? 'Update FAQ' : 'Save FAQ' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
     </div>
 </template>
 

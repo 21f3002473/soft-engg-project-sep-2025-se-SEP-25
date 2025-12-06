@@ -53,32 +53,35 @@
             </div>
         </div>
 
-        <div class="modal fade" id="announcementModal" tabindex="-1" ref="modal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-primary text-white border-bottom-0">
-                        <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} Announcement</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <form @submit.prevent="submitForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Content</label>
-                                <textarea v-model="form.announcement" class="form-control bg-light" rows="5" required
-                                    placeholder="Type your announcement here..."></textarea>
-                                <div class="form-text">Visible to all employees immediately.</div>
-                            </div>
-                            <div class="d-flex justify-content-end pt-2">
-                                <button type="button" class="btn btn-secondary me-2" @click="closeModal">Cancel</button>
-                                <button type="submit" class="btn btn-primary shadow-sm">
-                                    {{ isEditing ? 'Update Announcement' : 'Post Announcement' }}
-                                </button>
-                            </div>
-                        </form>
+        <Teleport to="body">
+            <div class="modal fade" id="announcementModal" tabindex="-1" ref="modal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-primary text-white border-bottom-0">
+                            <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} Announcement</h5>
+                            <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <form @submit.prevent="submitForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Content</label>
+                                    <textarea v-model="form.announcement" class="form-control bg-light" rows="5"
+                                        required placeholder="Type your announcement here..."></textarea>
+                                    <div class="form-text">Visible to all employees immediately.</div>
+                                </div>
+                                <div class="d-flex justify-content-end pt-2">
+                                    <button type="button" class="btn btn-secondary me-2"
+                                        @click="closeModal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary shadow-sm">
+                                        {{ isEditing ? 'Update Announcement' : 'Post Announcement' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
     </div>
 </template>
 

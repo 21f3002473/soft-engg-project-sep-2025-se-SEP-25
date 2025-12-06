@@ -67,83 +67,88 @@
             </div>
         </div>
 
-        <div class="modal fade" id="courseModal" tabindex="-1" ref="modal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-primary text-white border-bottom-0">
-                        <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} Course</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <form @submit.prevent="submitForm">
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Course Name</label>
-                                <input v-model="form.course_name" type="text" class="form-control" required
-                                    placeholder="E.g., Intro to Python">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Topics (comma separated)</label>
-                                <input v-model="form.topics" type="text" class="form-control"
-                                    placeholder="E.g., Coding, Data Science">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Course Link</label>
-                                <input v-model="form.course_link" type="url" class="form-control"
-                                    placeholder="https://...">
-                                <div class="form-text">Full URL to the external learning resource.</div>
-                            </div>
-                            <div class="d-flex justify-content-end pt-2">
-                                <button type="button" class="btn btn-secondary me-2" @click="closeModal">Cancel</button>
-                                <button type="submit" class="btn btn-primary shadow-sm">
-                                    {{ isEditing ? 'Update Course' : 'Add Course' }}
-                                </button>
-                            </div>
-                        </form>
+        <Teleport to="body">
+            <div class="modal fade" id="courseModal" tabindex="-1" ref="modal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-primary text-white border-bottom-0">
+                            <h5 class="modal-title fw-bold">{{ isEditing ? 'Edit' : 'Create' }} Course</h5>
+                            <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <form @submit.prevent="submitForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Course Name</label>
+                                    <input v-model="form.course_name" type="text" class="form-control" required
+                                        placeholder="E.g., Intro to Python">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Topics (comma separated)</label>
+                                    <input v-model="form.topics" type="text" class="form-control"
+                                        placeholder="E.g., Coding, Data Science">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Course Link</label>
+                                    <input v-model="form.course_link" type="url" class="form-control"
+                                        placeholder="https://...">
+                                    <div class="form-text">Full URL to the external learning resource.</div>
+                                </div>
+                                <div class="d-flex justify-content-end pt-2">
+                                    <button type="button" class="btn btn-secondary me-2"
+                                        @click="closeModal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary shadow-sm">
+                                        {{ isEditing ? 'Update Course' : 'Add Course' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
-        <div class="modal fade" id="assignModal" tabindex="-1" ref="assignModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-primary text-white border-bottom-0">
-                        <h5 class="modal-title fw-bold">Assign Course</h5>
-                        <button type="button" class="btn-close btn-close-white" @click="closeAssignModal"></button>
-                    </div>
-                    <div class="modal-body p-4">
-                        <form @submit.prevent="submitAssignment">
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Select Employee</label>
-                                <select v-model="assignForm.employee_id" class="form-select" required>
-                                    <option value="" disabled>Choose an employee...</option>
-                                    <option v-for="emp in employees" :key="emp.id" :value="emp.id">
-                                        {{ emp.name }}
-                                    </option>
-                                </select>
-                                <div class="form-text">Only employees (not PMs) are listed.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-medium">Select Course</label>
-                                <select v-model="assignForm.course_id" class="form-select" required>
-                                    <option value="" disabled>Choose a course...</option>
-                                    <option v-for="course in courses" :key="course.id" :value="course.id">
-                                        {{ course.course_name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-end pt-2">
-                                <button type="button" class="btn btn-secondary me-2"
-                                    @click="closeAssignModal">Cancel</button>
-                                <button type="submit" class="btn btn-primary shadow-sm">
-                                    Assign Course
-                                </button>
-                            </div>
-                        </form>
+        <Teleport to="body">
+            <div class="modal fade" id="assignModal" tabindex="-1" ref="assignModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-primary text-white border-bottom-0">
+                            <h5 class="modal-title fw-bold">Assign Course</h5>
+                            <button type="button" class="btn-close btn-close-white" @click="closeAssignModal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <form @submit.prevent="submitAssignment">
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Select Employee</label>
+                                    <select v-model="assignForm.employee_id" class="form-select" required>
+                                        <option value="" disabled>Choose an employee...</option>
+                                        <option v-for="emp in employees" :key="emp.id" :value="emp.id">
+                                            {{ emp.name }}
+                                        </option>
+                                    </select>
+                                    <div class="form-text">Only employees (not PMs) are listed.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Select Course</label>
+                                    <select v-model="assignForm.course_id" class="form-select" required>
+                                        <option value="" disabled>Choose a course...</option>
+                                        <option v-for="course in courses" :key="course.id" :value="course.id">
+                                            {{ course.course_name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="d-flex justify-content-end pt-2">
+                                    <button type="button" class="btn btn-secondary me-2"
+                                        @click="closeAssignModal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary shadow-sm">
+                                        Assign Course
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
     </div>
 </template>
 
