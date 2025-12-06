@@ -3,6 +3,7 @@ from datetime import timedelta
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.admin_resources.admin_resources import *
 from app.api.resources.employee import *
+from app.api.resources.hr.hr_assistant_resource import AIAssistantResource
 from app.api.resources.hr.hr_employee_resource import (
     EmployeeDetailResource,
     EmployeeListResource,
@@ -69,6 +70,8 @@ class API:
             EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}"
         )
         self.register_router(HRProjectListResource, f"{hr_base_url}/projects-overview")
+
+        self.register_router(AIAssistantResource, f"{hr_base_url}/assistant")
 
         # Admin
         admin_base_url = "/api/admin"

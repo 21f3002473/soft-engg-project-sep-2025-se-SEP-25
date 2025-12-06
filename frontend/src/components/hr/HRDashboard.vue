@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <header class="dash-header">
       <h1 class="title">HR Dashboard</h1>
-      <p class="subtitle">Overview of employees, performance reviews, and policies</p>
+      <p class="subtitle">Overview of employees and performance reviews</p>
     </header>
 
     <section class="stats-grid">
@@ -18,15 +18,7 @@
         <div class="stat-icon bg-green"></div>
         <div class="stat-info">
           <h2>{{ reviewCount }}</h2>
-          <p>Total Reviews</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon bg-purple"></div>
-        <div class="stat-info">
-          <h2>{{ policyCount }}</h2>
-          <p>Company Policies</p>
+          <p>Total Reviews Submitted</p>
         </div>
       </div>
 
@@ -34,7 +26,7 @@
         <div class="stat-icon bg-orange"></div>
         <div class="stat-info">
           <h2>{{ avgRating.toFixed(1) }}</h2>
-          <p>Average Review Rating</p>
+          <p>Average Rating</p>
         </div>
       </div>
 
@@ -42,7 +34,15 @@
         <div class="stat-icon bg-red"></div>
         <div class="stat-info">
           <h2>{{ employeesWithoutReviews }}</h2>
-          <p>Employees without Reviews</p>
+          <p>Employees Without Reviews</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon bg-purple"></div>
+        <div class="stat-info">
+          <h2>{{ employeesWithReviews }}</h2>
+          <p>Employees With Reviews</p>
         </div>
       </div>
     </section>
@@ -106,10 +106,8 @@ export default {
   data() {
     return {
       employees: [],
-      policies: [],
       reviews: [],
       employeeCount: 0,
-      policyCount: 0,
       reviewCount: 0,
       avgRating: 0,
       employeesWithoutReviews: 0,
@@ -181,6 +179,8 @@ export default {
   }
 };
 </script>
+
+
 
 <style scoped>
 .dashboard-container {
