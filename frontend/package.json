@@ -22,6 +22,8 @@
     "vue": "^3.2.13",
     "vue-router": "^4.6.3",
     "vue3-pdf": "^4.2.6",
+    "sweetalert2": "^11.26.3",
+    "vue3-toastify": "^0.2.8",
     "vuex": "^4.1.0"
   },
   "devDependencies": {

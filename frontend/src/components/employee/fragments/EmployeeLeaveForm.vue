@@ -26,7 +26,8 @@
 
         <div class="mb-3">
           <label class="form-label fw-bold">Reason</label>
-          <textarea v-model="form.reason" rows="3" class="form-control" placeholder="State your reason..." required></textarea>
+          <textarea v-model="form.reason" rows="3" class="form-control" placeholder="State your reason..."
+            required></textarea>
         </div>
 
         <div class="d-flex justify-content-end">
@@ -39,6 +40,7 @@
 
 <script>
 import { make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeLeaveForm',
@@ -63,7 +65,7 @@ export default {
   methods: {
     async submitForm() {
       if (this.isViewMode) return;
-      
+
       try {
         const payload = {
           leave_type: this.form.type,
@@ -71,13 +73,13 @@ export default {
           to_date: this.form.to,
           reason: this.form.reason
         };
-        
+
         await make_postrequest('/api/employee/requests/leave', payload);
-        alert('Leave request submitted successfully!');
+        useNotify().success('Leave request submitted successfully!');
         this.$router.push('/employee/requests');
       } catch (error) {
         console.error("Failed to submit leave request:", error);
-        alert('Failed to submit leave request. Please try again.');
+        useNotify().error('Failed to submit leave request. Please try again.');
       }
     }
   }
@@ -88,15 +90,18 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(-15px);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateY(0);

@@ -1,4 +1,7 @@
 import { createStore } from 'vuex';
+import { useNotify } from '@/utils/useNotify.js';
+
+const notify = useNotify();
 
 const store = createStore({
     state: {
@@ -22,6 +25,7 @@ const store = createStore({
             state.TOKEN = null;
             state.USER = null;
             state.role = null;
+            state.is_authenticated = false;
         },
         setAuthentication(state, status) {
             state.is_authenticated = status;
@@ -42,6 +46,37 @@ const store = createStore({
         },
         clearAll({ commit }) {
             commit('clearAll');
+        },
+        initializeStore({ commit }) {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (token) {
+                commit('setToken', token);
+                commit('setAuthentication', true);
+            }
+
+            if (user) {
+                try {
+                    const parsedUser = JSON.parse(user);
+                    commit('setUser', parsedUser);
+
+                    let role = parsedUser.role;
+                    if (role === "root") role = "admin";
+                    else if (role === "product_manager") role = "productmanager";
+                    else if (role === "human_resource") role = "hr";
+
+                    commit('setRole', role);
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+        },
+        logout({ commit }) {
+            commit('clearAll');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            notify.success("Logged out successfully");
         },
     },
 });

@@ -1,36 +1,45 @@
 <template>
   <nav class="navbar navbar-expand-lg sticky-top py-3 shadow-sm custom-navbar">
     <div class="container-fluid" style="max-width: 1250px;">
-      
+
       <div class="d-flex align-items-center flex-wrap gap-3 gap-lg-4 w-100 justify-content-between">
-        
+
         <div class="d-flex align-items-center gap-3 gap-lg-4 flex-wrap">
           <div class="navbar-brand fw-bold text-primary fs-4 me-0" style="letter-spacing: 0.5px;">Sync'em</div>
-          
+
           <ul class="nav nav-pills d-flex gap-2">
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeDashboard' }" class="nav-link" active-class="active">Dashboard</router-link>
+              <router-link :to="{ name: 'EmployeeDashboard' }" class="nav-link"
+                active-class="active">Dashboard</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeLearning' }" class="nav-link" active-class="active">Learning</router-link>
+              <router-link :to="{ name: 'EmployeeLearning' }" class="nav-link"
+                active-class="active">Learning</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeRequests' }" class="nav-link" active-class="active">Requests</router-link>
+              <router-link :to="{ name: 'EmployeeRequests' }" class="nav-link"
+                active-class="active">Requests</router-link>
             </li>
             <li class="nav-item">
               <router-link :to="{ name: 'EmployeeHRFAQs' }" class="nav-link" active-class="active">HR FAQs</router-link>
             </li>
             <li class="nav-item">
-              <router-link :to="{ name: 'EmployeeWriting' }" class="nav-link" active-class="active">Writing</router-link>
+              <router-link :to="{ name: 'EmployeeWriting' }" class="nav-link"
+                active-class="active">Writing</router-link>
             </li>
           </ul>
         </div>
 
         <div class="d-flex align-items-center gap-3">
-          <router-link :to="{ name: 'EmployeeAccount' }" class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
+          <router-link :to="{ name: 'EmployeeAccount' }"
+            class="btn d-flex align-items-center gap-2 fw-semibold account-btn" active-class="active">
             <i class="fas fa-user-circle fs-5"></i>
             <span>Account</span>
           </router-link>
+          <button class="btn d-flex align-items-center gap-2 fw-semibold account-btn" @click="logout">
+            <i class="fas fa-sign-out-alt fs-5"></i>
+            <span>Logout</span>
+          </button>
         </div>
 
       </div>
@@ -39,8 +48,28 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
-  name: 'EmployeeNavBar'
+  name: 'EmployeeNavBar',
+  methods: {
+    async logout() {
+      const result = await Swal.fire({
+        title: 'Logout?',
+        text: "Are you sure you want to logout?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout!'
+      });
+
+      if (result.isConfirmed) {
+        this.$store.dispatch('logout');
+        this.$router.push({ name: 'Login' });
+      }
+    }
+  }
 };
 </script>
 
@@ -113,6 +142,7 @@ export default {
   .search-input {
     width: 100%;
   }
+
   .search-input:focus {
     width: 100%;
   }

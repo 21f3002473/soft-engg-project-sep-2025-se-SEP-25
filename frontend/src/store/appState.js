@@ -1,5 +1,7 @@
-//import store from "@/store/store.js";
-// import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
+import store from "@/store/store.js";
+import { useNotify } from '@/utils/useNotify.js';
+
+const notify = useNotify();
 
 //export async function submitLogin(params = {}, router) {
   //const { email, password } = params || {};
@@ -9,58 +11,6 @@
     //throw new Error("Email and password are required");
   //}
 
-// remove the below block to disable local login after backend integration is done
-  // const localUser = PREDEF_USERS[email];
-  // if (localUser && localUser.password === password) {
-    
-  //   const data = {
-  //     email: localUser.email,
-  //     role: localUser.role,
-  //     name: localUser.name,
-  //     access_token: localUser.token,
-  //   };
-
-    
-  //   localStorage.setItem("token", localUser.token);
-  //   localStorage.setItem("user", JSON.stringify(data));
-
-  //   if (store?.dispatch) {
-  //     store.dispatch("updateToken", localUser.token);
-  //     if (store._actions?.updateUser) {
-  //       store.dispatch("updateUser", data);
-  //     }
-  //   }
-
-  //   var role = data.role;
-  //   if (role == "root") {
-  //     role = "admin";
-  //   } else if (role == "pm") {
-  //     role = "productmanager";
-  //   } else if (role == "hr") {
-  //     role = "hr";
-  //   } else if (role == "employee") {
-  //     role = "employee";
-  //   } else {
-  //     throw new Error("Invalid user role");
-  //   }
-  //   const targetRoute = `/${role}/dashboard`;
-  //   router.replace(targetRoute);
-
-  //   return { ok: true, data };
-  // }
- // remove above block to disable local login after backend integration is done
-  
- import store from "@/store/store.js";
-// import { PREDEF_USERS } from "@/store/predef_cred.js"; // remove this after backend integration is done
-
-export async function submitLogin(params = {}, router) {
-  const { email, password } = params || {};
-  const loginUrl = `${store.state.BASEURL}/user/login`;
-
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
-
   try {
     const res = await fetch(loginUrl, {
       method: "POST",
@@ -68,14 +18,13 @@ export async function submitLogin(params = {}, router) {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+
       body: JSON.stringify({ email, password }),
     });
 
-    console.log("Login response status:", res.status);
     const maybeJson = await (async () => {
       try { return await res.json(); } catch { return null; }
     })();
-    console.log("Login response data:", maybeJson);
 
     if (!res.ok) {
       const message =
@@ -106,19 +55,24 @@ export async function submitLogin(params = {}, router) {
         store.dispatch("updateUser", data);
       }
     }
-
-    var role = data.role; 
+    var role = data.role;
     if (role == "root") {
       role = "admin";
-    } else if (role == "pm") {
+    } else if (role == "product_manager") {
       role = "productmanager";
-    } else if (role === "hr" || role === "human_resource") {
+    } else if (role == "human_resource") {
       role = "hr";
     } else if (role == "employee") {
       role = "employee";
     } else {
       throw new Error("Invalid user role");
     }
+    if (store?.dispatch) {
+      store.dispatch("updateRole", role);
+      store.dispatch("updateAuthentication", true);
+    }
+
+    notify.success("Login successful!");
 
     const targetRoute = `/${role}/dashboard`;
     router.replace(targetRoute);
@@ -127,34 +81,91 @@ export async function submitLogin(params = {}, router) {
   } catch (err) {
     localStorage.removeItem("token");
     store.dispatch("clearAll");
-    throw err instanceof Error ? err : new Error("Unable to login");
+    const errorMessage = err instanceof Error ? err.message : "Unable to login";
+    notify.error(errorMessage);
+    throw err instanceof Error ? err : new Error(errorMessage);
   }
 }
 
+export async function make_getrequest(url, params = {}) {
+  const queryString = Object.keys(params).length
+    ? "?" + new URLSearchParams(params).toString()
+    : "";
 
-// export function returnStoreData() {
-//     return {
-//         BASEURL: store.state.BASEURL,
-//         TOKEN: store.state.TOKEN,
-//         USER: store.state.USER,
-//     };
-// }
+  const token = localStorage.getItem("token") || store.state.TOKEN;
+  const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
 
-// export async function initializeAuth() {
-//     const token = localStorage.getItem("token");
-//     if (token) {
-//         store.dispatch("updateToken", token);
+  const response = await fetch(`${store.state.BASEURL}${url}${queryString}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cleanToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
 
-//         const isValid = await store.dispatch("validateToken");
+  const data = await response.json();
+  return data;
+}
 
-//         if (!isValid) {
-//             store.dispatch("clearAll");
-//             return false;
-//         }
+export async function make_postrequest(url, data = {}) {
+  const token = localStorage.getItem("token") || store.state.TOKEN;
+  const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
 
-//         return isValid;
-//     } else {
-//         store.dispatch("clearAll");
-//         return false;
-//     }
-// }
+  const response = await fetch(`${store.state.BASEURL}${url}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cleanToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(errText || "Network response was not ok");
+  }
+
+  const responseData = await response.json();
+  return responseData;
+}
+
+export async function make_putrequest(url, data = {}) {
+  const token = localStorage.getItem("token") || store.state.TOKEN;
+  const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
+
+  const response = await fetch(`${store.state.BASEURL}${url}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cleanToken}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  const responseData = await response.json();
+  return responseData;
+}
+
+export async function make_deleterequest(url) {
+  const token = localStorage.getItem("token") || store.state.TOKEN;
+  const cleanToken = token ? token.replace(/^['"]+|['"]+$/g, "") : "";
+
+  const response = await fetch(`${store.state.BASEURL}${url}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cleanToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const responseData = await response.json();
+  return responseData;
+}

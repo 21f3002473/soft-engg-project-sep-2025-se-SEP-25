@@ -17,14 +17,8 @@
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label class="form-label fw-bold">Amount (₹)</label>
-            <input
-              v-model="form.amount"
-              type="number"
-              min="0"
-              class="form-control"
-              placeholder="Enter amount"
-              required
-            />
+            <input v-model="form.amount" type="number" min="0" class="form-control" placeholder="Enter amount"
+              required />
           </div>
           <div class="col-md-6">
             <label class="form-label fw-bold">Date of Expense</label>
@@ -34,12 +28,7 @@
 
         <div class="mb-3">
           <label class="form-label fw-bold">Remarks</label>
-          <textarea
-            v-model="form.remarks"
-            rows="3"
-            class="form-control"
-            placeholder="Add any remarks..."
-          ></textarea>
+          <textarea v-model="form.remarks" rows="3" class="form-control" placeholder="Add any remarks..."></textarea>
         </div>
 
         <div class="d-flex justify-content-end">
@@ -52,6 +41,7 @@
 
 <script>
 import { make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeReimbursementForm',
@@ -86,11 +76,11 @@ export default {
         };
 
         await make_postrequest('/api/employee/requests/reimbursement', payload);
-        alert('Reimbursement request submitted successfully!');
+        useNotify().success('Reimbursement request submitted successfully!');
         this.$router.push('/employee/requests');
       } catch (error) {
         console.error("Failed to submit reimbursement request:", error);
-        alert('Failed to submit reimbursement request. Please try again.');
+        useNotify().error('Failed to submit reimbursement request. Please try again.');
       }
     }
   }
@@ -101,15 +91,18 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(-15px);
 }
+
 .slide-fade-enter-to {
   opacity: 1;
   transform: translateY(0);

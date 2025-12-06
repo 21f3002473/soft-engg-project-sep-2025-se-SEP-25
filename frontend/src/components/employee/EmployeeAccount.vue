@@ -30,14 +30,8 @@
         <div v-else class="row g-3">
           <div class="col-md-6" v-for="(value, key) in editableFields" :key="key">
             <label :for="key" class="form-label fw-medium text-secondary">{{ keyLabels[key] }}</label>
-            <input
-              :id="key"
-              v-model="user[key]"
-              :readonly="key === 'department'"
-              :type="inputTypes[key]"
-              class="form-control"
-              :class="{ 'bg-light': key === 'department' }"
-            />
+            <input :id="key" v-model="user[key]" :readonly="key === 'department'" :type="inputTypes[key]"
+              class="form-control" :class="{ 'bg-light': key === 'department' }" />
           </div>
         </div>
       </div>
@@ -55,7 +49,9 @@
 </template>
 
 <script>
-import { make_getrequest, make_putrequest, make_deleterequest } from "@/store/appState.js";
+import { make_getrequest, make_putrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
+import Swal from 'sweetalert2';
 
 export default {
   name: "EmployeeAccount",
@@ -120,7 +116,7 @@ export default {
         this.originalUser = JSON.parse(JSON.stringify(this.user));
       } catch (error) {
         console.error("Failed to fetch account:", error);
-        alert("Failed to load account information.");
+        useNotify().error("Failed to load account information.");
       } finally {
         this.loading = false;
       }
@@ -132,34 +128,48 @@ export default {
           name: this.user.name,
           email: this.user.email,
         };
-        
+
         await make_putrequest("/api/employee/account", payload);
-        
+
         this.originalUser = JSON.parse(JSON.stringify(this.user));
-        alert("Profile updated successfully!");
+        useNotify().success("Profile updated successfully!");
       } catch (error) {
         console.error("Failed to update profile:", error);
-        alert("Failed to update profile. Please try again.");
+        useNotify().error("Failed to update profile. Please try again.");
       } finally {
         this.loading = false;
       }
     },
     resetForm() {
-      if (confirm("Reset all changes?")) {
-        this.user = JSON.parse(JSON.stringify(this.originalUser));
-      }
+      Swal.fire({
+        title: 'Reset Changes?',
+        text: "Are you sure you want to discard your changes?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, reset it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.user = JSON.parse(JSON.stringify(this.originalUser));
+          useNotify().info('Changes reset.');
+        }
+      });
     },
     async logout() {
-      if (!confirm("Are you sure you want to logout?")) return;
-      
-      this.loading = true;
-      try {
-        await make_deleterequest("/api/employee/account");
-      } catch (error) {
-        console.warn("Logout API call failed, proceeding with client-side logout:", error);
-      } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+      const result = await Swal.fire({
+        title: 'Logout?',
+        text: "Are you sure you want to logout?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout!'
+      });
+
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.$store.dispatch('logout');
         this.$router.push({ name: "Login" });
         this.loading = false;
       }

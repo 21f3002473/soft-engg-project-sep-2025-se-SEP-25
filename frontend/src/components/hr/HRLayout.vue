@@ -25,6 +25,9 @@
             <li class="nav-item">
               <router-link :to="{ name: 'HRChatbot' }" class="nav-link">Chatbot</router-link>
             </li>
+            <li class="nav-item ms-2">
+              <button class="btn btn-outline-light btn-sm" @click="logout">Logout</button>
+            </li>
           </ul>
         </div>
       </div>
@@ -37,7 +40,13 @@
 
 <script>
 export default {
-  name: "HRLayout"
+  name: "HRLayout",
+  methods: {
+    logout() {
+      this.$store.dispatch('logout');
+      this.$router.push({ name: 'Login' });
+    }
+  }
 }
 </script>
 

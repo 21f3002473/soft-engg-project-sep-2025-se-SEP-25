@@ -13,7 +13,8 @@
       <div class="col-md-3 col-sm-6" v-for="(item, index) in stats" :key="index">
         <div class="card border-0 shadow-sm h-100 stat-card-hover">
           <div class="card-body d-flex align-items-center p-3">
-            <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center me-3 text-white" :class="item.colorClass">
+            <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center me-3 text-white"
+              :class="item.colorClass">
               <i :class="item.icon"></i>
             </div>
             <div>
@@ -30,31 +31,27 @@
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body p-4">
             <h3 class="h3 fw-bold text-primary mb-3">Your Tasks</h3>
-            
+
             <div class="d-flex gap-2 mb-3">
-              <input 
-                v-model="newTask" 
-                @keyup.enter="addTask"
-                placeholder="Add a new task..." 
-                class="form-control py-4 fs-5"
-              />
-              <button @click="addTask" :disabled="!newTask" class="btn btn-primary d-flex align-items-center justify-content-center px-3">
+              <input v-model="newTask" @keyup.enter="addTask" placeholder="Add a new task..."
+                class="form-control py-4 fs-5" />
+              <button @click="addTask" :disabled="!newTask"
+                class="btn btn-primary d-flex align-items-center justify-content-center px-3">
                 <i class="bi bi-plus fs-5"></i>
               </button>
             </div>
 
             <div v-if="loadingTasks" class="text-muted">Loading tasks...</div>
             <ul v-else class="list-group list-group-flush mx-2">
-              <li v-for="task in displayedTasks" :key="task.id" class="list-group-item border-0 border-bottom d-flex align-items-center py-3">
-                <input 
-                  class="form-check-input mt-0 fs-5"
-                  type="checkbox" 
-                  :checked="task.status === 'completed'" 
-                  @change="toggleTask(task)"
-                />
-                <span :class="{ 'text-decoration-line-through text-muted': task.status === 'completed' }" class="fs-5 mx-2">{{ task.task }}</span>
+              <li v-for="task in displayedTasks" :key="task.id"
+                class="list-group-item border-0 border-bottom d-flex align-items-center py-3">
+                <input class="form-check-input mt-0 fs-5" type="checkbox" :checked="task.status === 'completed'"
+                  @change="toggleTask(task)" />
+                <span :class="{ 'text-decoration-line-through text-muted': task.status === 'completed' }"
+                  class="fs-5 mx-2">{{ task.task }}</span>
               </li>
-              <li v-if="displayedTasks.length === 0" class="list-group-item border-0 text-muted fs-5">No recent tasks.</li>
+              <li v-if="displayedTasks.length === 0" class="list-group-item border-0 text-muted fs-5">No recent tasks.
+              </li>
             </ul>
           </div>
         </div>
@@ -82,6 +79,7 @@
 
 <script>
 import { make_getrequest, make_putrequest, make_postrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
 
 export default {
   name: 'EmployeeDashboard',
@@ -133,7 +131,7 @@ export default {
       this.loadingAnnouncements = true;
       try {
         const data = await make_getrequest('/api/employee/dashboard');
-        
+
         if (data.user && data.user.name) {
           this.userName = data.user.name;
         }
@@ -162,26 +160,26 @@ export default {
     },
     async addTask() {
       if (!this.newTask.trim()) return;
-      
+
       try {
         const payload = { task: this.newTask };
         const response = await make_postrequest('/api/employee/todo', payload);
-        
+
         this.tasks.unshift({
           id: response.task_id,
           task: this.newTask,
           status: 'pending',
           date_created: new Date().toISOString()
         });
-        
+
         this.newTask = '';
-        
+
         const pendingStat = this.stats.find(s => s.key === 'pending_tasks');
         if (pendingStat) pendingStat.value++;
-        
+
       } catch (error) {
         console.error("Failed to add task:", error);
-        alert("Failed to add task");
+        useNotify().error("Failed to add task");
       }
     },
     async toggleTask(task) {
@@ -196,7 +194,7 @@ export default {
         console.error("Failed to update task:", error);
 
         task.status = originalStatus;
-        alert("Failed to update task status");
+        useNotify().error("Failed to update task status");
       }
     },
     updateLocalStats(oldStatus, newStatus) {
@@ -215,15 +213,15 @@ export default {
       if (!dateString) return '';
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return dateString;
-      
+
       const now = new Date();
       const diffInSeconds = Math.floor((now - date) / 1000);
-      
+
       if (diffInSeconds < 60) return 'Just now';
       if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
       if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
       if (diffInSeconds < 172800) return 'Yesterday';
-      
+
       return date.toLocaleDateString();
     }
   }
@@ -252,6 +250,6 @@ export default {
 
 .stat-card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }
 </style>
