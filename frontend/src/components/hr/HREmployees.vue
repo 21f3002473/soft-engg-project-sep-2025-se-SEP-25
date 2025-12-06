@@ -60,17 +60,7 @@
             </div>
           </div>
 
-          <!-- RIGHT: PANEL -->
-          <div class="col-md-4">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Review Gen</h5>
-                <p class="card-text">
-                  Auto-generate and manage employee performance assessments.
-                </p>
-              </div>
-            </div>
-          </div>
+          
 
         </div>
       </section>
@@ -299,6 +289,7 @@ export default {
 .badge {
   font-size: 0.85rem;
 }
+
 </style>
 
 
