@@ -19,6 +19,14 @@ def test_review_create_success(base_url, auth_hr):
     assert "id" in data["review"]
 
 
+def review_create(base_url, auth_hr):
+    payload = {"user_id": 1, "rating": 4,
+               "comments": "Good performance overall."}
+
+    r = httpx.post(f"{base_url}/hr/review/create",
+                   json=payload, headers=auth_hr)
+    return r.json().get("review").get("id")
+
 def test_review_create_sever_error(base_url, auth_hr):
     payload = {"user_id": 1}
 
@@ -37,20 +45,12 @@ def test_review_create_unauthorized(base_url):
 
 # GET REVIEW DETAIL (GET /api/hr/review/{id})
 def test_review_detail_success(base_url, auth_hr):
-    payload = {"user_id": 2, "rating": 4, "comments": "Good performance overall."}
 
-    response_create = httpx.post(
-        f"{base_url}/hr/review/create", json=payload, headers=auth_hr
-    )
     list_resp = httpx.get(f"{base_url}/hr/reviews", headers=auth_hr)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
-    reviews = data.get("reviews", [])
 
-    if not reviews:
-        pytest.skip("No reviews available to test GET detail")
-
-    rev_id = response_create.json()["review"]["id"]
+    rev_id = review_create(base_url, auth_hr)
 
     r = httpx.get(f"{base_url}/hr/reviews/{rev_id}", headers=auth_hr)
 

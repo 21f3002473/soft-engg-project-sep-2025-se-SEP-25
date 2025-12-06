@@ -96,8 +96,8 @@ def auth_employee(employee_token):
     return {"Authorization": f"Bearer {employee_token}"}
 
 
-print(BASE_URL)
-print(HR_USER_EMAIL, HR_USER_PASSWORD)
-print(PM_USER_EMAIL, PM_USER_PASSWORD)
-print(ROOT_USER_EMAIL, ROOT_USER_PASSWORD)
-print(EMP_USER_EMAIL, EMP_USER_PASSWORD)
+# print(BASE_URL)
+# print(HR_USER_EMAIL, HR_USER_PASSWORD)
+# print(PM_USER_EMAIL, PM_USER_PASSWORD)
+# print(ROOT_USER_EMAIL, ROOT_USER_PASSWORD)
+# print(EMP_USER_EMAIL, EMP_USER_PASSWORD)
