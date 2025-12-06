@@ -128,10 +128,26 @@ const routes = [
                     }
                 ]
             },
-            { path: 'hr-faqs', name: 'EmployeeHRFAQs', component: () => import('@/components/employee/EmployeeHRFAQs.vue') },
-            { path: 'learning', name: 'EmployeeLearning', component: () => import('@/components/employee/EmployeeLearning.vue') },
-            { path: 'writing', name: 'EmployeeWriting', component: () => import('@/components/employee/EmployeeWriting.vue') },
-            { path: 'account', name: 'EmployeeAccount', component: () => import('@/components/employee/EmployeeAccount.vue') },
+            {
+                path: 'hr-faqs',
+                name: 'EmployeeHRFAQs',
+                component: () => import('@/components/employee/EmployeeHRFAQs.vue'),
+            },
+            {
+                path: 'learning',
+                name: 'EmployeeLearning',
+                component: () => import('@/components/employee/EmployeeLearning.vue'),
+            },
+            {
+                path: 'writing',
+                name: 'EmployeeWriting',
+                component: () => import('@/components/employee/EmployeeWriting.vue'),
+            },
+            {
+                path: 'account',
+                name: 'EmployeeAccount',
+                component: () => import('@/components/employee/EmployeeAccount.vue'),
+            }
         ],
     },
     {
@@ -220,25 +236,12 @@ const routes = [
             },
         ],
     },
-];
+]
 
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes
-});
-
-router.beforeEach((to, from, next) => {
-    const hrToken = localStorage.getItem("hr_token");
-
-    if (to.matched.some(record => record.meta.requiresHRAuth)) {
-        if (!hrToken) {
-            alert("Please log in to access HR dashboard.");
-            return next("/login");
-        }
-    }
-
-    next();
-});
+})
 
 router.beforeEach((to, from, next) => {
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
