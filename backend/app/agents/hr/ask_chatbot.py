@@ -1,10 +1,11 @@
-import os
 import json
+import os
 import pickle
+
+import faiss
+import google.generativeai as genai
 import numpy as np
 from dotenv import load_dotenv
-import google.generativeai as genai
-import faiss
 
 load_dotenv()
 
@@ -18,11 +19,12 @@ TOP_K = 5
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "data", "data.txt")
 VECTOR_STORE_FILE = os.path.join(BASE_DIR, "data", "hr_vectors.pkl")
-#LLM_MODEL = "gemini-2.0-flash"
-#EMBED_MODEL = "gemini-embedding-001"
-#DATA_FILE = "backend/app/agents/hr/data/data.txt"
-#VECTOR_STORE_FILE = "backend/app/agents/hr/data/hr_vectors.pkl"
-#TOP_K = 5
+# LLM_MODEL = "gemini-2.0-flash"
+# EMBED_MODEL = "gemini-embedding-001"
+# DATA_FILE = "backend/app/agents/hr/data/data.txt"
+# VECTOR_STORE_FILE = "backend/app/agents/hr/data/hr_vectors.pkl"
+# TOP_K = 5
+
 
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
@@ -30,6 +32,7 @@ def get_client():
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
     genai.configure(api_key=api_key)
     return genai  # return module
+
 
 def build_vector_store():
     """Embed each line of data.txt using Gemini embeddings and save FAISS index."""
@@ -61,12 +64,14 @@ def build_vector_store():
         pickle.dump({"index": index, "texts": lines}, f)
     print(f"Vector store saved to {VECTOR_STORE_FILE}")
 
+
 def load_vector_store():
     if not os.path.exists(VECTOR_STORE_FILE):
         build_vector_store()
     with open(VECTOR_STORE_FILE, "rb") as f:
         data = pickle.load(f)
     return data["index"], data["texts"]
+
 
 def embed_text(text):
     """Generate embedding for a string using Gemini."""
@@ -76,6 +81,7 @@ def embed_text(text):
     faiss.normalize_L2(emb)
     return emb
 
+
 def retrieve_relevant_chunks(question, top_k=TOP_K):
     """Retrieve top-k relevant lines from HR data using Gemini embeddings and FAISS."""
     index, texts = load_vector_store()
@@ -83,6 +89,7 @@ def retrieve_relevant_chunks(question, top_k=TOP_K):
     D, I = index.search(q_emb, top_k)
     chunks = [texts[i] for i in I[0]]
     return chunks
+
 
 def answer_question(question: str):
     try:
@@ -113,8 +120,10 @@ QUESTION:
         print(f"Error: {e}")
         return "I don't know"
 
+
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 2:
         print('Usage: python ask_chatbot.py "your question here"')
         exit()
