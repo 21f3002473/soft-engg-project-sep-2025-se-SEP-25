@@ -2,9 +2,9 @@ import json
 import os
 
 import faiss
+import google.generativeai as genai
 import numpy as np
 from dotenv import load_dotenv
-import google.generativeai as genai
 
 load_dotenv()
 
