@@ -3,7 +3,9 @@ from datetime import timedelta
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.admin_resources.admin_resources import *
 from app.api.resources.employee import *
-from app.api.resources.hr.hr_assistant_resource import AIAssistantResource as HRAssistantResource
+from app.api.resources.hr.hr_assistant_resource import (
+    AIAssistantResource as HRAssistantResource,
+)
 from app.api.resources.hr.hr_employee_resource import (
     EmployeeDetailResource,
     EmployeeListResource,
