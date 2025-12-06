@@ -5,24 +5,15 @@
     </header>
     <div class="card">
       <div class="card-body">
-        <form class="row g-2 mb-3">
-          <div class="col-md-6">
-            <input
-              type="text"
-              v-model="searchProject"
-              class="form-control"
-              placeholder="Search by Project Name..."
-            />
-          </div>
-          <div class="col-md-6">
-            <input
-              type="text"
-              v-model="searchManager"
-              class="form-control"
-              placeholder="Search by Project Manager..."
-            />
-          </div>
-        </form>
+        <!-- Single Search Bar -->
+        <div class="mb-3">
+          <input
+            type="text"
+            v-model="searchQuery"
+            class="form-control"
+            placeholder="Search by Project Name or Manager..."
+          />
+        </div>
 
         <div class="table-responsive">
           <table class="table table-striped table-hover mb-0">
@@ -49,10 +40,6 @@
           </table>
         </div>
       </div>
-
-      <!-- <div class="card-footer text-muted text-center">
-        © 2025 Sync'em. All rights reserved.
-      </div> -->
     </div>
   </div>
 </template>
@@ -65,8 +52,7 @@ export default {
 
   data() {
     return {
-      searchProject: "",
-      searchManager: "",
+      searchQuery: "",
       projects: [],
       BASE: "http://localhost:8000/api/hr",
     };
@@ -74,10 +60,12 @@ export default {
 
   computed: {
     filteredProjects() {
+      if (!this.searchQuery.trim()) return this.projects;
+      const q = this.searchQuery.toLowerCase();
       return this.projects.filter(
         (p) =>
-          p.name.toLowerCase().includes(this.searchProject.toLowerCase()) &&
-          p.manager.toLowerCase().includes(this.searchManager.toLowerCase())
+          p.name.toLowerCase().includes(q) ||
+          p.manager.toLowerCase().includes(q)
       );
     },
   },
@@ -98,11 +86,9 @@ export default {
           `${this.BASE}/projects-overview`,
           this.getAuthHeaders()
         );
-
         this.projects = res.data.projects || [];
       } catch (err) {
         console.error("Error fetching projects:", err);
-
         if (err.response?.status === 401) {
           localStorage.removeItem("hr_token");
           window.location.href = "/login";

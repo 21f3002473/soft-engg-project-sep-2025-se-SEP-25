@@ -2,49 +2,60 @@
   <div class="container-fluid py-4">
     <div class="container">
       <div class="row g-4">
+        <!-- PDF Viewer -->
         <div class="col-12 col-md-6">
           <div class="card h-100"> 
             <div class="card-body p-0">
               <div class="ratio ratio-4x3"> 
-                <div class="card-body p-0" style="height: 60vh;">
-                  <iframe
-                    src="/docs/Human Resources Policy.pdf"
-                    frameborder="0"
-                    class="w-100 h-100"
-                  ></iframe>
-                </div>
+                <iframe
+                  src="/docs/Human Resources Policy.pdf"
+                  frameborder="0"
+                  class="w-100 h-100"
+                ></iframe>
               </div>
             </div>
             <div class="card-footer text-muted small">Company Policies</div>
           </div>
         </div>
 
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">HR Policies — Ask Here</h5>
+        <!-- HR Assistant Chat -->
+        <div class="col-12 col-md-6 d-flex flex-column">
+          <div class="chat-card card flex-grow-1 d-flex flex-column">
+            <div class="card-header bg-primary text-white">
+              HR Policies — Ask Here
+            </div>
 
-              <textarea
-                v-model="query"
-                placeholder="Type your question about HR policies..."
-                class="form-control mb-3 flex-grow-1"
-                rows="6"
-              ></textarea>
-
-              <div class="d-flex gap-2">
-                <button class="btn btn-primary" @click="submitQuery">Ask</button>
-                <button class="btn btn-outline-secondary" type="button" @click="query = ''">Clear</button>
-              </div>
-
-              <div v-if="response" class="alert alert-secondary mt-3" role="alert">
-                <strong>Response:</strong>
-                <div>{{ response }}</div>
+            <!-- Chat messages container -->
+            <div class="chat-body flex-grow-1 p-3" ref="chatBody">
+              <div
+                v-for="(msg, index) in messages"
+                :key="index"
+                :class="['chat-message', msg.role]"
+              >
+                <div class="message-text">{{ msg.text }}</div>
               </div>
             </div>
 
-            <div class="card-footer text-muted small">AI Assistant Chatbot</div>
+            <!-- Input box -->
+            <div class="card-footer p-3 bg-light d-flex gap-2">
+              <textarea
+                v-model="query"
+                placeholder="Type your question about HR policies..."
+                class="form-control"
+                rows="2"
+                @keyup.enter.exact.prevent="submitQuery"
+              ></textarea>
+              <button
+                class="btn btn-primary"
+                @click="submitQuery"
+                :disabled="loading"
+              >
+                {{ loading ? "Asking..." : "Ask" }}
+              </button>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -56,21 +67,101 @@ export default {
   data() {
     return {
       query: "",
-      response: "",
+      messages: [], // Stores chat messages with role 'user' or 'ai'
+      loading: false,
     };
   },
   methods: {
-    submitQuery() {
-      if (this.query.trim() === "") {
-        this.response = "Please type a question first.";
-        return;
-      }
-      this.response = `This is an automated response to: "${this.query}"`;
+    async submitQuery() {
+      if (!this.query.trim()) return;
+
+      // Add user message
+      this.messages.push({ role: "user", text: this.query });
+      const userQuery = this.query;
       this.query = "";
+      this.loading = true;
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/hr/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: userQuery }),
+        });
+
+        const data = await res.json();
+        const answer = res.ok ? data.answer : data.error || "No response.";
+
+        // Add AI response
+        this.messages.push({ role: "ai", text: answer });
+
+        // Scroll to bottom
+        this.$nextTick(() => {
+          const chat = this.$refs.chatBody;
+          chat.scrollTop = chat.scrollHeight;
+        });
+      } catch (err) {
+        console.error(err);
+        this.messages.push({ role: "ai", text: "Error communicating with server." });
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
 </script>
+
+<style scoped>
+.chat-card {
+  display: flex;
+  flex-direction: column;
+  height: 60vh;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  background-color: #f8fafc;
+}
+
+.chat-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.chat-message {
+  margin-bottom: 12px;
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background-color: #e5e7eb; /* Light gray */
+  color: #111827;
+  border-bottom-right-radius: 0;
+}
+
+.chat-message.ai {
+  align-self: flex-start;
+  background-color: #3b82f6; /* Blue */
+  color: #ffffff;
+  border-bottom-left-radius: 0;
+}
+
+.card-footer textarea {
+  resize: none;
+  border-radius: 12px;
+}
+
+.card-footer button {
+  height: fit-content;
+  border-radius: 12px;
+}
+</style>
+
+
+
 
 
 <!-- <style scoped>
