@@ -25,7 +25,7 @@
 
           <!-- Policy Buttons Section -->
           <div class="card mb-3">
-            <div class="card-header bg-success text-white">
+            <div class="card-header bg-primary text-white">
               HR Policies Management
             </div>
             <div class="card-body d-flex flex-column gap-2">
@@ -45,7 +45,7 @@
               <div v-if="isHR" class="mt-3">
                 <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2"/>
                 <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2" rows="3"></textarea>
-                <button class="btn btn-success" @click="addPolicy">Add Policy</button>
+                <button class="btn btn-primary" @click="addPolicy">Add Policy</button>
               </div>
 
               <!-- Display selected policy -->
