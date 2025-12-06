@@ -91,9 +91,9 @@ import os
 from pathlib import Path
 
 import faiss
+import google.generativeai as genai
 import numpy as np
 from dotenv import load_dotenv
-import google.generativeai as genai
 from PyPDF2 import PdfReader
 
 load_dotenv()
