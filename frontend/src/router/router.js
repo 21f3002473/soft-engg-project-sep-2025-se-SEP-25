@@ -227,7 +227,6 @@ const router = createRouter({
     routes
 });
 
-// ✅ FINAL WORKING HR AUTH GUARD
 router.beforeEach((to, from, next) => {
     const hrToken = localStorage.getItem("hr_token");
 
