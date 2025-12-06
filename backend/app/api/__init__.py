@@ -11,16 +11,12 @@ from app.api.resources.hr.hr_policy_resource import (
     HRPolicyCollectionResource,
     HRPolicyDetailResource,
 )
+from app.api.resources.hr.hr_project_resource import HRProjectListResource
 from app.api.resources.hr.hr_review_resource import (
     HRReviewDetailResource,
     HRReviewsByUserResource,
     HRReviewsListResource,
 )
-
-from app.api.resources.hr.hr_project_resource import HRProjectListResource
-
-
-
 from app.api.resources.pm_resources.clients import (
     ClientRequirementResource,
     ClientsResource,
@@ -73,7 +69,6 @@ class API:
             EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}"
         )
         self.register_router(HRProjectListResource, f"{hr_base_url}/projects-overview")
-
 
         # Admin
         admin_base_url = "/api/admin"
