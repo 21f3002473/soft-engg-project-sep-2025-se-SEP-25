@@ -10,7 +10,17 @@ from app.middleware import require_hr, require_pm, require_root
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session
+from sqlmodel import select, or_
 
+def list_employees(session: Session):
+    return session.exec(
+        select(User).where(
+            or_(
+                User.role == "EMPLOYEE",
+                User.role ==  "PRODUCT_MANAGER"
+            )
+        )
+    ).all()
 
 class EmployeeListResource(Resource):
     """
