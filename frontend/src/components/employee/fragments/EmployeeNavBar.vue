@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg sticky-top py-3 shadow-sm custom-navbar">
-    <div class="container-fluid" style="max-width: 1250px;">
+    <div class="container-fluid" style="max-width: 90%;">
 
       <div class="d-flex align-items-center flex-wrap gap-3 gap-lg-4 w-100 justify-content-between">
 
