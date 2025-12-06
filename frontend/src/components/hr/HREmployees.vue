@@ -1,118 +1,114 @@
 <template>
-  <div class="employees-root container-fluid py-4 min-vh-100 bg-light">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2 class="h3 mb-1 text-primary fw-bold">Employee Management</h2>
-          <p class="text-muted mb-0">Manage reviews, announcements, FAQs, and courses</p>
-        </div>
+  <div class="employees-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h3 mb-1 text-primary fw-bold">Employee Management</h2>
+        <p class="text-muted mb-0">Manage reviews, announcements, FAQs, and courses</p>
       </div>
-
-      <ul class="nav nav-tabs mb-4 border-bottom-0">
-        <li class="nav-item">
-          <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
-            :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'employees', 'text-muted': activeTab !== 'employees' }"
-            href="#" @click.prevent="activeTab = 'employees'">
-            <i class="bi bi-people me-2"></i>Employees & Reviews
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
-            :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'announcements', 'text-muted': activeTab !== 'announcements' }"
-            href="#" @click.prevent="activeTab = 'announcements'">
-            <i class="bi bi-megaphone me-2"></i>Announcements
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
-            :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'faqs', 'text-muted': activeTab !== 'faqs' }"
-            href="#" @click.prevent="activeTab = 'faqs'">
-            <i class="bi bi-question-circle me-2"></i>FAQs
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
-            :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'courses', 'text-muted': activeTab !== 'courses' }"
-            href="#" @click.prevent="activeTab = 'courses'">
-            <i class="bi bi-book me-2"></i>Courses
-          </a>
-        </li>
-      </ul>
-
-      <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body p-4">
-
-          <section v-if="activeTab === 'employees'" class="fade-in">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                  <h4 class="mb-0 text-secondary">Performance Reviews</h4>
-                  <div class="input-group w-50 shadow-sm">
-                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input v-model="search" type="text" class="form-control border-start-0 ps-0"
-                      placeholder="Search Employee..." />
-                  </div>
-                </div>
-
-                <div class="table-responsive rounded border">
-                  <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-secondary small text-uppercase">
-                      <tr>
-                        <th class="ps-4 py-3">Employee</th>
-                        <th class="py-3">Status</th>
-                        <th class="py-3 text-end pe-4">Actions</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr v-for="emp in filteredEmployees" :key="emp.id" class="border-bottom-0">
-                        <td class="ps-4 fw-medium">{{ emp.name }}</td>
-
-                        <td>
-                          <span class="badge rounded-pill px-3 py-2 fw-normal"
-                            :class="emp.status === 'Done' ? 'bg-success-subtle text-success' : 'bg-light text-dark border'">
-                            <i class="bi me-1" :class="emp.status === 'Done' ? 'bi-check-circle-fill' : 'bi-clock'"></i>
-                            {{ emp.status }}
-                          </span>
-                        </td>
-
-                        <td class="text-end pe-4">
-                          <button class="btn btn-sm btn-outline-primary me-2 shadow-sm" @click="openViewModal(emp)">
-                            <i class="bi bi-eye me-1"></i> View
-                          </button>
-
-                          <button class="btn btn-sm btn-success shadow-sm" @click="openAddModal(emp)">
-                            <i class="bi bi-plus-circle me-1"></i> Review
-                          </button>
-                        </td>
-                      </tr>
-                      <tr v-if="filteredEmployees.length === 0">
-                        <td colspan="3" class="text-center py-5 text-muted">No employees found.</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section v-if="activeTab === 'announcements'" class="fade-in">
-            <HRAnnouncements />
-          </section>
-
-          <section v-if="activeTab === 'faqs'" class="fade-in">
-            <HRFAQs />
-          </section>
-
-          <section v-if="activeTab === 'courses'" class="fade-in">
-            <HRCourses />
-          </section>
-
-        </div>
-      </div>
-
     </div>
 
+    <ul class="nav nav-tabs mb-4 border-bottom-0">
+      <li class="nav-item">
+        <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
+          :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'employees', 'text-muted': activeTab !== 'employees' }"
+          href="#" @click.prevent="activeTab = 'employees'">
+          <i class="bi bi-people me-2"></i>Employees & Reviews
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
+          :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'announcements', 'text-muted': activeTab !== 'announcements' }"
+          href="#" @click.prevent="activeTab = 'announcements'">
+          <i class="bi bi-megaphone me-2"></i>Announcements
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
+          :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'faqs', 'text-muted': activeTab !== 'faqs' }"
+          href="#" @click.prevent="activeTab = 'faqs'">
+          <i class="bi bi-question-circle me-2"></i>FAQs
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link px-4 py-2 fw-medium rounded-top border-0"
+          :class="{ 'active shadow-sm bg-white text-primary': activeTab === 'courses', 'text-muted': activeTab !== 'courses' }"
+          href="#" @click.prevent="activeTab = 'courses'">
+          <i class="bi bi-book me-2"></i>Courses
+        </a>
+      </li>
+    </ul>
+
+    <div class="card shadow-sm border-0 rounded-3">
+      <div class="card-body p-4">
+
+        <section v-if="activeTab === 'employees'" class="fade-in">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0 text-secondary">Performance Reviews</h4>
+                <div class="input-group w-50 shadow-sm">
+                  <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                  <input v-model="search" type="text" class="form-control border-start-0 ps-0"
+                    placeholder="Search Employee..." />
+                </div>
+              </div>
+
+              <div class="table-responsive rounded border">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="bg-light text-secondary small text-uppercase">
+                    <tr>
+                      <th class="ps-4 py-3">Employee</th>
+                      <th class="py-3">Status</th>
+                      <th class="py-3 text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr v-for="emp in filteredEmployees" :key="emp.id" class="border-bottom-0">
+                      <td class="ps-4 fw-medium">{{ emp.name }}</td>
+
+                      <td>
+                        <span class="badge rounded-pill px-3 py-2 fw-normal"
+                          :class="emp.status === 'Done' ? 'bg-success-subtle text-success' : 'bg-light text-dark border'">
+                          <i class="bi me-1" :class="emp.status === 'Done' ? 'bi-check-circle-fill' : 'bi-clock'"></i>
+                          {{ emp.status }}
+                        </span>
+                      </td>
+
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-primary me-2 shadow-sm" @click="openViewModal(emp)">
+                          <i class="bi bi-eye me-1"></i> View
+                        </button>
+
+                        <button class="btn btn-sm btn-success shadow-sm" @click="openAddModal(emp)">
+                          <i class="bi bi-plus-circle me-1"></i> Review
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="filteredEmployees.length === 0">
+                      <td colspan="3" class="text-center py-5 text-muted">No employees found.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section v-if="activeTab === 'announcements'" class="fade-in">
+          <HRAnnouncements />
+        </section>
+
+        <section v-if="activeTab === 'faqs'" class="fade-in">
+          <HRFAQs />
+        </section>
+
+        <section v-if="activeTab === 'courses'" class="fade-in">
+          <HRCourses />
+        </section>
+
+      </div>
+    </div>
     <div class="modal fade" id="viewModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
