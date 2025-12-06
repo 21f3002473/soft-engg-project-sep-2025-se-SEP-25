@@ -1,11 +1,9 @@
+from app.database import Project, User, engine
+from app.middleware import require_hr, require_pm, require_root
 from fastapi import Depends
 from fastapi_restful import Resource
 from sqlmodel import Session, select
 
-from app.database import engine
-from app.database import Project
-from app.database import User
-from app.middleware import require_hr, require_pm, require_root
 
 class HRProjectListResource(Resource):
     def get(self):
