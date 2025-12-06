@@ -163,9 +163,8 @@ export default {
           : 0;
 
         const employeeIdsWithReviews = new Set(reviews.map(r => r.user_id));
-        const employeesWithReviews = employeeIdsWithReviews.size;
-
-        this.employeesWithoutReviews = this.employeeCount - employeesWithReviews;
+        this.employeesWithReviews = employeeIdsWithReviews.size;
+        this.employeesWithoutReviews = this.employeeCount - this.employeesWithReviews;
 
         this.recentEmployees = [...employees]
           .sort((a, b) => b.id - a.id)
