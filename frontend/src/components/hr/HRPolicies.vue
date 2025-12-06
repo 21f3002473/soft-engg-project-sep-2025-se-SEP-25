@@ -23,20 +23,17 @@
             <div class="card-body d-flex flex-column gap-2">
 
               <div class="d-flex gap-2 flex-wrap">
-                <button
-                  v-for="policy in policies"
-                  :key="policy.id"
-                  class="btn btn-outline-primary"
-                  @click="selectAndLoadPolicy(policy)"
-                >
+                <button v-for="policy in policies" :key="policy.id" class="btn btn-outline-primary"
+                  @click="selectAndLoadPolicy(policy)">
                   {{ policy.title }}
                 </button>
               </div>
 
               <div v-if="isHR" class="mt-3 border p-3 rounded">
                 <h6>Create New Policy</h6>
-                <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2"/>
-                <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2" rows="3"></textarea>
+                <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2" />
+                <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2"
+                  rows="3"></textarea>
                 <button class="btn btn-success" @click="addPolicy">Add Policy</button>
               </div>
 
@@ -44,19 +41,11 @@
                 <h5>Selected Policy</h5>
 
                 <label class="fw-bold">Title:</label>
-                <input 
-                  v-model="selectedPolicyEdit.title" 
-                  class="form-control mb-2"
-                  :readonly="!isHR"
-                />
+                <input v-model="selectedPolicyEdit.title" class="form-control mb-2" :readonly="!isHR" />
 
                 <label class="fw-bold">Content:</label>
-                <textarea
-                  v-model="selectedPolicyEdit.content"
-                  class="form-control mb-2"
-                  rows="4"
-                  :readonly="!isHR"
-                ></textarea>
+                <textarea v-model="selectedPolicyEdit.content" class="form-control mb-2" rows="4"
+                  :readonly="!isHR"></textarea>
 
                 <div v-if="isHR" class="d-flex gap-2 mt-2">
                   <button class="btn btn-primary" @click="updatePolicy">Update</button>
@@ -79,18 +68,9 @@
             </div>
 
             <div class="card-footer p-3 bg-light d-flex gap-2">
-              <textarea
-                v-model="query"
-                placeholder="Type your question..."
-                class="form-control"
-                rows="2"
-                @keyup.enter.exact.prevent="submitQuery"
-              ></textarea>
-              <button
-                class="btn btn-primary"
-                @click="submitQuery"
-                :disabled="loading"
-              >
+              <textarea v-model="query" placeholder="Type your question..." class="form-control" rows="2"
+                @keyup.enter.exact.prevent="submitQuery"></textarea>
+              <button class="btn btn-primary" @click="submitQuery" :disabled="loading">
                 {{ loading ? "Asking..." : "Ask" }}
               </button>
             </div>
@@ -104,7 +84,7 @@
 
 
 <script>
-import { make_getrequest, make_postrequest } from "@/store/appState.js";
+import { make_getrequest, make_postrequest, make_putrequest, make_deleterequest } from "@/store/appState.js";
 
 export default {
   name: "HRPolicies",
@@ -159,28 +139,12 @@ export default {
       if (!this.selectedPolicy) return;
 
       try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/hr/policy/${this.selectedPolicy.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify(this.selectedPolicyEdit),
-          }
-        );
-
-        const data = await res.json();
-
-        if (res.ok) {
-          Object.assign(this.selectedPolicy, data.policy);
-          alert("Policy updated successfully");
-        } else {
-          alert(data.error || "Failed to update");
-        }
+        const data = await make_putrequest(`/api/hr/policy/${this.selectedPolicy.id}`, this.selectedPolicyEdit);
+        Object.assign(this.selectedPolicy, data.policy);
+        alert("Policy updated successfully");
       } catch (err) {
         console.error("Update error:", err);
+        alert(err.message || "Failed to update");
       }
     },
 
@@ -190,32 +154,18 @@ export default {
       if (!confirm("Are you sure you want to delete this policy?")) return;
 
       try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/hr/policy/${this.selectedPolicy.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+        await make_deleterequest(`/api/hr/policy/${this.selectedPolicy.id}`);
+        this.policies = this.policies.filter(
+          (p) => p.id !== this.selectedPolicy.id
         );
 
-        const data = await res.json();
+        this.selectedPolicy = null;
+        this.selectedPolicyEdit = { title: "", content: "" };
 
-        if (res.ok) {
-          this.policies = this.policies.filter(
-            (p) => p.id !== this.selectedPolicy.id
-          );
-
-          this.selectedPolicy = null;
-          this.selectedPolicyEdit = { title: "", content: "" };
-
-          alert("Policy deleted");
-        } else {
-          alert(data.error || "Failed to delete");
-        }
+        alert("Policy deleted");
       } catch (err) {
         console.error("Delete error:", err);
+        alert(err.message || "Failed to delete");
       }
     },
 
