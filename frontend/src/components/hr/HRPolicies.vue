@@ -23,22 +23,45 @@
             <div class="card-body d-flex flex-column gap-2">
 
               <div class="d-flex gap-2 flex-wrap">
-                <button v-for="policy in policies" :key="policy.id" class="btn btn-outline-primary"
-                  @click="viewPolicy(policy)">
+                <button
+                  v-for="policy in policies"
+                  :key="policy.id"
+                  class="btn btn-outline-primary"
+                  @click="selectAndLoadPolicy(policy)"
+                >
                   {{ policy.title }}
                 </button>
               </div>
 
-              <div v-if="isHR" class="mt-3">
-                <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2" />
-                <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2"
-                  rows="3"></textarea>
-                <button class="btn btn-primary" @click="addPolicy">Add Policy</button>
+              <div v-if="isHR" class="mt-3 border p-3 rounded">
+                <h6>Create New Policy</h6>
+                <input v-model="newPolicy.title" placeholder="Policy Title" class="form-control mb-2"/>
+                <textarea v-model="newPolicy.content" placeholder="Policy Content" class="form-control mb-2" rows="3"></textarea>
+                <button class="btn btn-success" @click="addPolicy">Add Policy</button>
               </div>
 
               <div v-if="selectedPolicy" class="mt-3 p-3 border rounded bg-light">
-                <h5>{{ selectedPolicy.title }}</h5>
-                <p>{{ selectedPolicy.content }}</p>
+                <h5>Selected Policy</h5>
+
+                <label class="fw-bold">Title:</label>
+                <input 
+                  v-model="selectedPolicyEdit.title" 
+                  class="form-control mb-2"
+                  :readonly="!isHR"
+                />
+
+                <label class="fw-bold">Content:</label>
+                <textarea
+                  v-model="selectedPolicyEdit.content"
+                  class="form-control mb-2"
+                  rows="4"
+                  :readonly="!isHR"
+                ></textarea>
+
+                <div v-if="isHR" class="d-flex gap-2 mt-2">
+                  <button class="btn btn-primary" @click="updatePolicy">Update</button>
+                  <button class="btn btn-danger" @click="deletePolicy">Delete</button>
+                </div>
               </div>
 
             </div>
@@ -56,9 +79,18 @@
             </div>
 
             <div class="card-footer p-3 bg-light d-flex gap-2">
-              <textarea v-model="query" placeholder="Type your question about HR policies..." class="form-control"
-                rows="2" @keyup.enter.exact.prevent="submitQuery"></textarea>
-              <button class="btn btn-primary" @click="submitQuery" :disabled="loading">
+              <textarea
+                v-model="query"
+                placeholder="Type your question..."
+                class="form-control"
+                rows="2"
+                @keyup.enter.exact.prevent="submitQuery"
+              ></textarea>
+              <button
+                class="btn btn-primary"
+                @click="submitQuery"
+                :disabled="loading"
+              >
                 {{ loading ? "Asking..." : "Ask" }}
               </button>
             </div>
@@ -70,6 +102,7 @@
   </div>
 </template>
 
+
 <script>
 import { make_getrequest, make_postrequest } from "@/store/appState.js";
 
@@ -80,15 +113,20 @@ export default {
       query: "",
       messages: [],
       loading: false,
+
       policies: [],
       selectedPolicy: null,
+      selectedPolicyEdit: { title: "", content: "" },
+
       newPolicy: { title: "", content: "" },
       isHR: true,
     };
   },
+
   mounted() {
     this.fetchPolicies();
   },
+
   methods: {
     async fetchPolicies() {
       try {
@@ -98,9 +136,12 @@ export default {
         console.error("Failed to fetch policies", err);
       }
     },
-    viewPolicy(policy) {
+
+    selectAndLoadPolicy(policy) {
       this.selectedPolicy = policy;
+      this.selectedPolicyEdit = { ...policy };
     },
+
     async addPolicy() {
       if (!this.newPolicy.title || !this.newPolicy.content) return;
 
@@ -113,6 +154,71 @@ export default {
         alert(err.message || "Failed to create policy");
       }
     },
+
+    async updatePolicy() {
+      if (!this.selectedPolicy) return;
+
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/hr/policy/${this.selectedPolicy.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify(this.selectedPolicyEdit),
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok) {
+          Object.assign(this.selectedPolicy, data.policy);
+          alert("Policy updated successfully");
+        } else {
+          alert(data.error || "Failed to update");
+        }
+      } catch (err) {
+        console.error("Update error:", err);
+      }
+    },
+
+    async deletePolicy() {
+      if (!this.selectedPolicy) return;
+
+      if (!confirm("Are you sure you want to delete this policy?")) return;
+
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/hr/policy/${this.selectedPolicy.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok) {
+          this.policies = this.policies.filter(
+            (p) => p.id !== this.selectedPolicy.id
+          );
+
+          this.selectedPolicy = null;
+          this.selectedPolicyEdit = { title: "", content: "" };
+
+          alert("Policy deleted");
+        } else {
+          alert(data.error || "Failed to delete");
+        }
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    },
+
     async submitQuery() {
       if (!this.query.trim()) return;
 
@@ -133,7 +239,7 @@ export default {
         });
       } catch (err) {
         console.error(err);
-        this.messages.push({ role: "ai", text: "Error communicating with server." });
+        this.messages.push({ role: "ai", text: "Server error." });
       } finally {
         this.loading = false;
       }
