@@ -271,6 +271,7 @@ class EmployeeDailyReport(SQLModel, table=True):
         default=None, description="Comma-separated task IDs covered"
     )
 
+
 class AllocationPolicyTypeEnum(str, Enum):
     MAX_PROJECTS_PER_EMPLOYEE = "max_projects_per_employee"
     MAX_WORKLOAD_HOURS = "max_workload_hours"
