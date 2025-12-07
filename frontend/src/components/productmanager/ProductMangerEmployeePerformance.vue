@@ -43,95 +43,144 @@
         </div>
       </div>
 
-      <!-- Current Stats Cards -->
-      <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-body text-center">
-              <div class="stat-icon bg-success bg-opacity-10 text-success mb-3">
-                <i class="bi bi-check-circle-fill fs-3"></i>
-              </div>
-              <h3 class="fw-bold mb-1">{{ currentStats?.completed || 0 }}</h3>
-              <p class="text-muted mb-0 small">Completed Tasks</p>
-              <small class="text-success fw-semibold">{{ currentStats?.completed_percentage || 0 }}%</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-body text-center">
-              <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-3">
-                <i class="bi bi-arrow-repeat fs-3"></i>
-              </div>
-              <h3 class="fw-bold mb-1">{{ currentStats?.in_progress || 0 }}</h3>
-              <p class="text-muted mb-0 small">In Progress</p>
-              <small class="text-primary fw-semibold">{{ currentStats?.in_progress_percentage || 0 }}%</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-body text-center">
-              <div class="stat-icon bg-warning bg-opacity-10 text-warning mb-3">
-                <i class="bi bi-clock-fill fs-3"></i>
-              </div>
-              <h3 class="fw-bold mb-1">{{ currentStats?.pending || 0 }}</h3>
-              <p class="text-muted mb-0 small">Pending Tasks</p>
-              <small class="text-warning fw-semibold">{{ currentStats?.pending_percentage || 0 }}%</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-body text-center">
-              <div class="stat-icon bg-info bg-opacity-10 text-info mb-3">
-                <i class="bi bi-list-task fs-3"></i>
-              </div>
-              <h3 class="fw-bold mb-1">{{ currentStats?.total || 0 }}</h3>
-              <p class="text-muted mb-0 small">Total Tasks</p>
-              <small class="text-info fw-semibold">All time</small>
-            </div>
-          </div>
+      <!-- Tabs Navigation -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link active" 
+                id="stats-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#stats" 
+                type="button" 
+                role="tab" 
+                aria-controls="stats" 
+                aria-selected="true"
+              >
+                <i class="bi bi-bar-chart-line me-2"></i>
+                Performance Stats
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                id="reports-tab" 
+                data-bs-toggle="tab" 
+                data-bs-target="#reports" 
+                type="button" 
+                role="tab" 
+                aria-controls="reports" 
+                aria-selected="false"
+              >
+                <i class="bi bi-file-earmark-text me-2"></i>
+                Daily Reports
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Charts Row -->
-      <div class="row g-3">
-        <!-- Performance Trends Chart -->
-        <div class="col-12 col-lg-8">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-header bg-white border-0">
-              <h5 class="card-title mb-0">
-                <i class="bi bi-graph-up me-2 text-primary"></i>
-                Performance Trends
-              </h5>
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Stats Tab -->
+        <div class="tab-pane fade show active" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+          <!-- Current Stats Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                  <div class="stat-icon bg-success bg-opacity-10 text-success mb-3">
+                    <i class="bi bi-check-circle-fill fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold mb-1">{{ currentStats?.completed || 0 }}</h3>
+                  <p class="text-muted mb-0 small">Completed Tasks</p>
+                  <small class="text-success fw-semibold">{{ currentStats?.completed_percentage || 0 }}%</small>
+                </div>
+              </div>
             </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas ref="performanceChart"></canvas>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                  <div class="stat-icon bg-primary bg-opacity-10 text-primary mb-3">
+                    <i class="bi bi-arrow-repeat fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold mb-1">{{ currentStats?.in_progress || 0 }}</h3>
+                  <p class="text-muted mb-0 small">In Progress</p>
+                  <small class="text-primary fw-semibold">{{ currentStats?.in_progress_percentage || 0 }}%</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                  <div class="stat-icon bg-warning bg-opacity-10 text-warning mb-3">
+                    <i class="bi bi-clock-fill fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold mb-1">{{ currentStats?.pending || 0 }}</h3>
+                  <p class="text-muted mb-0 small">Pending Tasks</p>
+                  <small class="text-warning fw-semibold">{{ currentStats?.pending_percentage || 0 }}%</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center">
+                  <div class="stat-icon bg-info bg-opacity-10 text-info mb-3">
+                    <i class="bi bi-list-task fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold mb-1">{{ currentStats?.total || 0 }}</h3>
+                  <p class="text-muted mb-0 small">Total Tasks</p>
+                  <small class="text-info fw-semibold">All time</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-3">
+            <!-- Performance Trends Chart -->
+            <div class="col-12 col-lg-8">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-white border-0">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Performance Trends
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas ref="performanceChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task Distribution Chart -->
+            <div class="col-12 col-lg-4">
+              <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-white border-0">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-pie-chart me-2 text-primary"></i>
+                    Task Distribution
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas ref="distributionChart"></canvas>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Task Distribution Chart -->
-        <div class="col-12 col-lg-4">
-          <div class="card shadow-sm h-100 border-0">
-            <div class="card-header bg-white border-0">
-              <h5 class="card-title mb-0">
-                <i class="bi bi-pie-chart me-2 text-primary"></i>
-                Task Distribution
-              </h5>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas ref="distributionChart"></canvas>
-              </div>
-            </div>
-          </div>
+        <!-- Reports Tab -->
+        <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+          <EmployeeDailyReports :employeeId="employeeId" />
         </div>
       </div>
     </div>
@@ -141,11 +190,15 @@
 <script>
 import { make_getrequest } from '@/store/appState';
 import { Chart, registerables } from 'chart.js';
+import EmployeeDailyReports from './fragments/EmployeeDailyReports.vue';
 
 Chart.register(...registerables);
 
 export default {
   name: 'ProductMangerEmployeePerformance',
+  components: {
+    EmployeeDailyReports
+  },
   props: {
     employeeId: {
       type: [String, Number],
@@ -169,7 +222,7 @@ export default {
       this.error = null;
 
       try {
-        const response = await make_getrequest(`/pr/employee/performance/${this.employeeId}`);
+        const response = await make_getrequest(`/api/pm/employee/performance/${this.employeeId}`);
         
         console.log('Performance Response:', response);
 
@@ -369,9 +422,44 @@ export default {
   height: auto !important;
 }
 
+/* Tabs styling */
+.nav-tabs {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #666;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #667eea;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: #667eea;
+  background-color: transparent;
+  border-color: transparent transparent #667eea transparent;
+}
+
+.tab-content {
+  padding-top: 24px;
+}
+
 @media (max-width: 768px) {
   .employee-avatar-lg {
     font-size: 3rem;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 }
 </style>

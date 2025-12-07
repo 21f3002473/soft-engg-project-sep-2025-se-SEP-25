@@ -81,7 +81,7 @@ export default {
             this.error = null;
 
             try {
-                const response = await make_getrequest('/pr/employees');
+                const response = await make_getrequest('/api/pm/employees');
                 
                 console.log('Employees Response:', response);
 
