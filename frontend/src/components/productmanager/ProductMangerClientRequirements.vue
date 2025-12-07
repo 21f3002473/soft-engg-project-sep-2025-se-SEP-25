@@ -118,7 +118,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                           <small class="text-muted">
                             <i class="bi bi-diagram-3 me-1"></i>
-                            {{ req.project_id }}
+                            {{ req.project_name || req.project_id }}
                           </small>
                         </div>
                       </div>
@@ -182,35 +182,39 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Project <span class="text-danger">*</span></label>
+                <label class="form-label">Project</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  :value="editForm.project_name || editForm.project_id"
+                  readonly
+                >
+                <small class="text-muted">Project assignment cannot be changed</small>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Status <span class="text-danger">*</span></label>
                 <select 
                   class="form-select" 
-                  v-model="editForm.project_id"
+                  v-model="editForm.status"
                   required
-                  :disabled="editProjectsLoading"
                 >
-                  <option value="" disabled>
-                    {{ editProjectsLoading ? 'Loading projects...' : 'Select a project' }}
-                  </option>
-                  <option 
-                    v-for="project in editProjects" 
-                    :key="project.id" 
-                    :value="project.project_id"
-                  >
-                    {{ project.project_name }} ({{ project.project_id }})
-                  </option>
+                  <option value="" disabled>Select status</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
                 </select>
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Description <span class="text-danger">*</span></label>
+                <label class="form-label">Description</label>
                 <textarea 
                   class="form-control" 
                   v-model="editForm.requirements"
                   rows="4"
-                  required
-                  placeholder="Enter requirement description"
+                  readonly
                 ></textarea>
+                <small class="text-muted">Description cannot be changed</small>
               </div>
             </form>
           </div>
@@ -292,7 +296,9 @@ export default {
         id: null,
         requirement_id: '',
         project_id: '',
-        requirements: ''
+        project_name: '',
+        requirements: '',
+        status: ''
       },
       editProjects: [],
       editProjectsLoading: false,
@@ -366,10 +372,10 @@ export default {
         id: requirement.id,
         requirement_id: requirement.requirement_id,
         project_id: requirement.project_id,
-        requirements: requirement.description
+        project_name: requirement.project_name,
+        requirements: requirement.description,
+        status: requirement.status || 'PENDING'
       };
-      
-      this.fetchEditProjects();
       
       if (!this.editModal) {
         this.editModal = new Modal(document.getElementById('editRequirementModal'));
@@ -382,19 +388,21 @@ export default {
       this.editErrorMessage = null;
 
       try {
+        const payload = {
+          status: this.editForm.status
+        };
+
         const response = await make_putrequest(
           `/api/pm/client/requirements/${this.clientId}/${this.editForm.id}`,
-          {
-            requirements: this.editForm.requirements,
-            project_id: this.editForm.project_id
-          }
+          payload
         );
 
         if (response && response.data) {
-          this.editSuccessMessage = response.message || 'Requirement updated successfully!';
+          this.editSuccessMessage = response.message || 'Requirement status updated successfully!';
           this.fetchClientDetails();
           setTimeout(() => {
             this.editModal?.hide();
+            this.editSuccessMessage = null;
           }, 1500);
         } else {
           this.editErrorMessage = response.message || 'Failed to update requirement';
