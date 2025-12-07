@@ -17,7 +17,7 @@ def test_hr_employee_detail_success(base_url, auth_pm, auth_hr):
     if not employees:
         pytest.skip("No Employees available to test GET detail")
 
-    emp_id = employees[0]["id"]
+    emp_id = employees[-1]["id"]
 
     r = httpx.get(f"{base_url}/hr/employee/{emp_id}", headers=auth_pm)
     assert r.status_code == 200
@@ -83,6 +83,13 @@ def test_hr_employee_update_unauthorized(base_url):
 
 # DELETE EMPLOYEE (DELETE /api/hr/employee/{id})
 def test_hr_employee_delete_success(base_url, auth_admin, auth_hr):
+    from admin.test_admin_apis import create_user
+    create_user(
+        client=httpx,
+        auth_admin=auth_admin,
+        name="John Doe",
+        role="employee"
+    )
     list_resp = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)
@@ -90,13 +97,11 @@ def test_hr_employee_delete_success(base_url, auth_admin, auth_hr):
 
     if not employees:
         pytest.skip("No Employees available to test DELETE")
-
-    emp_id = employees[-1]["id"]
-
-    r = httpx.delete(f"{base_url}/hr/employee/{emp_id}", headers=auth_admin)
-
-    assert r.status_code == 200
-    assert assert_json(r)["message"] == "Employee deleted"
+    else:
+        emp_id = employees[-1]["id"]
+        r = httpx.delete(f"{base_url}/hr/employee/{emp_id}", headers=auth_admin)
+        assert r.status_code == 200
+        assert assert_json(r)["message"] == "Employee deleted"
 
 
 def test_hr_employee_delete_not_found(base_url, auth_admin):
