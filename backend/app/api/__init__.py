@@ -25,12 +25,35 @@ from app.api.resources.pm_resources.clients import (
     ClientsResource,
     ClientUpdatesResource,
 )
+from app.api.resources.pm_resources.daily_reports import (
+    DailyReportDetailResource,
+    ProjectDailyReportsResource,
+)
 from app.api.resources.pm_resources.dashboard import PRDashboardResource
 from app.api.resources.pm_resources.employee import (
     EmployeePerformanceResource,
     EmployeesResource,
 )
-from app.api.resources.pm_resources.project import ProjectsResource
+from app.api.resources.pm_resources.employee_daily_reports import (
+    EmployeeDailyReportsResource,
+    EmployeeReportDetailResource,
+)
+from app.api.resources.pm_resources.progress_emails import (
+    ProgressEmailDetailResource,
+    ProjectProgressEmailResource,
+)
+from app.api.resources.pm_resources.project import (
+    ProjectsDashboardResource,
+    ProjectsResource,
+    ProjectViewResource,
+)
+from app.api.resources.pm_resources.requirement_analysis import (
+    RequirementAnalysisResource,
+)
+from app.api.resources.pm_resources.roadmap import (
+    ProjectRoadmapResource,
+    RoadmapHistoryResource,
+)
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -93,19 +116,87 @@ class API:
         self.register_router(PRDashboardResource, f"{pm_base_url}/dashboard")
         self.register_router(ClientsResource, f"{pm_base_url}/clients")
 
+        # Client requirements - list and create
         self.register_router(
             ClientRequirementResource,
             f"{pm_base_url}/client/requirements/{{client_id}}",
         )
+
+        # Client requirements - update and delete specific requirement
+        self.register_router(
+            ClientRequirementResource,
+            f"{pm_base_url}/client/requirements/{{client_id}}/{{requirement_id}}",
+        )
+
+        self.register_router(
+            ProjectsDashboardResource, f"{pm_base_url}/projects/dashboard"
+        )
+
+        self.register_router(
+            ProjectViewResource, f"{pm_base_url}/project/{{project_id}}"
+        )
+
+        # Client updates - list and create
         self.register_router(
             ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
         )
+
+        # Client updates - update and delete specific update
+        self.register_router(
+            ClientUpdatesResource,
+            f"{pm_base_url}/client/updates/{{client_id}}/{{update_id}}",
+        )
+
         self.register_router(EmployeesResource, f"{pm_base_url}/employees")
         self.register_router(
             EmployeePerformanceResource,
             f"{pm_base_url}/employee/performance/{{employee_id}}",
         )
         self.register_router(ProjectsResource, f"{pm_base_url}/projects")
+
+        # Requirement Analysis
+        self.register_router(
+            RequirementAnalysisResource,
+            f"{pm_base_url}/project/{{project_id}}/analysis",
+        )
+
+        # Project Roadmap
+        self.register_router(
+            ProjectRoadmapResource,
+            f"{pm_base_url}/project/{{project_id}}/client/{{client_id}}/roadmap",
+        )
+        self.register_router(
+            RoadmapHistoryResource,
+            f"{pm_base_url}/project/{{project_id}}/client/{{client_id}}/roadmap/history",
+        )
+
+        # Progress Emails
+        self.register_router(
+            ProjectProgressEmailResource,
+            f"{pm_base_url}/project/{{project_id}}/progress-emails",
+        )
+        self.register_router(
+            ProgressEmailDetailResource, f"{pm_base_url}/progress-emails/{{email_id}}"
+        )
+
+        # Daily Reports
+        self.register_router(
+            ProjectDailyReportsResource,
+            f"{pm_base_url}/project/{{project_id}}/daily-reports",
+        )
+        self.register_router(
+            DailyReportDetailResource, f"{pm_base_url}/daily-reports/{{report_id}}"
+        )
+
+        # Employee Daily Reports
+        self.register_router(
+            EmployeeDailyReportsResource,
+            f"{pm_base_url}/employee/{{employee_id}}/daily-reports",
+        )
+        self.register_router(
+            EmployeeReportDetailResource,
+            f"{pm_base_url}/employee-reports/{{report_id}}",
+        )
 
         # Employee
         emp_base_url = "/api/employee"

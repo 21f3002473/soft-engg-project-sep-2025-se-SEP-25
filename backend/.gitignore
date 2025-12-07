@@ -3,6 +3,7 @@ __pycache__/
 .env
 admin_api_docs.md
 requests.http
+.idea/  
 imp_requests.http
 vectorstore.pkl
 chunks/

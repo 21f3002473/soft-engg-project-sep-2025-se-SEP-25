@@ -48,24 +48,77 @@
         </div>
       </div>
 
-      <!-- Updates and Chat -->
+      <!-- Updates and Email History Tabs -->
       <div class="col-lg-9 col-md-8">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-primary text-white">
-            <h3 class="h5 mb-0">
-              <i class="bi bi-bell-fill me-2"></i>
-              Client Updates
-            </h3>
-          </div>
-          <div class="card-body">
-            <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
-              
-              <!-- Updates List -->
-              <div class="flex-md-shrink-0" style="min-width: 320px; max-width: 400px;">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link active" 
+              id="updates-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#updates-content" 
+              type="button" 
+              role="tab"
+            >
+              <i class="bi bi-bell-fill me-1"></i>
+              Updates
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link" 
+              id="emails-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#emails-content" 
+              type="button" 
+              role="tab"
+            >
+              <i class="bi bi-envelope-check me-1"></i>
+              Email History
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Updates Tab -->
+          <div 
+            class="tab-pane fade show active" 
+            id="updates-content" 
+            role="tabpanel"
+          >
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">
+                  <i class="bi bi-bell-fill me-2"></i>
+                  Client Updates
+                </h3>
+                <button 
+                  type="button" 
+                  class="btn btn-light btn-sm"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#addUpdateModal"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>Add Update
+                </button>
+              </div>
+              <div class="card-body">
+                <!-- Success/Error Messages -->
+                <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                  <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+                  <button type="button" class="btn-close" @click="successMessage = null"></button>
+                </div>
+                <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+                  <button type="button" class="btn-close" @click="errorMessage = null"></button>
+                </div>
+
+                <!-- Updates List (Full Width) -->
                 <div class="alert alert-light border mb-0" style="max-height: 500px; overflow-y: auto;">
                   <h6 class="text-primary mb-3">
                     <i class="bi bi-calendar-check me-2"></i>
-                    Updates List
+                    Updates List ({{ totalUpdates }})
                   </h6>
                   
                   <div v-if="updates.length === 0" class="text-center text-muted py-3">
@@ -77,23 +130,39 @@
                     <li 
                       v-for="update in updates" 
                       :key="update.id"
-                      class="list-group-item px-0"
+                      class="list-group-item px-0 py-3"
                     >
-                      <div class="d-flex align-items-start">
-                        <span class="badge bg-secondary me-2 mt-1">{{ update.update_id }}</span>
-                        <div class="flex-fill">
-                          <p class="mb-1 small">{{ update.description }}</p>
-                          <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                              <i class="bi bi-calendar3 me-1"></i>
-                              {{ formatDate(update.date) }}
-                            </small>
+                      <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <span class="badge bg-secondary">{{ update.update_id }}</span>
+                          <div class="d-flex gap-1">
+                            <button 
+                              class="btn btn-sm btn-outline-primary" 
+                              @click="editUpdate(update)"
+                              title="Edit"
+                            >
+                              <i class="bi bi-pencil me-1"></i>Edit
+                            </button>
+                            <button 
+                              class="btn btn-sm btn-outline-danger" 
+                              @click="confirmDeleteUpdate(update)"
+                              title="Delete"
+                            >
+                              <i class="bi bi-trash me-1"></i>Delete
+                            </button>
                           </div>
-                          <small class="text-muted d-block mt-1">
+                        </div>
+                        <p class="mb-1 small">{{ update.description }}</p>
+                        <div class="d-flex flex-wrap gap-2">
+                          <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            {{ formatDate(update.date) }}
+                          </small>
+                          <small class="text-muted">
                             <i class="bi bi-folder me-1"></i>
                             Project: {{ update.project_id }}
                           </small>
-                          <small class="text-muted d-block">
+                          <small class="text-muted">
                             <i class="bi bi-person me-1"></i>
                             By: {{ update.created_by }}
                           </small>
@@ -103,18 +172,138 @@
                   </ul>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- AI Chatbot -->
-              <div class="flex-fill border rounded p-3 bg-light" style="min-height: 500px;">
-                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                  <i class="bi bi-robot text-primary me-2 fs-5"></i>
-                  <h5 class="mb-0">AI Assistant</h5>
-                  <span class="badge bg-success ms-auto">Online</span>
+          <!-- Email History Tab -->
+          <div 
+            class="tab-pane fade" 
+            id="emails-content" 
+            role="tabpanel"
+          >
+            <div v-if="clientData && clientProjects.length > 0">
+              <ProductManagerEmailHistory 
+                :projectId="getFirstProjectId()"
+              />
+            </div>
+            <div v-else class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Client must have projects to view email history.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Update Modal -->
+    <div class="modal fade" id="addUpdateModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-plus-circle me-2"></i>
+              {{ isEditing ? 'Edit Update' : 'Add New Update' }}
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="saveUpdate">
+              <div class="mb-3">
+                <label class="form-label">Update ID <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    v-model="updateForm.update_id"
+                    :readonly="isEditing"
+                    required
+                  >
+                  <button 
+                    v-if="!isEditing"
+                    type="button" 
+                    class="btn btn-outline-secondary" 
+                    @click="generateUpdateId"
+                  >
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </button>
                 </div>
-                <ProductMangerChatbot :clientId="clientID" :clientName="clientData?.client_name" />
+                <small class="text-muted">Auto-generated. Click to regenerate.</small>
               </div>
 
-            </div>
+              <div class="mb-3" v-if="!isEditing">
+                <label class="form-label">Project <span class="text-danger">*</span></label>
+                <select 
+                  class="form-select" 
+                  v-model="updateForm.project_id"
+                  required
+                  :disabled="projectsLoading"
+                >
+                  <option value="" disabled>
+                    {{ projectsLoading ? 'Loading projects...' : 'Select a project' }}
+                  </option>
+                  <option 
+                    v-for="project in clientProjects" 
+                    :key="project.id" 
+                    :value="project.id"
+                  >
+                    {{ project.project_name }} ({{ project.project_id }})
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Details <span class="text-danger">*</span></label>
+                <textarea 
+                  class="form-control" 
+                  v-model="updateForm.details"
+                  rows="4"
+                  required
+                  placeholder="Enter update details"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="saveUpdate"
+              :disabled="saving"
+            >
+              <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+              {{ saving ? 'Saving...' : 'Save Update' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteUpdateModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this update?</p>
+            <p class="fw-bold mb-0">{{ updateToDelete?.update_id }}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              @click="deleteUpdate"
+              :disabled="deleting"
+            >
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+              {{ deleting ? 'Deleting...' : 'Delete' }}
+            </button>
           </div>
         </div>
       </div>
@@ -123,8 +312,9 @@
 </template>
 
 <script>
-import ProductMangerChatbot from './fragments/ProductMangerChatbot.vue';
-import { make_getrequest } from '@/store/appState';
+import ProductManagerEmailHistory from './fragments/ProductManagerEmailHistory.vue';
+import { make_getrequest, make_postrequest, make_putrequest, make_deleterequest } from '@/store/appState';
+import { Modal } from 'bootstrap';
 
 export default {
     name: "ProductMangerUpdateClient",
@@ -135,15 +325,30 @@ export default {
         }
     },
     components: {
-        ProductMangerChatbot
+        ProductManagerEmailHistory
     },
     data() {
         return {
             clientData: null,
             updates: [],
             totalUpdates: 0,
+            clientProjects: [],
+            projectsLoading: false,
             loading: true,
-            error: null
+            error: null,
+            isEditing: false,
+            saving: false,
+            deleting: false,
+            successMessage: null,
+            errorMessage: null,
+            updateForm: {
+                update_id: '',
+                project_id: '',
+                details: ''
+            },
+            updateToDelete: null,
+            addUpdateModal: null,
+            deleteUpdateModal: null
         };
     },
     computed: {
@@ -164,7 +369,7 @@ export default {
             this.error = null;
 
             try {
-                const response = await make_getrequest(`/pr/client/updates/${this.clientID}`);
+                const response = await make_getrequest(`/api/pm/client/updates/${this.clientID}`);
                 
                 console.log('Client Updates Response:', response);
 
@@ -185,6 +390,122 @@ export default {
                 this.loading = false;
             }
         },
+        async fetchClientProjects() {
+            this.projectsLoading = true;
+            try {
+                const response = await make_getrequest(`/api/pm/projects?id_client=${this.clientID}`);
+                
+                if (response && response.data && response.data.projects) {
+                    this.clientProjects = response.data.projects;
+                } else {
+                    this.clientProjects = [];
+                }
+            } catch (error) {
+                console.error('Error fetching client projects:', error);
+                this.clientProjects = [];
+            } finally {
+                this.projectsLoading = false;
+            }
+        },
+        generateUpdateId() {
+            const uuid = crypto.randomUUID().split('-')[0].toUpperCase();
+            this.updateForm.update_id = `UPD-${uuid}`;
+        },
+        editUpdate(update) {
+            this.isEditing = true;
+            this.updateForm = {
+                update_id: update.update_id,
+                project_id: update.project_id,
+                details: update.description,
+                id: update.id
+            };
+            
+            if (!this.addUpdateModal) {
+                this.addUpdateModal = new Modal(document.getElementById('addUpdateModal'));
+            }
+            this.addUpdateModal.show();
+        },
+        async saveUpdate() {
+            this.saving = true;
+            this.successMessage = null;
+            this.errorMessage = null;
+
+            try {
+                let response;
+                
+                if (this.isEditing) {
+                    // Update existing
+                    response = await make_putrequest(
+                        `/api/pm/client/updates/${this.clientID}/${this.updateForm.id}`,
+                        { details: this.updateForm.details }
+                    );
+                } else {
+                    // Create new
+                    response = await make_postrequest(
+                        `/api/pm/client/updates/${this.clientID}`,
+                        {
+                            update_id: this.updateForm.update_id,
+                            project_id: this.updateForm.project_id,
+                            details: this.updateForm.details
+                        }
+                    );
+                }
+
+                if (response && response.data) {
+                    this.successMessage = response.message || 'Update saved successfully!';
+                    this.fetchClientUpdates();
+                    this.resetForm();
+                    this.addUpdateModal?.hide();
+                } else {
+                    this.errorMessage = response.message || 'Failed to save update';
+                }
+            } catch (error) {
+                console.error('Error saving update:', error);
+                this.errorMessage = error.message || 'An error occurred while saving the update';
+            } finally {
+                this.saving = false;
+            }
+        },
+        confirmDeleteUpdate(update) {
+            this.updateToDelete = update;
+            
+            if (!this.deleteUpdateModal) {
+                this.deleteUpdateModal = new Modal(document.getElementById('deleteUpdateModal'));
+            }
+            this.deleteUpdateModal.show();
+        },
+        async deleteUpdate() {
+            this.deleting = true;
+
+            try {
+                const response = await make_deleterequest(
+                    `/api/pm/client/updates/${this.clientID}/${this.updateToDelete.id}`
+                );
+
+                if (response && response.message) {
+                    this.successMessage = response.message || 'Update deleted successfully!';
+                    this.fetchClientUpdates();
+                    this.deleteUpdateModal?.hide();
+                } else {
+                    this.errorMessage = response.message || 'Failed to delete update';
+                }
+            } catch (error) {
+                console.error('Error deleting update:', error);
+                this.errorMessage = error.message || 'An error occurred while deleting the update';
+            } finally {
+                this.deleting = false;
+                this.updateToDelete = null;
+            }
+        },
+        resetForm() {
+            this.isEditing = false;
+            this.updateForm = {
+                update_id: '',
+                project_id: '',
+                details: ''
+            };
+            this.generateUpdateId();
+        },
         formatDate(dateString) {
             if (!dateString) return 'N/A';
             try {
@@ -197,10 +518,33 @@ export default {
             } catch (e) {
                 return dateString;
             }
+        },
+        getFirstProjectId() {
+            // Get the first project ID for email history
+            if (this.clientProjects && this.clientProjects.length > 0) {
+                return this.clientProjects[0].id;
+            }
+            return null;
         }
     },
     mounted() {
         this.fetchClientUpdates();
+        this.fetchClientProjects();
+        this.generateUpdateId();
+
+        // Setup modal event listeners
+        const addModalEl = document.getElementById('addUpdateModal');
+        if (addModalEl) {
+            addModalEl.addEventListener('show.bs.modal', () => {
+                if (!this.isEditing) {
+                    this.fetchClientProjects();
+                    this.generateUpdateId();
+                }
+            });
+            addModalEl.addEventListener('hidden.bs.modal', () => {
+                this.resetForm();
+            });
+        }
     },
     watch: {
         clientID() {
@@ -237,6 +581,11 @@ export default {
 
 .list-group-item:hover {
   background-color: #f8f9fa;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

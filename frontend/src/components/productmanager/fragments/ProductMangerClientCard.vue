@@ -1,10 +1,11 @@
 <template>
     <div class="client-card card shadow-sm h-100 border-0">
         <img
-            :src="`https://dummyjson.com/icon/${encodeURIComponent(clientname)}/150`"
+            :src="clientImage"
             class="card-img-top"
             :alt="clientname"
             style="height: 150px; object-fit: cover;"
+            @error="handleImageError"
         />
         <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -36,7 +37,35 @@ export default {
         },
         description: {
             type: String,
-            required: true
+            default: 'Click to view details'
+        },
+        image: {
+            type: String,
+            default: null
+        }
+    },
+    data() {
+        return {
+            imageError: false
+        };
+    },
+    computed: {
+        clientImage() {
+            // If image error occurred or no image, use fallback
+            if (this.imageError || !this.image) {
+                return `https://dummyjson.com/icon/${encodeURIComponent(this.clientname)}/150`;
+            }
+            // Check if image is already a full data URL or just base64
+            if (this.image.startsWith('data:image')) {
+                return this.image;
+            }
+            // Assume it's base64 encoded, add data URL prefix
+            return `data:image/png;base64,${this.image}`;
+        }
+    },
+    methods: {
+        handleImageError() {
+            this.imageError = true;
         }
     }
 };

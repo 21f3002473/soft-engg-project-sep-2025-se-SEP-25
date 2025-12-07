@@ -20,7 +20,12 @@
                     </li>
                     <li class="nav-item">
                         <router-link class="nav-link" :to="{ name: 'ProductManagerClientsUpdate' }">
-                            Clients
+                            Updates
+                        </router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" :to="{ name: 'ProductManagerProjectDetails' }">
+                            Projects
                         </router-link>
                     </li>
                     <li class="nav-item">
