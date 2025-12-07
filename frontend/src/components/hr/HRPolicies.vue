@@ -218,16 +218,6 @@ export default {
     async deletePolicy() {
       if (!this.selectedPolicy) return;
 
-      //const confirm = await Swal.fire({
-        //title: "Are you sure?",
-        //text: "Do you really want to delete this policy?",
-        //icon: "warning",
-        //showCancelButton: true,
-        //confirmButtonColor: "#dc3545",
-        //confirmButtonColor: "#6c757d",
-        //confirmButtonText: "Yes, delete it!",
-      //});
-
       const confirm = await Swal.fire({
       title: "Are you sure?",
       text: "Do you really want to delete this policy?",
