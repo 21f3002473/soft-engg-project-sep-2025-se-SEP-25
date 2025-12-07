@@ -1,221 +1,328 @@
-# Sync’em – AI-Powered Project & HR Assistance Platform
+# Sync’em – AI-Powered Workforce & Project Management Platform
 
-## Project Overview
-Sync’em is an AI-driven workforce management system designed to help **HR Managers**, **Project Managers**, **Admins**, and **Employees** operate efficiently.  
-It provides intelligent project allocation, HR‑policy chatbot responses, employee learning recommendations, performance reviews, and admin-level system controls.
+## ⭐ Overview
+**Sync’em** is an AI-augmented workforce and project management platform built for **Admins**, **HR Managers**, **Project Managers**, and **Employees**.  
+It provides role‑based dashboards, automated project allocation, AI chatbots, HR assistants, learning recommendations, background task automation, and complete workflow management.
 
-The platform is built with:
-- **FastAPI (Python)** for backend  
-- **Vue.js** for frontend  
-- **PostgreSQL** for database  
-- **GenAI agents** integrated into multiple workflows  
-
----
-
-## Project Team
-- Akbar Ali  
-- Deon Levon Dmello  
-- D Narendran  
-- Sampriti Raha  
-- Sayan Bhowmick  
-- Soham Chakraborty  
-- Telvin Varghese  
-- Tummala Naveen  
+Technologies used:
+- **FastAPI**, **PostgreSQL**
+- **Vue.js**, **TailwindCSS**
+- **Celery**, **Redis**, **MailHog**
+- **GenAI Agents (RAG + LLM-based assistants)**
 
 ---
 
-## Project Structure
+# 👥 Team 25 — IIT Madras (Software Engineering)
+Akbar Ali • Deon Levon Dmello • D Narendran • Sampriti Raha •  
+Sayan Bhowmick • Soham Chakraborty • Telvin Varghese • Tummala Naveen
+
+---
+
+# 📁 Project Structure
 ```
 Syncem/
-├── backend/                 # FastAPI backend
+├── backend/
 │   ├── app/
-│   │   ├── api/             # API routers
-│   │   ├── controllers/     # Business logic
-│   │   ├── database/        # Models + connection
-│   │   ├── agents/          # GenAI RAG + chatbot
-│   │   ├── middleware/
+│   │   ├── api/                 # FastAPI routes (admin/hr/pm/employee)
+│   │   ├── agents/              # GenAI chatbot, RAG modules
+│   │   ├── controllers/         # Business logic layer
+│   │   ├── database/            # Models + DB connection
+│   │   ├── tasks/               # Celery tasks
 │   │   ├── utils/
-│   │   └── static/docs/     # HR PDFs, assets
-│   ├── tests/               # Pytest test cases
-│   ├── requirements.txt
-│   ├── config.py
-│   └── main.py              # Entry point
+│   │   ├── middleware/
+│   │   └── static/              # HR policy PDFs & assets
+│   ├── tests/                   # Pytest suite
+│   ├── main.py
+│   └── requirements.txt
 │
-├── frontend/                # Vue frontend
-│   ├── public/
+├── frontend/
 │   ├── src/
-│   │   ├── components/      # UI components by role
+│   │   ├── components/          # Vue components
 │   │   ├── router/
 │   │   ├── store/
 │   │   ├── utils/
 │   │   └── App.vue
-│   ├── package.json
-│   └── tailwind.config.js
-|
-├── .github/workflows/       # CI/CD pipelines
-└── README.md
+│   ├── public/
+│   ├── .env                     # VUE_APP_API_URL lives here
+│   ├── .env-dev
+│   └── package.json
+│
+└── Milestones/ (All M1–M5 docs + code)
 ```
 
 ---
 
-## Prerequisites
+# ⚙️ Prerequisites
 
-### Backend
-- Python 3.10+
-- PostgreSQL
+## Backend
+- Python **3.10+**
+- PostgreSQL **14+**
+- Redis server
 - Virtual environment tool
-- `.env` file with DB credentials + SECRET_KEY  
 
-### Frontend
-- Node.js v16+
+## Frontend
+- Node.js **16+**
 - npm or yarn
 
 ---
 
-## Backend Setup
+# 🛠 Backend Setup (Windows / macOS / Linux)
 
-### 1. Create Virtual Environment
+## 1️⃣ Create Virtual Environment
+### Windows
+```
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+### macOS / Linux
 ```
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Install Dependencies
+---
+
+## 2️⃣ Install Dependencies
 ```
 pip install -r requirements.txt
 ```
 
-### 3. Configure PostgreSQL
-Create DB + user:
+---
+
+## 3️⃣ PostgreSQL Setup
+Inside psql:
 ```
 CREATE DATABASE se_preprod;
 CREATE USER myuser WITH PASSWORD '12345678';
 GRANT ALL PRIVILEGES ON DATABASE se_preprod TO myuser;
+
+-- Give ownership
+ALTER SCHEMA public OWNER TO myuser;
+
+-- Grant full access on schema
+GRANT USAGE, CREATE ON SCHEMA public TO myuser;
+
+-- Allow access to existing objects
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO myuser;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO myuser;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO myuser;
+
+-- Ensure future objects are usable
+ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+GRANT ALL PRIVILEGES ON TABLES TO myuser;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+GRANT ALL PRIVILEGES ON SEQUENCES TO myuser;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+GRANT ALL PRIVILEGES ON FUNCTIONS TO myuser;
 ```
 
-Update your `.env`:
+`.env` file:
 ```
 DATABASE_URL=postgresql://myuser:12345678@localhost/se_preprod
-SECRET_KEY=your_generated_secret_key
-```
-
-### 4. Run the Backend
-```
-python3 main.py
-```
-
-Visit:
-```
-http://127.0.0.1:8000/docs   # Swagger UI
+SECRET_KEY=your_generated_secure_key
 ```
 
 ---
 
-## Frontend Setup
+## 4️⃣ Run the Backend
+### Windows
+```
+.venv\Scripts\activate
+python main.py
+```
 
-### 1. Install Dependencies
+### macOS / Linux
+```
+source .venv/bin/activate
+python3 main.py
+```
+
+Swagger documentation:
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+# 🎨 Frontend Setup
+
+## 1️⃣ Install Dependencies
 ```
 cd frontend
 npm install
 ```
 
-### 2. Run Dev Server
+## 2️⃣ Configure API URL  
+Create `.env` in `frontend/`:
+
+```
+VUE_APP_API_URL=http://127.0.0.1:8000
+```
+
+For production:
+```
+VUE_APP_API_URL=https://api.syncem.com
+```
+
+Restart the dev server after editing `.env`.
+
+---
+
+## 3️⃣ Start Frontend
 ```
 npm run serve
 ```
-Frontend runs at:
+
+Runs on:
 ```
 http://localhost:8080/
 ```
 
-### Predefined Local Credentials (for development only)
+### Local Test Accounts
 ```
-ROOT_USER_EMAIL=root@example.com
-PM_USER_EMAIL=pm@example.com
-HR_USER_EMAIL=hr@example.com
-EMPLOYEE_USER_EMAIL=employee@example.com
-# all passwords: supersecretpassword
-```
-
----
-
-## Quickstart
-
-### Start Backend
-```
-cd backend
-source .venv/bin/activate
-python3 main.py
-```
-
-### Start Frontend
-```
-cd frontend
-npm run serve
+root@example.com
+pm@example.com
+hr@example.com
+employee@example.com
+Password: supersecretpassword
 ```
 
 ---
 
-## Key Features (Role‑Based)
+# 📨 MailHog Setup (Email Testing)
 
-### **Admin**
-- Manage employees & roles  
-- View logs  
-- Monitor system status  
-- Manage backups  
-- Update system settings  
+## Install MailHog
 
-### **HR Manager**
-- Manage employees  
-- Manage HR policies  
-- Generate performance reviews (GenAI-powered)  
-- Chatbot for HR policies  
-- Project overview + assignment  
+### macOS
+```
+brew install mailhog
+```
 
-### **Project Manager**
-- Client requirements management  
-- Automated client updates  
-- Employee performance insights  
-- AI assistant for requirement refinement  
+### Linux
+```
+sudo wget -O /usr/local/bin/mailhog https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64
+sudo chmod +x /usr/local/bin/mailhog
+```
 
-### **Employee**
-- Dashboard with tasks & announcements  
-- Submit leave, transfer, reimbursement requests  
-- Learning recommendations (GenAI)  
-- Chatbot for HR queries  
-- Notes + writing assistant  
+### Windows  
+Download: https://github.com/mailhog/MailHog/releases
+
+### Docker (any OS)
+```
+docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+```
+
+Start MailHog:
+```
+mailhog
+```
+
+Access UI:
+```
+http://localhost:8025
+```
+
+`.env`:
+```
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_FROM_EMAIL=noreply@syncem.com
+```
 
 ---
 
-## API Documentation
-Full API documentation is available at:
+# ⚡ Celery Setup (Async + Scheduled Jobs)
 
+## Install Redis
+
+### macOS
+```
+brew install redis
+brew services start redis
+```
+
+### Linux
+```
+sudo apt install redis-server
+sudo systemctl start redis
+```
+
+### Windows  
+Download redis package from Microsoft archive.
+
+---
+
+## Start Celery
+Worker:
+```
+celery -A app.celery_app worker --loglevel=info
+```
+
+Beat:
+```
+celery -A app.celery_app beat --loglevel=info
+```
+
+Flower Dashboard:
+```
+celery -A app.celery_app flower --port=5555
+```
+
+Dashboard:
+```
+http://localhost:5555
+```
+
+---
+
+# 🤖 Background Tasks
+### Email Tasks
+- Welcome email  
+- Password reset  
+- Project assignment  
+
+### Report Tasks
+- Daily reports  
+- Project reports  
+- CSV exports  
+
+### Notifications
+- Batch alerts  
+- Cleanup jobs  
+
+Example:
+```python
+send_welcome_email.delay(email="user@example.com", name="John")
+```
+
+---
+
+# 📘 API Documentation
+Full API docs:
 ```
 http://127.0.0.1:8000/docs
 ```
 
-Backend routes follow structured namespaces:
+Routes:
 - `/api/admin`
 - `/api/hr`
 - `/api/employee`
 - `/api/pm`
 
-Swagger (Milestone 4) defines:
-- Request/response schemas  
-- Status codes  
-- Auth flow (JWT)  
-
 ---
 
-## Testing (Pytest)
-
-### Run all tests
+# 🧪 Testing (Pytest)
+Run all tests:
 ```
-python3 -m pytest -vv
+pytest -vv
 ```
 
-### Run tests per module
+Run per module:
 ```
 pytest tests/admin -vv
 pytest tests/hr -vv
@@ -224,49 +331,41 @@ pytest tests/employee -vv
 pytest tests/login -vv
 ```
 
-Milestone 5 provides detailed expected vs. actual outputs, including failure scenarios (e.g., invalid JSON structure for reimbursement requests).
-
 ---
 
-## Feature Walkthrough Summary
+# 🎯 Role-Based Features
 
-### 1. Authentication & Role-based Login
-- Auto-redirect to role dashboards  
-- JWT token validation  
+## Admin
+- System logs  
+- Backups  
+- User management  
+- Updates  
 
-### 2. Dashboards (for each role)
-- HR: performance + allocation  
-- PM: clients + updates + reports  
-- Employee: tasks + requests + learning  
+## HR Manager
+- Policies (CRUD)  
+- Performance reviews (AI-assisted)  
+- Employee management  
+- HR chatbot  
 
-### 3. Chatbots (GenAI-powered)
-- HR policy bot  
+## Project Manager
+- Client requirements  
+- Updates  
+- Performance insights  
+- AI assistant for requirement refinement  
+
+## Employee
+- Dashboard  
+- Leave/Transfer/Reimbursement requests  
+- Learning recommendations  
 - Writing assistant  
-- Employee guidance bot  
-
-### 4. Project Allocation (AI-assisted)
-- Matches employee skills, history & availability  
-
-### 5. Requests System (Employee)
-- Leave  
-- Transfer  
-- Reimbursement  
-- Notes  
+- HR FAQ bot  
 
 ---
 
-## Contributors
-**Team 25 — September 2025 Batch**
-- Akbar Ali  
-- Deon Levon Dmello  
-- D Narendran  
-- Sampriti Raha  
-- Sayan Bhowmick  
-- Soham Chakraborty  
-- Telvin Varghese  
-- Tummala Naveen  
+# 👨‍💻 Contributors
+Team 25 — IIT Madras BS Degree Program
 
 ---
 
-## License
-This project is part of the **Software Engineering Course – IIT Madras Online Degree Program**.
+# 📄 License
+Academic project under IIT Madras BS Degree (Software Engineering).
