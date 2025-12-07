@@ -8,3 +8,5 @@ vectorstore.pkl
 chunks/
 faiss.index
 vectors.npz
+hr_vectors.pkl
+chunks_chatbot/
