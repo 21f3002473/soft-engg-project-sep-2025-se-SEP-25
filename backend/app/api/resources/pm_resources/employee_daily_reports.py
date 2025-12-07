@@ -7,16 +7,14 @@ import logging
 from datetime import datetime
 from typing import Optional
 
+from app.database import User, get_session
+from app.database.product_manager_models import EmployeeDailyReport
+from app.middleware import require_pm
+from app.tasks.requirement_tasks import generate_employee_daily_report
 from fastapi import Depends, HTTPException, Query
 from fastapi_restful.cbv import cbv
 from fastapi_restful.inferring_router import InferringRouter
-from sqlmodel import Session, select, desc
-
-from app.middleware import require_pm
-from app.database import get_session
-from app.database import User
-from app.database.product_manager_models import EmployeeDailyReport
-from app.tasks.requirement_tasks import generate_employee_daily_report
+from sqlmodel import Session, desc, select
 
 logger = logging.getLogger(__name__)
 

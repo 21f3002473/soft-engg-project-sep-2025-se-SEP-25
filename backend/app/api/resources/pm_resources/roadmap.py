@@ -2,19 +2,19 @@
 API Resource for project roadmap generation and retrieval.
 """
 
+import json
 from logging import getLogger
 from typing import Optional
-import json
 
+from app.core.agents.pm_agents.pm_roadmap_agent import get_pm_roadmap_agent
 from app.database import User, get_session
-from app.database.product_manager_models import RequirementRoadmap, Project, Client
+from app.database.product_manager_models import Client, Project, RequirementRoadmap
 from app.middleware import require_pm
 from app.tasks.requirement_tasks import generate_project_roadmap_task
-from app.core.agents.pm_agents.pm_roadmap_agent import get_pm_roadmap_agent
 from fastapi import Depends, HTTPException, Query
 from fastapi_restful import Resource
 from pydantic import BaseModel
-from sqlmodel import Session, select, desc
+from sqlmodel import Session, desc, select
 
 logger = getLogger(__name__)
 

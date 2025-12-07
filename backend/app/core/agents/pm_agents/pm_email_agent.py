@@ -5,26 +5,25 @@ This agent creates personalized progress update emails for clients
 using project updates, requirements status, and milestone information.
 """
 
-import logging
 import json
-from typing import Annotated, Dict, List, Optional, TypedDict
+import logging
 from datetime import datetime, timedelta
-
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.graph import StateGraph, END
+from typing import Annotated, Dict, List, Optional, TypedDict
 
 from app.config import Config
 from app.database.product_manager_models import (
-    Project,
     Client,
-    Update,
+    ClientProgressEmail,
+    Project,
     Requirement,
     StatusTypeEnum,
-    ClientProgressEmail,
+    Update,
 )
-from sqlmodel import Session, select, desc
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+from langgraph.graph import END, StateGraph
+from sqlmodel import Session, desc, select
 
 logger = logging.getLogger(__name__)
 

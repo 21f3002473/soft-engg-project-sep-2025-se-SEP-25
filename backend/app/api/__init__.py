@@ -25,10 +25,22 @@ from app.api.resources.pm_resources.clients import (
     ClientsResource,
     ClientUpdatesResource,
 )
+from app.api.resources.pm_resources.daily_reports import (
+    DailyReportDetailResource,
+    ProjectDailyReportsResource,
+)
 from app.api.resources.pm_resources.dashboard import PRDashboardResource
 from app.api.resources.pm_resources.employee import (
     EmployeePerformanceResource,
     EmployeesResource,
+)
+from app.api.resources.pm_resources.employee_daily_reports import (
+    EmployeeDailyReportsResource,
+    EmployeeReportDetailResource,
+)
+from app.api.resources.pm_resources.progress_emails import (
+    ProgressEmailDetailResource,
+    ProjectProgressEmailResource,
 )
 from app.api.resources.pm_resources.project import (
     ProjectsDashboardResource,
@@ -41,18 +53,6 @@ from app.api.resources.pm_resources.requirement_analysis import (
 from app.api.resources.pm_resources.roadmap import (
     ProjectRoadmapResource,
     RoadmapHistoryResource,
-)
-from app.api.resources.pm_resources.progress_emails import (
-    ProjectProgressEmailResource,
-    ProgressEmailDetailResource,
-)
-from app.api.resources.pm_resources.daily_reports import (
-    ProjectDailyReportsResource,
-    DailyReportDetailResource,
-)
-from app.api.resources.pm_resources.employee_daily_reports import (
-    EmployeeDailyReportsResource,
-    EmployeeReportDetailResource,
 )
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,

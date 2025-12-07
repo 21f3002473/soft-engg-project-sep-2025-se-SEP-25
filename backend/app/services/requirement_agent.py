@@ -1,12 +1,12 @@
 import logging
-from typing import Dict, List, Optional
 from datetime import datetime
+from typing import Dict, List, Optional
 
 from app.database import get_session
 from app.database.product_manager_models import (
-    Requirement,
-    Project,
     Client,
+    Project,
+    Requirement,
     StatusTypeEnum,
 )
 from sqlmodel import Session, select

@@ -6,25 +6,24 @@ Generates automated daily progress reports for projects with AI analysis.
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import TypedDict, Annotated, List, Dict, Any
-
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_groq import ChatGroq
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from sqlmodel import Session, select
+from typing import Annotated, Any, Dict, List, TypedDict
 
 from app.config import Config
 from app.database.connection import get_session
 from app.database.product_manager_models import (
-    Project,
     Client,
-    Update,
-    Requirement,
     EmpTodo,
+    Project,
     ProjectDailyReport,
+    Requirement,
     StatusTypeEnum,
+    Update,
 )
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
+from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
 

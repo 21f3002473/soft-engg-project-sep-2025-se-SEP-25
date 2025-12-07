@@ -1,20 +1,19 @@
 import logging
-from typing import Annotated, Dict, List, Optional, TypedDict
 from datetime import datetime
-
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.graph import StateGraph, END
-from langgraph.prebuilt import ToolNode
+from typing import Annotated, Dict, List, Optional, TypedDict
 
 from app.config import Config
 from app.database.product_manager_models import (
-    Requirement,
-    Project,
     Client,
+    Project,
+    Requirement,
     StatusTypeEnum,
 )
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+from langgraph.graph import END, StateGraph
+from langgraph.prebuilt import ToolNode
 from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)

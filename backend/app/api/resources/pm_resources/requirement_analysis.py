@@ -1,10 +1,10 @@
 from logging import getLogger
 from typing import Optional
 
+from app.core.agents.pm_agents.pm_requirements_agent import get_pm_requirements_agent
 from app.database import User, get_session
 from app.middleware import require_pm
 from app.tasks.requirement_tasks import analyze_project_requirements_ai
-from app.core.agents.pm_agents.pm_requirements_agent import get_pm_requirements_agent
 from fastapi import Depends, HTTPException, Query
 from fastapi_restful import Resource
 from pydantic import BaseModel

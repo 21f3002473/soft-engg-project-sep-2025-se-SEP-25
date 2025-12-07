@@ -4,20 +4,16 @@ Handles email generation, history retrieval, and sending operations.
 """
 
 import logging
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 from app.database import User, get_session
-from app.database.product_manager_models import (
-    ClientProgressEmail,
-    Project,
-    Client,
-)
+from app.database.product_manager_models import Client, ClientProgressEmail, Project
 from app.middleware import require_pm
 from app.tasks.requirement_tasks import generate_progress_email_task
 from fastapi import Depends, HTTPException, Query
 from fastapi_restful import Resource
-from sqlmodel import Session, select, desc
+from sqlmodel import Session, desc, select
 
 logger = logging.getLogger(__name__)
 

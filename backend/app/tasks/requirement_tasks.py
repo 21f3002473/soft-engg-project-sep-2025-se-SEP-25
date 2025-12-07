@@ -1,12 +1,13 @@
 import logging
 from datetime import datetime
+
 from app.celery_app import celery_app
-from app.database import get_session
+from app.core.agents.pm_agents.employee_report_agent import EmployeePerformanceAgent
+from app.core.agents.pm_agents.pm_daily_report_agent import PMDailyReportAgent
+from app.core.agents.pm_agents.pm_email_agent import get_pm_email_agent
 from app.core.agents.pm_agents.pm_requirements_agent import get_pm_requirements_agent
 from app.core.agents.pm_agents.pm_roadmap_agent import get_pm_roadmap_agent
-from app.core.agents.pm_agents.pm_email_agent import get_pm_email_agent
-from app.core.agents.pm_agents.pm_daily_report_agent import PMDailyReportAgent
-from app.core.agents.pm_agents.employee_report_agent import EmployeePerformanceAgent
+from app.database import get_session
 from app.tasks.email_tasks import send_email_task
 
 logger = logging.getLogger(__name__)
@@ -651,7 +652,7 @@ def generate_daily_project_report(
         auto_send: Whether to send report via email
         report_date: Date for the report (defaults to today)
     """
-    from app.database.product_manager_models import ProjectDailyReport, Client
+    from app.database.product_manager_models import Client, ProjectDailyReport
     from sqlmodel import select
 
     try:
@@ -750,8 +751,8 @@ def generate_employee_daily_report(
         auto_send: Whether to send report via email
         report_date: Date for the report (defaults to today)
     """
-    from app.database.product_manager_models import EmployeeDailyReport
     from app.database.employee_models import User
+    from app.database.product_manager_models import EmployeeDailyReport
     from sqlmodel import select
 
     try:

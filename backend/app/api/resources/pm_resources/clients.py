@@ -6,14 +6,14 @@ from app.database.product_manager_models import (
     Client,
     Project,
     Requirement,
-    Update,
     StatusTypeEnum,
+    Update,
 )
 from app.middleware import require_pm
 from app.tasks.requirement_tasks import (
     analyze_project_requirements_ai,
-    generate_project_roadmap_task,
     generate_progress_email_task,
+    generate_project_roadmap_task,
 )
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
