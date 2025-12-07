@@ -22,34 +22,28 @@ logger = logging.getLogger(__name__)
 class TeamAllocationState(TypedDict):
     """State for the team allocation workflow"""
 
-    
     project_id: int
     project_description: str
     team_size_hint: int
     required_skills_hint: List[str]
     auto_assign: bool
 
-    
     required_skills: List[Dict[str, Any]]
     required_roles: List[str]
     complexity_score: float
     estimated_duration_weeks: int
     experience_level_needed: Dict[str, Any]
 
-    
     available_employees: List[Dict[str, Any]]
     employee_skills: Dict[int, List[Dict[str, Any]]]
     employee_availability: Dict[int, Dict[str, Any]]
 
-    
     active_policies: List[Dict[str, Any]]
     policy_constraints: Dict[str, Any]
 
-    
     recommendations: List[Dict[str, Any]]
     ranked_candidates: List[Dict[str, Any]]
 
-    
     final_recommendations: List[Dict[str, Any]]
     reasoning: str
     success: bool
@@ -73,7 +67,6 @@ class TeamAllocationAgent:
 
         workflow = StateGraph(TeamAllocationState)
 
-        
         workflow.add_node("analyze_project", self.analyze_project_requirements)
         workflow.add_node("fetch_employees", self.fetch_available_employees)
         workflow.add_node("fetch_policies", self.fetch_allocation_policies)
@@ -82,7 +75,6 @@ class TeamAllocationAgent:
         workflow.add_node("rank_recommendations", self.rank_and_select_recommendations)
         workflow.add_node("generate_reasoning", self.generate_explainable_reasoning)
 
-        
         workflow.set_entry_point("analyze_project")
         workflow.add_edge("analyze_project", "fetch_employees")
         workflow.add_edge("fetch_employees", "fetch_policies")
@@ -101,7 +93,7 @@ class TeamAllocationAgent:
         )
 
         try:
-            
+
             from app.database.product_manager_models import Project
 
             project = self.session.exec(
@@ -118,7 +110,6 @@ class TeamAllocationAgent:
                 "project_description", ""
             )
 
-            
             system_prompt = """You are an expert project analyst. Analyze the project description and extract:
 1. Required technical skills with proficiency levels (beginner/intermediate/advanced/expert)
 2. Required roles (e.g., frontend dev, backend dev, QA, DevOps, UI/UX)
@@ -160,7 +151,6 @@ Analyze this project and extract requirements."""
             response = self.llm.invoke(messages)
             content = response.content
 
-            
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             elif "```" in content:
@@ -168,7 +158,6 @@ Analyze this project and extract requirements."""
 
             analysis = json.loads(content)
 
-            
             state["required_skills"] = analysis.get("required_skills", [])
             state["required_roles"] = analysis.get("required_roles", [])
             state["complexity_score"] = analysis.get("complexity_score", 50)
@@ -179,7 +168,6 @@ Analyze this project and extract requirements."""
                 "experience_level_needed", {}
             )
 
-            
             from app.database.product_manager_models import ProjectRequirementAnalysis
 
             analysis_record = ProjectRequirementAnalysis(
@@ -217,7 +205,6 @@ Analyze this project and extract requirements."""
                 EmployeeSkill,
             )
 
-            
             employees = self.session.exec(
                 select(User).where(User.role == RoleEnum.EMPLOYEE)
             ).all()
@@ -227,7 +214,7 @@ Analyze this project and extract requirements."""
             employee_availability = {}
 
             for emp in employees:
-                
+
                 skills = self.session.exec(
                     select(EmployeeSkill).where(EmployeeSkill.employee_id == emp.id)
                 ).all()
@@ -242,7 +229,6 @@ Analyze this project and extract requirements."""
                     for s in skills
                 ]
 
-                
                 availability = self.session.exec(
                     select(EmployeeAvailability).where(
                         EmployeeAvailability.employee_id == emp.id
@@ -266,7 +252,7 @@ Analyze this project and extract requirements."""
                         ),
                     }
                 else:
-                    
+
                     employee_availability[emp.id] = {
                         "is_available": True,
                         "current_projects": 0,
@@ -322,7 +308,6 @@ Analyze this project and extract requirements."""
                     }
                 )
 
-                
                 if policy.policy_type.value not in policy_constraints:
                     policy_constraints[policy.policy_type.value] = []
                 policy_constraints[policy.policy_type.value].append(config)
@@ -354,23 +339,18 @@ Analyze this project and extract requirements."""
                 emp_skills_list = employee_skills.get(emp_id, [])
                 emp_avail = employee_availability.get(emp_id, {})
 
-                
                 skill_match_score = self._calculate_skill_match(
                     required_skills, emp_skills_list
                 )
 
-                
                 availability_score = self._calculate_availability_score(emp_avail)
 
-                
                 experience_match_score = self._calculate_experience_match(
                     state.get("experience_level_needed", {}), emp_skills_list
                 )
 
-                
                 workload_score = 100 - emp_avail.get("utilization", 0)
 
-                
                 match_score = (
                     skill_match_score * 0.40
                     + experience_match_score * 0.25
@@ -394,7 +374,6 @@ Analyze this project and extract requirements."""
 
                 ranked_candidates.append(candidate)
 
-            
             ranked_candidates.sort(key=lambda x: x["match_score"], reverse=True)
 
             state["ranked_candidates"] = ranked_candidates
@@ -422,14 +401,12 @@ Analyze this project and extract requirements."""
             req_proficiency = req_skill.get("proficiency", "intermediate").lower()
             importance = req_skill.get("importance", "medium")
 
-            
             importance_weight = {"critical": 3, "high": 2, "medium": 1, "low": 0.5}.get(
                 importance, 1
             )
 
             max_possible_score += 4 * importance_weight
 
-            
             for emp_skill in employee_skills:
                 emp_skill_name = emp_skill.get("skill", "").lower()
                 if req_skill_name in emp_skill_name or emp_skill_name in req_skill_name:
@@ -437,7 +414,6 @@ Analyze this project and extract requirements."""
                     req_level = proficiency_map.get(req_proficiency, 2)
                     emp_level = proficiency_map.get(emp_proficiency, 1)
 
-                    
                     if emp_level >= req_level:
                         total_score += 4 * importance_weight
                     elif emp_level == req_level - 1:
@@ -475,7 +451,6 @@ Analyze this project and extract requirements."""
         if not required_exp or not employee_skills:
             return 50.0
 
-        
         total_years = sum(s.get("years", 0) for s in employee_skills)
         avg_years = total_years / len(employee_skills) if employee_skills else 0
 
@@ -521,7 +496,6 @@ Analyze this project and extract requirements."""
                 violations = []
                 compliance_score = 100.0
 
-                
                 max_projects_policies = policy_constraints.get(
                     "max_projects_per_employee", []
                 )
@@ -533,7 +507,6 @@ Analyze this project and extract requirements."""
                         )
                         compliance_score -= 50
 
-                
                 max_workload_policies = policy_constraints.get("max_workload_hours", [])
                 for policy in max_workload_policies:
                     max_hours = policy.get("max_hours_per_week", 40)
@@ -544,7 +517,6 @@ Analyze this project and extract requirements."""
                 candidate["policy_violations"] = violations
                 candidate["policy_compliance_score"] = max(0, compliance_score)
 
-                
                 if compliance_score >= 30:
                     filtered_candidates.append(candidate)
 
@@ -567,22 +539,19 @@ Analyze this project and extract requirements."""
             team_size_hint = state.get("team_size_hint", 3)
             required_roles = state.get("required_roles", [])
 
-            
             for candidate in ranked_candidates:
                 policy_score = candidate.get("policy_compliance_score", 100)
                 original_score = candidate.get("match_score", 0)
-                
+
                 candidate["final_score"] = (original_score * 0.7) + (policy_score * 0.3)
 
-            
             ranked_candidates.sort(key=lambda x: x["final_score"], reverse=True)
 
-            
             num_to_recommend = min(len(ranked_candidates), max(team_size_hint, 5))
             final_recommendations = ranked_candidates[:num_to_recommend]
 
             state["final_recommendations"] = final_recommendations
-            state["recommendations"] = final_recommendations  
+            state["recommendations"] = final_recommendations
 
             logger.info(f"Selected {len(final_recommendations)} final recommendations")
             return state
@@ -600,7 +569,6 @@ Analyze this project and extract requirements."""
             required_skills = state.get("required_skills", [])
             required_roles = state.get("required_roles", [])
 
-            
             system_prompt = """You are an AI team allocation assistant. Generate a clear, 
 concise explanation for why these employees were recommended for the project.
 
@@ -646,7 +614,7 @@ Provide a brief explanation for these recommendations."""
 
         except Exception as e:
             logger.error(f"Error generating reasoning: {str(e)}", exc_info=True)
-            
+
             state["reasoning"] = (
                 "Recommendations generated based on skill matching and availability."
             )
@@ -696,7 +664,6 @@ Provide a brief explanation for these recommendations."""
                     "error": final_state.get("error", "Unknown error occurred"),
                 }
 
-            
             from app.database.product_manager_models import AllocationRecommendation
 
             recommendations_saved = []
