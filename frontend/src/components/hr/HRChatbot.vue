@@ -102,7 +102,6 @@ export default {
       this.isTyping = true;
 
       try {
-        //const response = await make_postrequest('/api/hr/assistant', { question: userText });
         const response = await make_postrequest('/api/hr/chatbot', { question: userText });
         
         this.isTyping = false;

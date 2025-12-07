@@ -1,10 +1,8 @@
 <template>
   <div class="policies-content container-fluid">
 
-    <!-- ROW 1 — PDF + POLICIES PANEL (Same Height) -->
     <div class="row g-4 align-items-stretch">
 
-      <!-- LEFT PDF VIEWER -->
       <div class="col-12 col-md-6 d-flex">
         <div class="card flex-fill border-0 shadow-sm rounded-3">
           <div class="card-body p-0">
@@ -22,7 +20,6 @@
         </div>
       </div>
 
-      <!-- RIGHT POLICY MANAGEMENT -->
       <div class="col-12 col-md-6 d-flex">
         <div class="card flex-fill border-0 shadow-sm rounded-3">
 
@@ -32,7 +29,6 @@
 
           <div class="card-body d-flex flex-column gap-2">
 
-            <!-- POLICY BUTTONS -->
             <div class="d-flex gap-2 flex-wrap">
               <button
                 v-for="policy in policies"
@@ -44,7 +40,6 @@
               </button>
             </div>
 
-            <!-- CREATE NEW POLICY -->
             <div v-if="isHR" class="mt-3 border p-3 rounded">
               <h6>Create New Policy</h6>
               <input
@@ -61,7 +56,6 @@
               <button class="btn btn-primary" @click="addPolicy">Add Policy</button>
             </div>
 
-            <!-- SELECTED POLICY -->
             <div
               v-if="selectedPolicy"
               class="mt-3 p-3 border rounded bg-light"
@@ -95,7 +89,6 @@
 
     </div>
 
-    <!-- ROW 2 — CHATBOT BELOW -->
     <div class="row mt-4">
       <div class="col-12">
         <div class="chat-card card border-0 shadow-sm rounded-3">
@@ -104,7 +97,6 @@
             HR Policies — Ask Here
           </div>
 
-          <!-- CHAT BODY -->
           <div
             ref="chatBody"
             class="chat-body p-3 flex-grow-1 d-flex flex-column"
