@@ -60,83 +60,124 @@
 
       <!-- Requirements and Chat -->
       <div class="col-lg-9 col-md-8">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-primary text-white">
-            <h3 class="h5 mb-0">
-              <i class="bi bi-list-check me-2"></i>
-              Client Requirements
-            </h3>
-          </div>
-          <div class="card-body">
-            <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
-              
-              <!-- Requirements List -->
-              <div class="flex-md-shrink-0" style="min-width: 320px; max-width: 400px;">
-                <div class="alert alert-light border mb-0" style="max-height: 500px; overflow-y: auto;">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link active" 
+              id="requirements-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#requirements-content" 
+              type="button" 
+              role="tab"
+            >
+              <i class="bi bi-list-check me-1"></i>
+              Requirements & Chat
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link" 
+              id="roadmap-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#roadmap-content" 
+              type="button" 
+              role="tab"
+            >
+              <i class="bi bi-map me-1"></i>
+              Project Roadmap
+            </button>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Requirements & Chat Tab -->
+          <div 
+            class="tab-pane fade show active" 
+            id="requirements-content" 
+            role="tabpanel"
+          >
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">
+                  <i class="bi bi-list-check me-2"></i>
+                  Client Requirements
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="requirements-wrapper">
                   <h6 class="text-primary mb-3">
                     <i class="bi bi-clipboard-check me-2"></i>
                     Requirements List
                   </h6>
                   
-                  <div v-if="requirements.length === 0" class="text-center text-muted py-3">
+                  <div v-if="requirements.length === 0" class="text-center text-muted py-5">
                     <i class="bi bi-inbox fs-1"></i>
                     <p class="mb-0 mt-2">No requirements available</p>
                   </div>
 
-                  <ul v-else class="list-group list-group-flush">
-                    <li 
+                  <div v-else class="row g-3">
+                    <div 
                       v-for="req in requirements" 
                       :key="req.id"
-                      class="list-group-item px-0 py-3 requirement-item"
+                      class="col-12 col-md-6 col-lg-4 col-xl-3"
                     >
-                      <div class="d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
+                      <div class="requirement-card">
+                        <div class="requirement-header">
                           <span class="badge bg-secondary">{{ req.requirement_id }}</span>
-                          <div class="d-flex gap-2">
-                            <span :class="getStatusBadgeClass(req.status)">
-                              {{ formatStatus(req.status) }}
-                            </span>
-                            <div class="d-flex gap-1">
-                              <button 
-                                class="btn btn-sm btn-outline-primary" 
-                                @click="editRequirement(req)"
-                                title="Edit"
-                              >
-                                <i class="bi bi-pencil"></i>
-                              </button>
-                              <button 
-                                class="btn btn-sm btn-outline-danger" 
-                                @click="confirmDeleteRequirement(req)"
-                                title="Delete"
-                              >
-                                <i class="bi bi-trash"></i>
-                              </button>
-                            </div>
-                          </div>
+                          <span :class="getStatusBadgeClass(req.status)">
+                            {{ formatStatus(req.status) }}
+                          </span>
                         </div>
-                        <p class="mb-2 requirement-description">{{ req.description }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                          <small class="text-muted">
+                        
+                        <div class="requirement-body">
+                          <p class="requirement-description">{{ req.description }}</p>
+                          <small class="text-muted d-block">
                             <i class="bi bi-diagram-3 me-1"></i>
                             {{ req.project_name || req.project_id }}
                           </small>
                         </div>
+                        
+                        <div class="requirement-actions">
+                          <button 
+                            class="btn btn-sm btn-outline-primary" 
+                            @click="editRequirement(req)"
+                            title="Edit Status"
+                          >
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            @click="confirmDeleteRequirement(req)"
+                            title="Delete"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
                       </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- AI Chatbot -->
-              <div class="flex-fill border rounded p-3 bg-light" style="min-height: 500px;">
-                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                  <i class="bi bi-robot text-primary me-2 fs-5"></i>
-                  <h5 class="mb-0">AI Assistant</h5>
-                  <span class="badge bg-success ms-auto">Online</span>
-                </div>
-                <ProductMangerChatbot :clientId="clientId" :clientName="clientData?.client_name" />
-              </div>
-
+          <!-- Roadmap Tab -->
+          <div 
+            class="tab-pane fade" 
+            id="roadmap-content" 
+            role="tabpanel"
+          >
+            <div v-if="clientData && requirements.length > 0">
+              <ProductManagerRoadmap 
+                :projectId="getProjectId()"
+                :clientId="clientId"
+              />
+            </div>
+            <div v-else class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Add requirements first to generate a project roadmap.
             </div>
           </div>
         </div>
@@ -268,7 +309,8 @@
 </template>
 
 <script>
-import ProductMangerChatbot from './fragments/ProductMangerChatbot.vue';
+// import ProductMangerChatbot from './fragments/ProductMangerChatbot.vue';
+import ProductManagerRoadmap from './fragments/ProductManagerRoadmap.vue';
 import AddRequirementModal from './fragments/AddRequirementModal.vue';
 import { make_getrequest, make_putrequest, make_deleterequest } from '@/store/appState';
 import { Modal } from 'bootstrap';
@@ -282,7 +324,8 @@ export default {
     }
   },
   components: {
-    ProductMangerChatbot,
+    // ProductMangerChatbot,
+    ProductManagerRoadmap,
     AddRequirementModal
   },
   data() {
@@ -466,6 +509,13 @@ export default {
       console.log('New requirement created:', newRequirement);
       // Refresh the requirements list
       this.fetchClientDetails();
+    },
+    getProjectId() {
+      // Get project_id from the first requirement if available
+      if (this.requirements && this.requirements.length > 0) {
+        return this.requirements[0].project_id;
+      }
+      return null;
     }
   },
   mounted() {
@@ -481,48 +531,59 @@ export default {
 </script>
 
 <style scoped>
-/* Custom scrollbar for requirements list */
-.alert.alert-light::-webkit-scrollbar {
-  width: 6px;
+.requirements-wrapper {
+  padding: 1rem;
 }
 
-.alert.alert-light::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+.requirement-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  border-left: 4px solid #dee2e6;
 }
 
-.alert.alert-light::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-.alert.alert-light::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-.list-group-item {
-  transition: background-color 0.2s ease;
-}
-
-.list-group-item:hover {
-  background-color: #f8f9fa;
-}
-
-.requirement-item {
-  transition: all 0.2s ease;
-  border-left: 3px solid transparent;
-}
-
-.requirement-item:hover {
-  background-color: #f8f9fa;
+.requirement-card:hover {
   border-left-color: #0d6efd;
-  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.requirement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.requirement-body {
+  flex-grow: 1;
+  margin-bottom: 0.75rem;
 }
 
 .requirement-description {
   font-size: 0.9rem;
   line-height: 1.5;
   color: #495057;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.requirement-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e9ecef;
 }
 
 .badge {
@@ -537,13 +598,8 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .card-body .border.rounded {
-    min-height: 300px;
-  }
-  
-  .flex-md-shrink-0 {
-    min-width: 100% !important;
-    max-width: 100% !important;
+  .requirement-card {
+    margin-bottom: 1rem;
   }
 }
 </style>

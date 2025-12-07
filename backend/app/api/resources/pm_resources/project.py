@@ -94,7 +94,6 @@ class ProjectsResource(Resource):
         try:
             logger.info(f"Fetching projects by {current_user.email}")
 
-            # Query projects, filter by client_id if provided
             if id_client is not None:
                 statement = select(Project).where(Project.client_id == id_client)
             else:
@@ -102,7 +101,6 @@ class ProjectsResource(Resource):
 
             projects = session.exec(statement).all()
 
-            # Format project data
             project_list = [
                 {
                     "id": project.id,
@@ -168,21 +166,18 @@ class ProjectsResource(Resource):
         try:
             logger.info(f"Creating project by {current_user.email}")
 
-            # Check if project_id already exists
             existing = session.exec(
                 select(Project).where(Project.project_id == data.project_id)
             ).first()
             if existing:
                 raise HTTPException(status_code=400, detail="Project ID already exists")
 
-            # Verify client exists
             client = session.exec(
                 select(Client).where(Client.id == data.client_id)
             ).first()
             if not client:
                 raise HTTPException(status_code=404, detail="Client not found")
 
-            # Verify manager exists if provided
             if data.manager_id:
                 manager = session.exec(
                     select(User).where(User.id == data.manager_id)
@@ -190,7 +185,6 @@ class ProjectsResource(Resource):
                 if not manager:
                     raise HTTPException(status_code=404, detail="Manager not found")
 
-            # Create new project
             new_project = Project(
                 project_id=data.project_id,
                 project_name=data.project_name,
@@ -264,7 +258,6 @@ class ProjectsResource(Resource):
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Update fields if provided
             if data.project_name is not None:
                 project.project_name = data.project_name
             if data.description is not None:
@@ -272,7 +265,7 @@ class ProjectsResource(Resource):
             if data.status is not None:
                 project.status = data.status
             if data.manager_id is not None:
-                # Verify manager exists
+
                 manager = session.exec(
                     select(User).where(User.id == data.manager_id)
                 ).first()
@@ -284,7 +277,6 @@ class ProjectsResource(Resource):
             session.commit()
             session.refresh(project)
 
-            # Get associated client for response
             client = session.exec(
                 select(Client).where(Client.id == project.client_id)
             ).first()
@@ -354,7 +346,6 @@ class ProjectsResource(Resource):
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Store project info before deletion for response
             deleted_project_id = project.project_id
             deleted_id = project.id
 
@@ -422,14 +413,12 @@ class ProjectsDashboardResource(Resource):
         try:
             logger.info(f"Fetching project dashboard data by {current_user.email}")
 
-            # Query all projects with their associated clients
             statement = select(Project)
             projects = session.exec(statement).all()
 
-            # Format project data with client and requirements count
             project_list = []
             for project in projects:
-                # Get associated client
+
                 client = session.exec(
                     select(Client).where(Client.id == project.client_id)
                 ).first()
@@ -506,19 +495,16 @@ class ProjectViewResource(Resource):
         try:
             logger.info(f"Fetching project {project_id} data by {current_user.email}")
 
-            # Query the project by ID
             project = session.exec(
                 select(Project).where(Project.id == project_id)
             ).first()
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Get associated client
             client = session.exec(
                 select(Client).where(Client.id == project.client_id)
             ).first()
 
-            # Get requirements for this project
             requirements = session.exec(
                 select(Requirement).where(Requirement.project_id == project.id)
             ).all()
@@ -534,7 +520,6 @@ class ProjectViewResource(Resource):
                 for req in requirements
             ]
 
-            # Get updates for this project
             updates = session.exec(
                 select(Update).where(Update.project_id == project.id)
             ).all()
@@ -622,7 +607,6 @@ class ProjectViewResource(Resource):
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Update fields if provided
             if data.project_name is not None:
                 project.project_name = data.project_name
             if data.description is not None:
@@ -630,7 +614,7 @@ class ProjectViewResource(Resource):
             if data.status is not None:
                 project.status = data.status
             if data.manager_id is not None:
-                # Verify manager exists
+
                 manager = session.exec(
                     select(User).where(User.id == data.manager_id)
                 ).first()
@@ -642,7 +626,6 @@ class ProjectViewResource(Resource):
             session.commit()
             session.refresh(project)
 
-            # Get associated data for response
             client = session.exec(
                 select(Client).where(Client.id == project.client_id)
             ).first()
@@ -762,7 +745,6 @@ class ProjectViewResource(Resource):
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Count associated data before deletion
             requirements_count = len(
                 session.exec(
                     select(Requirement).where(Requirement.project_id == project.id)
@@ -774,25 +756,21 @@ class ProjectViewResource(Resource):
                 ).all()
             )
 
-            # Store project info before deletion for response
             deleted_project_id = project.project_id
             deleted_id = project.id
 
-            # Delete associated requirements
             requirements = session.exec(
                 select(Requirement).where(Requirement.project_id == project.id)
             ).all()
             for req in requirements:
                 session.delete(req)
 
-            # Delete associated updates
             updates = session.exec(
                 select(Update).where(Update.project_id == project.id)
             ).all()
             for update in updates:
                 session.delete(update)
 
-            # Delete the project
             session.delete(project)
             session.commit()
 

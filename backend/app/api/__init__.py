@@ -35,7 +35,25 @@ from app.api.resources.pm_resources.project import (
     ProjectsResource,
     ProjectViewResource,
 )
-from app.api.resources.pm_resources.requirement_analysis import RequirementAnalysisResource
+from app.api.resources.pm_resources.requirement_analysis import (
+    RequirementAnalysisResource,
+)
+from app.api.resources.pm_resources.roadmap import (
+    ProjectRoadmapResource,
+    RoadmapHistoryResource,
+)
+from app.api.resources.pm_resources.progress_emails import (
+    ProjectProgressEmailResource,
+    ProgressEmailDetailResource,
+)
+from app.api.resources.pm_resources.daily_reports import (
+    ProjectDailyReportsResource,
+    DailyReportDetailResource,
+)
+from app.api.resources.pm_resources.employee_daily_reports import (
+    EmployeeDailyReportsResource,
+    EmployeeReportDetailResource,
+)
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -103,7 +121,7 @@ class API:
             ClientRequirementResource,
             f"{pm_base_url}/client/requirements/{{client_id}}",
         )
-        
+
         # Client requirements - update and delete specific requirement
         self.register_router(
             ClientRequirementResource,
@@ -122,10 +140,11 @@ class API:
         self.register_router(
             ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
         )
-        
+
         # Client updates - update and delete specific update
         self.register_router(
-            ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}/{{update_id}}",
+            ClientUpdatesResource,
+            f"{pm_base_url}/client/updates/{{client_id}}/{{update_id}}",
         )
 
         self.register_router(EmployeesResource, f"{pm_base_url}/employees")
@@ -134,6 +153,50 @@ class API:
             f"{pm_base_url}/employee/performance/{{employee_id}}",
         )
         self.register_router(ProjectsResource, f"{pm_base_url}/projects")
+
+        # Requirement Analysis
+        self.register_router(
+            RequirementAnalysisResource,
+            f"{pm_base_url}/project/{{project_id}}/analysis",
+        )
+
+        # Project Roadmap
+        self.register_router(
+            ProjectRoadmapResource,
+            f"{pm_base_url}/project/{{project_id}}/client/{{client_id}}/roadmap",
+        )
+        self.register_router(
+            RoadmapHistoryResource,
+            f"{pm_base_url}/project/{{project_id}}/client/{{client_id}}/roadmap/history",
+        )
+
+        # Progress Emails
+        self.register_router(
+            ProjectProgressEmailResource,
+            f"{pm_base_url}/project/{{project_id}}/progress-emails",
+        )
+        self.register_router(
+            ProgressEmailDetailResource, f"{pm_base_url}/progress-emails/{{email_id}}"
+        )
+
+        # Daily Reports
+        self.register_router(
+            ProjectDailyReportsResource,
+            f"{pm_base_url}/project/{{project_id}}/daily-reports",
+        )
+        self.register_router(
+            DailyReportDetailResource, f"{pm_base_url}/daily-reports/{{report_id}}"
+        )
+
+        # Employee Daily Reports
+        self.register_router(
+            EmployeeDailyReportsResource,
+            f"{pm_base_url}/employee/{{employee_id}}/daily-reports",
+        )
+        self.register_router(
+            EmployeeReportDetailResource,
+            f"{pm_base_url}/employee-reports/{{report_id}}",
+        )
 
         # Employee
         emp_base_url = "/api/employee"

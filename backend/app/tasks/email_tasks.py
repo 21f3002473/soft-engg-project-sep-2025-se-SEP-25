@@ -42,7 +42,6 @@ def send_email_task(
 
     except Exception as e:
         logger.error(f"Error sending email: {str(e)}", exc_info=True)
-        # Retry with exponential backoff
         raise self.retry(exc=e, countdown=60 * (2**self.request.retries))
 
 

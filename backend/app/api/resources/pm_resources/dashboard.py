@@ -73,11 +73,9 @@ class PRDashboardResource(Resource):
         try:
             logger.info(f"Dashboard accessed by: {current_user.email}")
 
-            # Query clients from database
             statement = select(Client)
             clients = session.exec(statement).all()
 
-            # Format client data
             client_list = [
                 {
                     "id": client.id,
@@ -87,11 +85,9 @@ class PRDashboardResource(Resource):
                 for client in clients
             ]
 
-            # Query projects from database
             project_statement = select(Project)
             projects = session.exec(project_statement).all()
 
-            # Format project data
             project_list = [
                 {
                     "id": project.id,
@@ -105,7 +101,6 @@ class PRDashboardResource(Resource):
                 for project in projects
             ]
 
-            # Calculate project statistics
             total_projects = len(projects)
             active_projects = sum(
                 1 for p in projects if p.status == StatusTypeEnum.IN_PROGRESS
@@ -152,7 +147,7 @@ class PRDashboardResource(Resource):
     ):
         """PM Dashboard this is api is to create new clients"""
         try:
-            # Check if client_id already exists
+
             existing = session.exec(
                 select(Client).where(Client.client_id == client.client_id)
             ).first()

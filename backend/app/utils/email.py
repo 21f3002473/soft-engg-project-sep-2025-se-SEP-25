@@ -49,12 +49,11 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            # Create message
+
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
             msg["From"] = f"{self.from_name} <{self.from_email}>"
 
-            # Handle single or multiple recipients
             if isinstance(to_email, str):
                 to_email = [to_email]
             msg["To"] = ", ".join(to_email)
@@ -62,25 +61,20 @@ class EmailService:
             if cc:
                 msg["Cc"] = ", ".join(cc)
 
-            # Attach plain text part
             text_part = MIMEText(body, "plain", "utf-8")
             msg.attach(text_part)
 
-            # Attach HTML part if provided
             if html_body:
                 html_part = MIMEText(html_body, "html", "utf-8")
                 msg.attach(html_part)
 
-            # Combine all recipients
             all_recipients = to_email + (cc or []) + (bcc or [])
 
-            # Connect to MailHog SMTP server
             with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
-                # MailHog doesn't require authentication, but we support it
+
                 if self.smtp_user and self.smtp_password:
                     server.login(self.smtp_user, self.smtp_password)
 
-                # Send email
                 server.send_message(msg, self.from_email, all_recipients)
 
             logger.info(f"Email sent successfully to {to_email}")

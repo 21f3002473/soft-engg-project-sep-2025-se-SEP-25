@@ -33,11 +33,9 @@ class EmployeesResource(Resource):
         try:
             logger.info(f"Fetching all employees by {current_user.email}")
 
-            # Query all users (employees)
             statement = select(User).where(User.role == "employee")
             employees = session.exec(statement).all()
 
-            # Format employee data
             employee_list = [
                 {
                     "id": emp.id,
@@ -89,18 +87,15 @@ class EmployeePerformanceResource(Resource):
                 f"Fetching performance for employee {employee_id} by {current_user.email}"
             )
 
-            # Query employee
             employee_statement = select(User).where(User.id == employee_id)
             employee = session.exec(employee_statement).first()
 
             if not employee:
                 raise HTTPException(status_code=404, detail="Employee not found")
 
-            # Query employee todos/tasks
             todo_statement = select(EmpTodo).where(EmpTodo.user_id == employee_id)
             todos = session.exec(todo_statement).all()
 
-            # Calculate current stats
             total_tasks = len(todos)
             completed_tasks = sum(
                 1 for t in todos if t.status == StatusTypeEnum.COMPLETED
@@ -110,7 +105,6 @@ class EmployeePerformanceResource(Resource):
             )
             pending_tasks = total_tasks - completed_tasks - in_progress_tasks
 
-            # Calculate percentages for pie chart
             completed_percentage = (
                 (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
             )
@@ -121,7 +115,6 @@ class EmployeePerformanceResource(Resource):
                 (pending_tasks / total_tasks * 100) if total_tasks > 0 else 0
             )
 
-            # Mock performance trend data (you can replace this with actual data from database)
             performance_trends = [
                 {"month": "Jan", "score": 65},
                 {"month": "Feb", "score": 72},

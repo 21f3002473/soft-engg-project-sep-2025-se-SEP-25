@@ -2,9 +2,19 @@ from logging import getLogger
 from typing import Optional
 
 from app.database import User, get_session
-from app.database.product_manager_models import Client, Project, Requirement, Update, StatusTypeEnum
+from app.database.product_manager_models import (
+    Client,
+    Project,
+    Requirement,
+    Update,
+    StatusTypeEnum,
+)
 from app.middleware import require_pm
-from app.tasks.requirement_tasks import analyze_project_requirements_ai
+from app.tasks.requirement_tasks import (
+    analyze_project_requirements_ai,
+    generate_project_roadmap_task,
+    generate_progress_email_task,
+)
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from pydantic import BaseModel
@@ -30,13 +40,13 @@ class ClientUpdateModel(BaseModel):
 class RequirementCreateModel(BaseModel):
     requirement_id: str
     requirements: str
-    project_id: str  # Changed to str to accept project_id like "PRJ001"
+    project_id: str
 
 
 class RequirementUpdateModel(BaseModel):
     requirements: Optional[str] = None
-    project_id: Optional[str] = None  # Changed to str
-    status: Optional[StatusTypeEnum] = None  # Added status field
+    project_id: Optional[str] = None
+    status: Optional[StatusTypeEnum] = None
 
 
 class UpdateCreateModel(BaseModel):
@@ -298,14 +308,16 @@ class ClientRequirementResource(Resource):
                 project = session.exec(
                     select(Project).where(Project.id == req.project_id)
                 ).first()
-                requirement_list.append({
-                    "id": req.id,
-                    "requirement_id": req.requirement_id,
-                    "description": req.requirements,
-                    "project_id": req.project_id,
-                    "project_name": project.project_name if project else None,
-                    "status": req.status,
-                })
+                requirement_list.append(
+                    {
+                        "id": req.id,
+                        "requirement_id": req.requirement_id,
+                        "description": req.requirements,
+                        "project_id": req.project_id,
+                        "project_name": project.project_name if project else None,
+                        "status": req.status,
+                    }
+                )
 
             return {
                 "message": "Requirements retrieved successfully",
@@ -354,7 +366,6 @@ class ClientRequirementResource(Resource):
                     status_code=400, detail="Requirement ID already exists"
                 )
 
-            # Find project by project_id (string) to get the actual id (int)
             project = session.exec(
                 select(Project).where(Project.project_id == data.project_id)
             ).first()
@@ -371,16 +382,25 @@ class ClientRequirementResource(Resource):
             session.commit()
             session.refresh(new_requirement)
 
-            # Trigger AI-powered async analysis
             logger.info(f"Triggering AI analysis for project {project.id}")
             analyze_project_requirements_ai.delay(
                 project_id=project.id,
                 new_requirement_id=new_requirement.id,
-                notify_email=current_user.email
+                notify_email=current_user.email,
+            )
+
+            logger.info(
+                f"Triggering roadmap generation for project {project.id}, client {client_id}"
+            )
+            generate_project_roadmap_task.delay(
+                project_id=project.id,
+                client_id=client_id,
+                trigger_type="requirement_added",
+                notify_email=current_user.email,
             )
 
             return {
-                "message": "Requirement created successfully. AI analysis report will be sent to your email.",
+                "message": "Requirement created successfully. AI analysis and roadmap will be sent to your email.",
                 "data": {
                     "id": new_requirement.id,
                     "requirement_id": new_requirement.requirement_id,
@@ -418,12 +438,11 @@ class ClientRequirementResource(Resource):
             if not requirement:
                 raise HTTPException(status_code=404, detail="Requirement not found")
 
-            # Track if status changed
             status_changed = False
             if data.status is not None and data.status != requirement.status:
                 status_changed = True
                 requirement.status = data.status
-            
+
             if data.requirements is not None:
                 requirement.requirements = data.requirements
             if data.project_id is not None:
@@ -438,17 +457,33 @@ class ClientRequirementResource(Resource):
             session.commit()
             session.refresh(requirement)
 
-            # Trigger AI analysis if status changed
             if status_changed:
-                logger.info(f"Status changed, triggering AI analysis for project {requirement.project_id}")
+                logger.info(
+                    f"Status changed, triggering AI analysis for project {requirement.project_id}"
+                )
                 analyze_project_requirements_ai.delay(
                     project_id=requirement.project_id,
                     new_requirement_id=requirement.id,
-                    notify_email=current_user.email
+                    notify_email=current_user.email,
+                )
+
+                logger.info(
+                    f"Triggering roadmap update for project {requirement.project_id}"
+                )
+                generate_project_roadmap_task.delay(
+                    project_id=requirement.project_id,
+                    client_id=client_id,
+                    trigger_type="status_change",
+                    notify_email=current_user.email,
                 )
 
             return {
-                "message": "Requirement updated successfully" + (" AI analysis triggered." if status_changed else ""),
+                "message": "Requirement updated successfully"
+                + (
+                    " AI analysis and roadmap update triggered."
+                    if status_changed
+                    else ""
+                ),
                 "data": {
                     "id": requirement.id,
                     "requirement_id": requirement.requirement_id,
@@ -634,6 +669,19 @@ class ClientUpdatesResource(Resource):
             session.add(new_update)
             session.commit()
             session.refresh(new_update)
+
+            try:
+                generate_progress_email_task.delay(
+                    project_id=data.project_id,
+                    client_id=client_id,
+                    trigger_type="update_added",
+                    auto_send=True,
+                )
+                logger.info(
+                    f"Triggered progress email for project {data.project_id} after update creation"
+                )
+            except Exception as email_error:
+                logger.error(f"Failed to trigger progress email: {str(email_error)}")
 
             return {
                 "message": "Update created successfully",

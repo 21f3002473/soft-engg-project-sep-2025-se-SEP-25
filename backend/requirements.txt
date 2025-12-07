@@ -40,6 +40,8 @@ langchain-classic
 langchain-community
 langchain-core
 langchain-text-splitters
+langchain-groq
+langgraph
 langsmith
 marshmallow
 multidict

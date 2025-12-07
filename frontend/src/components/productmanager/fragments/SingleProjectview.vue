@@ -178,16 +178,57 @@
                 </div>
             </div>
 
-            <!-- Requirements Section -->
+            <!-- Tabbed Sections -->
             <div class="col-12">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-clipboard-check me-2"></i>
-                            Requirements ({{ project.requirements_count }})
-                        </h5>
+                    <div class="card-header bg-white">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button 
+                                    class="nav-link active" 
+                                    id="requirements-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#requirements" 
+                                    type="button"
+                                    role="tab"
+                                >
+                                    <i class="bi bi-clipboard-check me-1"></i>
+                                    Requirements ({{ project.requirements_count }})
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button 
+                                    class="nav-link" 
+                                    id="updates-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#updates" 
+                                    type="button"
+                                    role="tab"
+                                >
+                                    <i class="bi bi-megaphone me-1"></i>
+                                    Updates ({{ project.updates_count }})
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button 
+                                    class="nav-link" 
+                                    id="daily-reports-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#daily-reports" 
+                                    type="button"
+                                    role="tab"
+                                >
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    Daily Reports
+                                </button>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="card-body">
+                    
+                    <div class="tab-content">
+                        <!-- Requirements Tab -->
+                        <div class="tab-pane fade show active" id="requirements" role="tabpanel">
+                            <div class="card-body">
                         <div v-if="project.requirements && project.requirements.length > 0" class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -216,20 +257,12 @@
                             <i class="bi bi-inbox fs-1"></i>
                             <p class="mt-2">No requirements found for this project</p>
                         </div>
-                    </div>
-                </div>
-            </div>
+                            </div>
+                        </div>
 
-            <!-- Updates Section -->
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-megaphone me-2"></i>
-                            Updates ({{ project.updates_count }})
-                        </h5>
-                    </div>
-                    <div class="card-body">
+                        <!-- Updates Tab -->
+                        <div class="tab-pane fade" id="updates" role="tabpanel">
+                            <div class="card-body">
                         <div v-if="project.updates && project.updates.length > 0" class="timeline">
                             <div 
                                 v-for="update in project.updates" 
@@ -262,6 +295,13 @@
                         <div v-else class="text-center text-muted py-4">
                             <i class="bi bi-inbox fs-1"></i>
                             <p class="mt-2">No updates found for this project</p>
+                        </div>
+                            </div>
+                        </div>
+
+                        <!-- Daily Reports Tab -->
+                        <div class="tab-pane fade" id="daily-reports" role="tabpanel">
+                            <ProjectDailyReports :projectId="projectId" />
                         </div>
                     </div>
                 </div>
@@ -308,9 +348,13 @@
 <script>
 import { make_getrequest, make_putrequest, make_deleterequest } from '@/store/appState';
 import { Modal } from 'bootstrap';
+import ProjectDailyReports from './ProjectDailyReports.vue';
 
 export default {
     name: 'SingleProjectView',
+    components: {
+        ProjectDailyReports
+    },
     props: {
         projectId: {
             type: [String, Number],
@@ -508,5 +552,50 @@ textarea.form-control {
 
 .table td {
     vertical-align: middle;
+}
+
+/* Tab styles */
+.nav-tabs {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 12px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    background-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    background-color: transparent;
+}
+
+.tab-content {
+    padding: 0;
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

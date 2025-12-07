@@ -21,7 +21,6 @@ class Config:
             "Set SECRET_KEY in .env file for persistent authentication."
         )
 
-    # Redis Configuration
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
     REDIS_DB = int(os.getenv("REDIS_DB", "0"))
@@ -32,7 +31,6 @@ class Config:
         else f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
     )
 
-    # Celery Configuration
     CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", REDIS_URL)
     CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", REDIS_URL)
 
@@ -72,7 +70,6 @@ class Config:
     DATABASE_URL = f"postgresql://{POSTGRES['user']}:{POSTGRES['password']}@{POSTGRES['host']}:{POSTGRES['port']}/{POSTGRES['db']}"
     print("DATABASE_URL:", DATABASE_URL)
 
-    # MailHog SMTP Configuration
     SMTP_HOST = os.getenv("SMTP_HOST", "localhost")
     SMTP_PORT = int(os.getenv("SMTP_PORT", "1025"))
     SMTP_USER = os.getenv("SMTP_USER", "")
@@ -80,5 +77,4 @@ class Config:
     SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL", "noreply@example.com")
     SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Project Management System")
 
-    # MailHog Web UI (for development)
     MAILHOG_UI_URL = os.getenv("MAILHOG_UI_URL", "http://localhost:8025")

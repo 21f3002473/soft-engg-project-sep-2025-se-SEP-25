@@ -48,42 +48,77 @@
         </div>
       </div>
 
-      <!-- Updates and Chat -->
+      <!-- Updates and Email History Tabs -->
       <div class="col-lg-9 col-md-8">
-        <div class="card shadow-sm h-100">
-          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h3 class="h5 mb-0">
-              <i class="bi bi-bell-fill me-2"></i>
-              Client Updates
-            </h3>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
             <button 
+              class="nav-link active" 
+              id="updates-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#updates-content" 
               type="button" 
-              class="btn btn-light btn-sm"
-              data-bs-toggle="modal" 
-              data-bs-target="#addUpdateModal"
+              role="tab"
             >
-              <i class="bi bi-plus-lg me-1"></i>Add Update
+              <i class="bi bi-bell-fill me-1"></i>
+              Updates
             </button>
-          </div>
-          <div class="card-body">
-            <!-- Success/Error Messages -->
-            <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-              <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
-              <button type="button" class="btn-close" @click="successMessage = null"></button>
-            </div>
-            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-              <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
-              <button type="button" class="btn-close" @click="errorMessage = null"></button>
-            </div>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link" 
+              id="emails-tab" 
+              data-bs-toggle="tab" 
+              data-bs-target="#emails-content" 
+              type="button" 
+              role="tab"
+            >
+              <i class="bi bi-envelope-check me-1"></i>
+              Email History
+            </button>
+          </li>
+        </ul>
 
-            <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
-              
-              <!-- Updates List -->
-              <div class="flex-md-shrink-0" style="min-width: 320px; max-width: 400px;">
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Updates Tab -->
+          <div 
+            class="tab-pane fade show active" 
+            id="updates-content" 
+            role="tabpanel"
+          >
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">
+                  <i class="bi bi-bell-fill me-2"></i>
+                  Client Updates
+                </h3>
+                <button 
+                  type="button" 
+                  class="btn btn-light btn-sm"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#addUpdateModal"
+                >
+                  <i class="bi bi-plus-lg me-1"></i>Add Update
+                </button>
+              </div>
+              <div class="card-body">
+                <!-- Success/Error Messages -->
+                <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                  <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+                  <button type="button" class="btn-close" @click="successMessage = null"></button>
+                </div>
+                <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+                  <button type="button" class="btn-close" @click="errorMessage = null"></button>
+                </div>
+
+                <!-- Updates List (Full Width) -->
                 <div class="alert alert-light border mb-0" style="max-height: 500px; overflow-y: auto;">
                   <h6 class="text-primary mb-3">
                     <i class="bi bi-calendar-check me-2"></i>
-                    Updates List
+                    Updates List ({{ totalUpdates }})
                   </h6>
                   
                   <div v-if="updates.length === 0" class="text-center text-muted py-3">
@@ -106,19 +141,19 @@
                               @click="editUpdate(update)"
                               title="Edit"
                             >
-                              <i class="bi bi-pencil">Edit</i>
+                              <i class="bi bi-pencil me-1"></i>Edit
                             </button>
                             <button 
                               class="btn btn-sm btn-outline-danger" 
                               @click="confirmDeleteUpdate(update)"
                               title="Delete"
                             >
-                              <i class="bi bi-trash">Delete</i>
+                              <i class="bi bi-trash me-1"></i>Delete
                             </button>
                           </div>
                         </div>
                         <p class="mb-1 small">{{ update.description }}</p>
-                        <div class="d-flex flex-column gap-1">
+                        <div class="d-flex flex-wrap gap-2">
                           <small class="text-muted">
                             <i class="bi bi-calendar3 me-1"></i>
                             {{ formatDate(update.date) }}
@@ -137,17 +172,23 @@
                   </ul>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- AI Chatbot -->
-              <div class="flex-fill border rounded p-3 bg-light" style="min-height: 500px;">
-                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                  <i class="bi bi-robot text-primary me-2 fs-5"></i>
-                  <h5 class="mb-0">AI Assistant</h5>
-                  <span class="badge bg-success ms-auto">Online</span>
-                </div>
-                <ProductMangerChatbot :clientId="clientID" :clientName="clientData?.client_name" />
-              </div>
-
+          <!-- Email History Tab -->
+          <div 
+            class="tab-pane fade" 
+            id="emails-content" 
+            role="tabpanel"
+          >
+            <div v-if="clientData && clientProjects.length > 0">
+              <ProductManagerEmailHistory 
+                :projectId="getFirstProjectId()"
+              />
+            </div>
+            <div v-else class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Client must have projects to view email history.
             </div>
           </div>
         </div>
@@ -271,7 +312,7 @@
 </template>
 
 <script>
-import ProductMangerChatbot from './fragments/ProductMangerChatbot.vue';
+import ProductManagerEmailHistory from './fragments/ProductManagerEmailHistory.vue';
 import { make_getrequest, make_postrequest, make_putrequest, make_deleterequest } from '@/store/appState';
 import { Modal } from 'bootstrap';
 
@@ -284,7 +325,7 @@ export default {
         }
     },
     components: {
-        ProductMangerChatbot
+        ProductManagerEmailHistory
     },
     data() {
         return {
@@ -477,6 +518,13 @@ export default {
             } catch (e) {
                 return dateString;
             }
+        },
+        getFirstProjectId() {
+            // Get the first project ID for email history
+            if (this.clientProjects && this.clientProjects.length > 0) {
+                return this.clientProjects[0].id;
+            }
+            return null;
         }
     },
     mounted() {
