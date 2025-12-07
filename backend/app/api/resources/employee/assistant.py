@@ -212,7 +212,7 @@ class AIAssistantResource(Resource):
             raise
 
         except Exception as e:
-            logger.error("AI Assistant Error", exc_info=True)
+            logger.error(f"AI Assistant Error: {e}", exc_info=True)
             raise HTTPException(500, "Internal server error")
 
 

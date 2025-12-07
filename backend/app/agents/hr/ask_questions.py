@@ -1,14 +1,3 @@
-# def get_client():
-# api_key = os.getenv("GEMINI_API_KEY")
-# if not api_key:
-# raise RuntimeError("Set GEMINI_API_KEY environment variable.")
-# return genai.Client(api_key=api_key)
-
-# THIS ONE Client thing has depraceted. DO NOT USE THIS.
-
-# EMBED_MODEL = "text-embedding-004"
-
-
 import json
 import os
 
@@ -21,7 +10,7 @@ load_dotenv()
 
 
 EMBED_MODEL = "gemini-embedding-001"
-LLM_MODEL = "gemini-2.0-flash"
+LLM_MODEL = "gemini-2.5-flash"
 
 CHUNKS_DIR = "chunks"
 VECTORS_FILE = "vectors.npz"
@@ -34,7 +23,7 @@ def get_client():
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
 
     genai.configure(api_key=api_key)
-    return genai  # return module
+    return genai
 
 
 def embed_query(client, query):
@@ -83,7 +72,6 @@ Give a concise answer. If not found, say "I don't know".
 
     print("Generating answer...")
 
-    # Correct new generation API
     model = genai.GenerativeModel(LLM_MODEL)
     resp = model.generate_content(prompt)
 

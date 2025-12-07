@@ -85,7 +85,7 @@ class AIAssistantResource(Resource):
         try:
             url = (
                 "https://generativelanguage.googleapis.com/v1beta/models/"
-                "gemini-2.0-flash:generateContent"
+                "gemini-2.5-flash:generateContent"
                 f"?key={Config.GEMINI_API_KEY}"
             )
 

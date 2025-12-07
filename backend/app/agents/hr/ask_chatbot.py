@@ -9,29 +9,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Config
-
-# Config
-LLM_MODEL = "gemini-2.0-flash"
+LLM_MODEL = "gemini-2.5-flash"
 EMBED_MODEL = "gemini-embedding-001"
 TOP_K = 5
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "data", "data.txt")
 VECTOR_STORE_FILE = os.path.join(BASE_DIR, "data", "hr_vectors.pkl")
-# LLM_MODEL = "gemini-2.0-flash"
-# EMBED_MODEL = "gemini-embedding-001"
-# DATA_FILE = "backend/app/agents/hr/data/data.txt"
-# VECTOR_STORE_FILE = "backend/app/agents/hr/data/hr_vectors.pkl"
-# TOP_K = 5
-
 
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
     genai.configure(api_key=api_key)
-    return genai  # return module
+    return genai
 
 
 def build_vector_store():
@@ -52,14 +43,12 @@ def build_vector_store():
         embeddings.append(emb)
     embeddings = np.vstack(embeddings)
 
-    # Normalize embeddings for cosine similarity
     faiss.normalize_L2(embeddings)
 
     dim = embeddings.shape[1]
-    index = faiss.IndexFlatIP(dim)  # Inner product ~ cosine similarity
+    index = faiss.IndexFlatIP(dim)
     index.add(embeddings)
 
-    # Save index and texts
     with open(VECTOR_STORE_FILE, "wb") as f:
         pickle.dump({"index": index, "texts": lines}, f)
     print(f"Vector store saved to {VECTOR_STORE_FILE}")
@@ -95,7 +84,6 @@ def answer_question(question: str):
     try:
         client = get_client()
 
-        # Retrieve top-k relevant lines
         relevant_chunks = retrieve_relevant_chunks(question, top_k=TOP_K)
         if not relevant_chunks:
             return "I don't know"

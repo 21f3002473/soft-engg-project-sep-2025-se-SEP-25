@@ -704,7 +704,7 @@ class CourseRecommendationResource(Resource):
 
             GEMINI_URL = (
                 "https://generativelanguage.googleapis.com/v1beta/models/"
-                "gemini-2.0-flash:generateContent"
+                "gemini-2.5-flash:generateContent"
             )
 
             async with httpx.AsyncClient(timeout=20.0) as client:
