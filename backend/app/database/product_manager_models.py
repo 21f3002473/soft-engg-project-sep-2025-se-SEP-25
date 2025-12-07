@@ -436,10 +436,14 @@ class AllocationRecommendation(SQLModel, table=True):
 
     project: Optional["Project"] = Relationship()
     employee: Optional["User"] = Relationship(
-        sa_relationship_kwargs={"foreign_keys": "[AllocationRecommendation.employee_id]"}
+        sa_relationship_kwargs={
+            "foreign_keys": "[AllocationRecommendation.employee_id]"
+        }
     )
     reviewer: Optional["User"] = Relationship(
-        sa_relationship_kwargs={"foreign_keys": "[AllocationRecommendation.reviewed_by]"}
+        sa_relationship_kwargs={
+            "foreign_keys": "[AllocationRecommendation.reviewed_by]"
+        }
     )
 
 
@@ -538,4 +542,3 @@ class EmployeeAvailability(SQLModel, table=True):
     updater: Optional["User"] = Relationship(
         sa_relationship_kwargs={"foreign_keys": "[EmployeeAvailability.updated_by]"}
     )
-

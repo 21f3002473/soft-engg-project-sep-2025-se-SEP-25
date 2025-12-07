@@ -19,8 +19,8 @@ from app.database.product_manager_models import (
     Project,
     ProjectRequirementAnalysis,
 )
-from app.tasks.requirement_tasks import generate_team_allocation_recommendations
 from app.middleware import require_pm
+from app.tasks.requirement_tasks import generate_team_allocation_recommendations
 from fastapi import Depends, HTTPException, Query
 from fastapi_restful import Resource
 from pydantic import BaseModel
@@ -82,9 +82,9 @@ class TeamAllocationResource(Resource):
     ):
         """
         Generate AI-powered team allocation recommendations for a project
-        
+
         POST /api/pm/projects/{project_id}/team-allocation
-        
+
         Body:
         {
             "team_size_hint": 3,
@@ -135,7 +135,7 @@ class TeamAllocationResource(Resource):
     ):
         """
         Get team allocation recommendations for a project
-        
+
         GET /api/pm/projects/{project_id}/team-allocation?status=pending_review&limit=10
         """
         try:
@@ -147,9 +147,7 @@ class TeamAllocationResource(Resource):
             )
 
             if status_filter:
-                query = query.where(
-                    AllocationRecommendation.status == status_filter
-                )
+                query = query.where(AllocationRecommendation.status == status_filter)
 
             # Order by match score
             query = query.order_by(AllocationRecommendation.match_score.desc())
@@ -216,9 +214,9 @@ class RecommendationApprovalResource(Resource):
     ):
         """
         Approve or reject a recommendation
-        
+
         PUT /api/pm/allocation-recommendations/{recommendation_id}
-        
+
         Body:
         {
             "action": "approve",  // or "reject"
@@ -244,29 +242,31 @@ class RecommendationApprovalResource(Resource):
 
             if action == "approve":
                 recommendation.status = AllocationRecommendationStatusEnum.APPROVED
-                
+
                 # TODO: Actually assign employee to project (create UserProject record)
                 from app.database.product_manager_models import UserProject
-                
+
                 # Check if already assigned
                 existing = session.exec(
                     select(UserProject).where(
                         UserProject.user_id == recommendation.employee_id,
-                        UserProject.project_id == recommendation.project_id
+                        UserProject.project_id == recommendation.project_id,
                     )
                 ).first()
-                
+
                 if not existing:
                     user_project = UserProject(
                         user_id=recommendation.employee_id,
-                        project_id=recommendation.project_id
+                        project_id=recommendation.project_id,
                     )
                     session.add(user_project)
-                
+
             elif action == "reject":
                 recommendation.status = AllocationRecommendationStatusEnum.REJECTED
             else:
-                raise HTTPException(status_code=400, detail="Invalid action. Use 'approve' or 'reject'")
+                raise HTTPException(
+                    status_code=400, detail="Invalid action. Use 'approve' or 'reject'"
+                )
 
             recommendation.feedback_provided = True
             recommendation.feedback_text = feedback
@@ -301,9 +301,9 @@ class NaturalLanguageQueryResource(Resource):
     ):
         """
         Process natural language query about team allocation
-        
+
         POST /api/pm/team-allocation/query
-        
+
         Body:
         {
             "query": "Who are the best Python developers available for a new project?",
@@ -320,9 +320,9 @@ class NaturalLanguageQueryResource(Resource):
                 raise HTTPException(status_code=400, detail="Query text is required")
 
             # Use AI to interpret the query
-            from langchain_groq import ChatGroq
-            from langchain_core.messages import SystemMessage, HumanMessage
             from app.config import Config
+            from langchain_core.messages import HumanMessage, SystemMessage
+            from langchain_groq import ChatGroq
 
             llm = ChatGroq(
                 model="llama-3.3-70b-versatile",
@@ -372,18 +372,19 @@ Return as JSON:
             if intent == "find_employees" and skills:
                 # Find employees with matching skills
                 matching_employees = []
-                
+
                 for skill_name in skills:
                     skill_records = session.exec(
-                        select(EmployeeSkill)
-                        .where(EmployeeSkill.skill_name.contains(skill_name))
+                        select(EmployeeSkill).where(
+                            EmployeeSkill.skill_name.contains(skill_name)
+                        )
                     ).all()
-                    
+
                     for skill_rec in skill_records:
                         employee = session.exec(
                             select(User).where(User.id == skill_rec.employee_id)
                         ).first()
-                        
+
                         if employee:
                             # Check availability
                             availability = session.exec(
@@ -391,25 +392,35 @@ Return as JSON:
                                     EmployeeAvailability.employee_id == employee.id
                                 )
                             ).first()
-                            
-                            matching_employees.append({
-                                "id": employee.id,
-                                "name": employee.name,
-                                "email": employee.email,
-                                "skill": skill_rec.skill_name,
-                                "proficiency": skill_rec.proficiency_level,
-                                "is_available": availability.is_available if availability else True,
-                                "current_utilization": (
-                                    (availability.current_workload_hours_per_week / 
-                                     availability.max_capacity_hours_per_week * 100)
-                                    if availability and availability.max_capacity_hours_per_week > 0
-                                    else 0
-                                ),
-                            })
-                
+
+                            matching_employees.append(
+                                {
+                                    "id": employee.id,
+                                    "name": employee.name,
+                                    "email": employee.email,
+                                    "skill": skill_rec.skill_name,
+                                    "proficiency": skill_rec.proficiency_level,
+                                    "is_available": (
+                                        availability.is_available
+                                        if availability
+                                        else True
+                                    ),
+                                    "current_utilization": (
+                                        (
+                                            availability.current_workload_hours_per_week
+                                            / availability.max_capacity_hours_per_week
+                                            * 100
+                                        )
+                                        if availability
+                                        and availability.max_capacity_hours_per_week > 0
+                                        else 0
+                                    ),
+                                }
+                            )
+
                 response_data["employees"] = matching_employees[:10]
                 response_text = f"Found {len(matching_employees)} employees with skills in {', '.join(skills)}."
-                
+
                 if matching_employees:
                     top_3 = matching_employees[:3]
                     response_text += " Top matches:\n"
@@ -419,24 +430,27 @@ Return as JSON:
             elif intent == "check_availability":
                 # Get overall availability stats
                 availabilities = session.exec(select(EmployeeAvailability)).all()
-                
+
                 available_count = sum(1 for a in availabilities if a.is_available)
                 avg_utilization = (
                     sum(
-                        a.current_workload_hours_per_week / a.max_capacity_hours_per_week * 100
+                        a.current_workload_hours_per_week
+                        / a.max_capacity_hours_per_week
+                        * 100
                         for a in availabilities
                         if a.max_capacity_hours_per_week > 0
-                    ) / len(availabilities)
+                    )
+                    / len(availabilities)
                     if availabilities
                     else 0
                 )
-                
+
                 response_data = {
                     "available_employees": available_count,
                     "total_employees": len(availabilities),
                     "average_utilization": round(avg_utilization, 1),
                 }
-                
+
                 response_text = (
                     f"{available_count} out of {len(availabilities)} employees are available. "
                     f"Average utilization is {avg_utilization:.1f}%."
@@ -554,7 +568,9 @@ class EmployeeAvailabilityResource(Resource):
             ).first()
 
             if not availability:
-                raise HTTPException(status_code=404, detail="Availability record not found")
+                raise HTTPException(
+                    status_code=404, detail="Availability record not found"
+                )
 
             return {
                 "employee_id": availability.employee_id,
@@ -563,8 +579,11 @@ class EmployeeAvailabilityResource(Resource):
                 "max_capacity_hours_per_week": availability.max_capacity_hours_per_week,
                 "is_available": availability.is_available,
                 "utilization_percentage": (
-                    (availability.current_workload_hours_per_week / 
-                     availability.max_capacity_hours_per_week * 100)
+                    (
+                        availability.current_workload_hours_per_week
+                        / availability.max_capacity_hours_per_week
+                        * 100
+                    )
                     if availability.max_capacity_hours_per_week > 0
                     else 0
                 ),
@@ -601,9 +620,13 @@ class EmployeeAvailabilityResource(Resource):
             if data.current_projects_count is not None:
                 availability.current_projects_count = data.current_projects_count
             if data.current_workload_hours_per_week is not None:
-                availability.current_workload_hours_per_week = data.current_workload_hours_per_week
+                availability.current_workload_hours_per_week = (
+                    data.current_workload_hours_per_week
+                )
             if data.max_capacity_hours_per_week is not None:
-                availability.max_capacity_hours_per_week = data.max_capacity_hours_per_week
+                availability.max_capacity_hours_per_week = (
+                    data.max_capacity_hours_per_week
+                )
             if data.is_available is not None:
                 availability.is_available = data.is_available
 
