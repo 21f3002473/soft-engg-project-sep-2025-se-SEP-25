@@ -175,7 +175,6 @@ export default {
                     this.resetForm();
                     this.$emit('project-created', response.data);
 
-                    // Close modal
                     const modalElement = document.getElementById('addNewProjectModal');
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     if (modalInstance) {

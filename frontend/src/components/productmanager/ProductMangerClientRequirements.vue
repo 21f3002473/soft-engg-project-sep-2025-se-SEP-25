@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid py-4">
+  <div class="product-manager-client-requirements">
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -446,6 +446,7 @@ export default {
   margin-bottom: 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

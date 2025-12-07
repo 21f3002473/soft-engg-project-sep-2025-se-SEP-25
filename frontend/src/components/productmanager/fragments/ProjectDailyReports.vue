@@ -6,11 +6,7 @@
           <i class="bi bi-calendar-check me-2"></i>
           Daily Progress Reports
         </h4>
-        <button 
-          class="btn btn-primary btn-sm"
-          @click="generateReport"
-          :disabled="generating"
-        >
+        <button class="btn btn-primary btn-sm" @click="generateReport" :disabled="generating">
           <span v-if="generating" class="spinner-border spinner-border-sm me-1"></span>
           <i v-else class="bi bi-plus-circle me-1"></i>
           {{ generating ? 'Generating...' : 'Generate Report' }}
@@ -18,7 +14,6 @@
       </div>
     </div>
 
-    <!-- Loading State -->
     <div v-if="loading" class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -26,19 +21,13 @@
       <p class="mt-2 text-muted">Loading reports...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger" role="alert">
       <i class="bi bi-exclamation-triangle me-2"></i>
       {{ error }}
     </div>
 
     <div v-else-if="reports.length > 0" class="reports-list">
-      <div 
-        v-for="report in reports" 
-        :key="report.id"
-        class="report-card mb-3"
-        @click="viewReport(report)"
-      >
+      <div v-for="report in reports" :key="report.id" class="report-card mb-3" @click="viewReport(report)">
         <div class="report-card-header">
           <div class="d-flex justify-content-between align-items-start">
             <div>
@@ -71,11 +60,7 @@
       </div>
 
       <div v-if="hasMore" class="text-center mt-3">
-        <button 
-          class="btn btn-outline-primary btn-sm"
-          @click="loadMore"
-          :disabled="loadingMore"
-        >
+        <button class="btn btn-outline-primary btn-sm" @click="loadMore" :disabled="loadingMore">
           <span v-if="loadingMore" class="spinner-border spinner-border-sm me-1"></span>
           {{ loadingMore ? 'Loading...' : 'Load More' }}
         </button>
@@ -83,9 +68,9 @@
     </div>
 
     <div v-else class="empty-state text-center py-5">
-      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <i class="bi bi-inbox fs-1 text-muted empty-state-icon"></i>
       <p class="mt-3 text-muted">No daily reports yet</p>
-      <button class="btn btn-primary btn-sm mt-2" @click="generateReport">
+      <button class="btn btn-primary mt-2" @click="generateReport">
         <i class="bi bi-plus-circle me-1"></i>
         Generate First Report
       </button>
@@ -159,7 +144,7 @@ export default {
         this.loading = true;
         this.offset = 0;
       }
-      
+
       this.error = null;
 
       try {
@@ -199,7 +184,7 @@ export default {
             text: 'Daily report generation started! It will be ready shortly.',
             type: 'success'
           });
-          
+
           setTimeout(() => {
             this.fetchReports();
           }, 3000);
@@ -330,7 +315,7 @@ export default {
   line-height: 1.5;
 }
 
-.empty-state i {
+.empty-state-icon {
   font-size: 4rem;
   color: #ccc;
 }
@@ -352,7 +337,7 @@ export default {
     flex-wrap: wrap;
     gap: 4px;
   }
-  
+
   .modal-xl {
     max-width: 95%;
   }
