@@ -1,0 +1,165 @@
+import os
+
+import pytest
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+BASE_URL = os.getenv("BASE_URL")
+
+
+@pytest.fixture
+def client():
+    return requests
+
+
+def assert_json(response):
+    assert "application/json" in response.headers.get("Content-Type", "")
+    return response.json()
+
+
+#  /api/admin/register (POST)
+def test_post_admin_register(client, auth_admin):
+    import random
+
+    admin_email = f"admin{random.randint(1, 1000)}@gmail.com"
+    payload = {
+        "name": "Admin",
+        "email": admin_email,
+        "password": "admin@gmail.com",
+    }
+    response = client.post(
+        f"{BASE_URL}/api/admin/register",
+        json=payload,
+        headers=auth_admin,
+    )
+    assert response.status_code in [200, 201]
+
+    data = assert_json(response)
+    print(data)
+    expected_keys = ["id", "name", "email", "role"]
+    assert set(expected_keys) == set(data.keys())
+
+
+#  /api/admin/summary (GET)
+def test_get_admin_summary(client, auth_admin):
+    response = client.get(
+        f"{BASE_URL}/api/admin/summary",
+        headers=auth_admin,
+    )
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    print(data)
+    assert isinstance(data, dict)
+
+    expected_keys = ["userCount", "logsCount", "backupsCount", "currentAdmin"]
+    assert set(expected_keys) == set(data.keys())
+
+    assert isinstance(data.get("currentAdmin"), dict)
+    assert ["id", "name", "email"] == list(data.get("currentAdmin").keys())
+
+
+#  /api/admin/employees (GET)
+def test_get_admin_employees(client, auth_admin):
+    response = client.get(
+        f"{BASE_URL}/api/admin/employees",
+        headers=auth_admin,
+    )
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    assert isinstance(data, list)
+
+    expected_keys = {"id", "name", "email", "role"}
+
+    for item in data:
+        assert set(item.keys()) == expected_keys
+
+    valid_roles = {"root", "product_manager", "human_resource", "employee"}
+    for item in data:
+        assert item["role"] in valid_roles
+
+
+#  /api/admin/employees (POST)
+def test_post_admin_employees(client, auth_admin):
+    import random
+
+    payload = {
+        "name": f"John Doe{random.randint(1, 1000)}",
+        "role": "HR",
+        "email": f"john{random.randint(1, 1000)}@gmail.com",
+    }
+    response = client.post(
+        f"{BASE_URL}/api/admin/employees",
+        json=payload,
+        headers=auth_admin,
+    )
+
+    assert response.status_code in [200, 201]
+
+    data = assert_json(response)
+    print(data)
+    expected_keys = {"id", "name", "email", "role", "temporary_password"}
+    assert set(expected_keys) == set(data.keys())
+
+
+#  /api/admin/backup-config (PUT)
+def test_put_admin_backup_config_failure(client, auth_admin):
+    payload = {
+        "backups": [{"day": "Monday", "type": "no", "datetime": "2025-10-30T03:00"}]
+    }
+
+    response = client.put(
+        f"{BASE_URL}/api/admin/backup-config",
+        json=payload,
+        headers=auth_admin,
+    )
+
+    assert response.status_code in list(range(400, 600))
+
+
+#  /api/admin/updates (GET)
+def test_get_admin_updates(client, auth_admin):
+    response = client.get(
+        f"{BASE_URL}/api/admin/updates",
+        headers=auth_admin,
+    )
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    assert isinstance(data, dict)
+
+    expected_keys = {"currentVersion", "updateAvailable", "lastChecked"}
+    assert set(expected_keys) == set(data.keys())
+
+
+#  /api/admin/account (GET)
+def test_get_admin_account(client, auth_admin):
+    response = client.get(
+        f"{BASE_URL}/api/admin/account",
+        headers=auth_admin,
+    )
+    assert response.status_code == 200
+
+    data = assert_json(response)
+    assert isinstance(data, dict)
+
+    expected_keys = {"id", "name", "email", "role"}
+    assert set(expected_keys) == set(data.keys())
+
+
+#  /api/admin/account (PUT) - Failure
+def test_put_admin_account_failure(client, auth_admin):
+    payload = {
+        "name": "XYZ",
+        "new_password": "ad@gmail.com",
+    }
+
+    response = client.put(
+        f"{BASE_URL}/api/admin/account", json=payload, headers=auth_admin
+    )
+
+    assert response.status_code in list(range(400, 600))

@@ -436,7 +436,6 @@ class AnnouncementAdminListCreateResource(Resource):
 
     def get(
         self,
-        user_id: int,
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
     ):
@@ -447,7 +446,6 @@ class AnnouncementAdminListCreateResource(Resource):
         - "As an Employee, I want to browse HR FAQs and documents..." (announcement retrieval)
 
         Args:
-            user_id (int): HR user ID making the request (for audit purposes)
             current_user (User): Authenticated HR user object
             session (Session): Database session
 
@@ -456,7 +454,6 @@ class AnnouncementAdminListCreateResource(Resource):
                 - id (int): Announcement identifier
                 - announcement (str): Announcement content/text
                 - created_at (datetime): When announcement was created
-                - user_id (int): HR user who created it
 
         Error Codes:
             - 401 Unauthorized: User is not HR personnel (caught by middleware)
@@ -472,7 +469,6 @@ class AnnouncementAdminListCreateResource(Resource):
                     "id": a.id,
                     "announcement": a.announcement,
                     "created_at": a.created_at,
-                    "user_id": user_id,
                 }
                 for a in ann_list
             ]
@@ -487,7 +483,6 @@ class AnnouncementAdminListCreateResource(Resource):
 
     def post(
         self,
-        user_id: int,
         data: dict,
         current_user: User = Depends(require_hr()),
         session: Session = Depends(get_session),
@@ -499,7 +494,6 @@ class AnnouncementAdminListCreateResource(Resource):
         - "As an Employee, I want to browse HR FAQs and documents..." (announcement creation)
 
         Args:
-            user_id (int): HR user ID creating the announcement
             data (dict): Request payload containing:
                 - announcement (str, required): Announcement text/content
             current_user (User): Authenticated HR user object
@@ -522,7 +516,6 @@ class AnnouncementAdminListCreateResource(Resource):
                 raise HTTPException(400, "announcement field is required")
 
             ann = Announcement(
-                user_id=user_id,
                 announcement=text,
             )
 
@@ -584,7 +577,6 @@ class AnnouncementAdminDetailResource(Resource):
                 "id": ann.id,
                 "announcement": ann.announcement,
                 "created_at": ann.created_at,
-                "user_id": ann.user_id,
             }
 
         except HTTPException:
@@ -723,9 +715,7 @@ class AnnouncementEmployeeResource(Resource):
 
         try:
             ann_list = session.exec(
-                select(Announcement)
-                .where(Announcement.user_id == current_user.id)
-                .order_by(Announcement.created_at.desc())
+                select(Announcement).order_by(Announcement.created_at.desc())
             ).all()
 
             return [
@@ -791,7 +781,6 @@ class AnnouncementAdminListResource(Resource):
                     "id": a.id,
                     "announcement": a.announcement,
                     "created_at": a.created_at,
-                    "user_id": a.user_id,
                 }
                 for a in ann_list
             ]

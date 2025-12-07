@@ -1,37 +1,67 @@
 <template>
-  <div class="user-requests">
-    <div class="page-header">
-      <h1 class="page-title">Requests</h1>
-      <div class="header-right">
-        <input
-          v-model="search"
-          placeholder="Search requests..."
-          class="search"
-          type="search"
-        />
+  <div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 text-primary fw-bold mb-0">Requests</h1>
+      <div class="d-flex gap-3 align-items-center position-relative">
+        <div class="dropdown">
+          <button class="btn btn-primary rounded-pill fw-bold d-flex align-items-center gap-2 shadow-sm" type="button"
+            @click="showCreateOptions = !showCreateOptions">
+            <i class="bi bi-plus-lg"></i> New Request
+          </button>
+          <ul class="dropdown-menu show mt-2 border-0 shadow" v-if="showCreateOptions" style="right: 0; left: auto;">
+            <li><a class="dropdown-item" href="#" @click.prevent="navigateTo('leave')">Leave</a></li>
+            <li><a class="dropdown-item" href="#" @click.prevent="navigateTo('reimbursement')">Reimbursement</a></li>
+            <li><a class="dropdown-item" href="#" @click.prevent="navigateTo('transfer')">Transfer</a></li>
+          </ul>
+        </div>
+        <input v-model="search" placeholder="Search requests..." class="form-control rounded-pill border-0 bg-light"
+          type="search" style="width: 250px;" />
       </div>
     </div>
 
-    <section class="panel">
+    <section class="card border-0 shadow-sm p-4" style="min-height: 400px;">
       <transition name="fade">
-        <div v-if="filteredItems.length" class="requests-grid">
-          <div
-            class="request-card"
-            v-for="item in filteredItems"
-            :key="item.id"
-            @click="openForm(item)"
-          >
-            <div class="request-info">
-              <h2 class="request-title">{{ item.title }}</h2>
-              <p class="request-desc">{{ item.description }}</p>
+        <div v-if="!isChildRouteActive" class="requests-container">
+          <div v-if="loading" class="text-center py-5 text-muted">
+            <div class="spinner-border text-primary mb-2" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
+            <div>Loading requests...</div>
+          </div>
+          <div v-else-if="filteredRequests.length" class="d-flex flex-column gap-3">
+            <div class="card p-3 border bg-light request-item" v-for="req in filteredRequests" :key="req.uniqueKey"
+              @click="openRequest(req)" style="cursor: pointer; transition: all 0.2s;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-column gap-1">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill text-uppercase" :class="getBadgeClass(req.type)">{{ req.type}}</span>
+                    <span class="text-muted small">{{ formatDate(req.date) }}</span>
+                  </div>
+                  <h5 class="mb-0 fw-bold text-dark">{{ req.description }}</h5>
+                  <div class="text-muted small" v-if="req.details">
+                    {{ req.details }}
+                  </div>
+                </div>
+                <div>
+                  <span class="badge rounded-pill text-capitalize" :class="getStatusClass(req.status)">{{ req.status}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-center py-5 text-muted">
+            <p class="mb-0">No requests found.</p>
           </div>
         </div>
       </transition>
 
 
       <transition name="slide-fade">
-        <div v-if="$route.params.id || $route.path.includes('requests/')" class="form-section">
+        <div v-if="isChildRouteActive" class="bg-light rounded p-3">
+          <button
+            class="btn btn-link text-decoration-none text-secondary fw-bold p-0 mb-3 d-flex align-items-center gap-2"
+            @click="goBack">
+            <i class="bi bi-arrow-left"></i> Back to Requests
+          </button>
           <router-view />
         </div>
       </transition>
@@ -40,180 +70,152 @@
 </template>
 
 <script>
+import { make_getrequest } from "@/store/appState.js";
+import { useNotify } from "@/utils/useNotify.js";
+import titleCase from "@/utils/titleCase.js";
+
 export default {
   name: "EmployeeRequests",
   data() {
     return {
       search: "",
-      items: [
-        {
-          id: 1,
-          title: "Leave",
-          description: "Apply for leaves and view leave history.",
-        },
-        {
-          id: 2,
-          title: "Reimbursement",
-          description: "Request expense reimbursements for official purposes.",
-        },
-        {
-          id: 3,
-          title: "Transfer",
-          description: "Apply for department or location transfers.",
-        },
-      ],
+      requests: [],
+      loading: false,
+      showCreateOptions: false,
     };
   },
   computed: {
-    filteredItems() {
+    filteredRequests() {
       const q = this.search.trim().toLowerCase();
-      if (!q) return this.items;
-      return this.items.filter((i) => i.title.toLowerCase().includes(q));
+      if (!q) return this.requests;
+      return this.requests.filter((r) =>
+        r.type.toLowerCase().includes(q) ||
+        r.status.toLowerCase().includes(q) ||
+        (r.description && r.description.toLowerCase().includes(q))
+      );
     },
+    isChildRouteActive() {
+      return this.$route.name !== 'EmployeeRequests';
+    }
   },
   methods: {
-    openForm(item) {
-      this.$router.push(`/employee/requests/${item.title.toLowerCase()}`);
+    navigateTo(type) {
+      this.showCreateOptions = false;
+      this.$router.push(`/employee/requests/${type}`);
     },
+    openRequest(req) {
+      const id = req.uniqueKey.split('-')[1];
+      this.$router.push({
+        path: `/employee/requests/${req.type.toLowerCase()}/${id}`,
+        state: { requestData: JSON.parse(JSON.stringify(req)) }
+      });
+    },
+    goBack() {
+      this.$router.push('/employee/requests');
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+    },
+    getBadgeClass(type) {
+      switch (type.toLowerCase()) {
+        case 'leave': return 'bg-primary-subtle text-primary';
+        case 'reimbursement': return 'bg-success-subtle text-success';
+        case 'transfer': return 'bg-info-subtle text-info';
+        default: return 'bg-secondary';
+      }
+    },
+    getStatusClass(status) {
+      switch (status.toLowerCase()) {
+        case 'pending': return 'bg-warning-subtle text-warning border border-warning-subtle';
+        case 'completed': return 'bg-success-subtle text-success border border-success-subtle';
+        case 'rejected': return 'bg-danger-subtle text-danger border border-danger-subtle';
+        default: return 'bg-secondary';
+      }
+    },
+    async fetchRequests() {
+      this.loading = true;
+      try {
+        const [leavesRes, reimbursementsRes, transfersRes] = await Promise.all([
+          make_getrequest('/api/employee/requests/leave'),
+          make_getrequest('/api/employee/requests/reimbursement'),
+          make_getrequest('/api/employee/requests/transfer')
+        ]);
+
+        const leaves = (leavesRes.leaves || []).map(l => ({
+          uniqueKey: `leave-${l.request_id}`,
+          type: 'Leave',
+          description: `${titleCase(l.leave_type)} Leave`,
+          details: `${l.reason || 'No reason provided'}`,
+          date: l.created_date || l.from_date,
+          status: l.status,
+          raw: l
+        }));
+
+        const reimbursements = (reimbursementsRes.reimbursements || []).map(r => ({
+          uniqueKey: `reimb-${r.request_id}`,
+          type: 'Reimbursement',
+          description: `${titleCase(r.expense_type)} Reimbursement`,
+          details: `Amount: $${r.amount} - ${r.remark || ''}`,
+          date: r.date_expense,
+          status: r.status,
+          raw: r
+        }));
+
+        const transfers = (transfersRes.transfers || []).map(t => ({
+          uniqueKey: `trans-${t.request_id}`,
+          type: 'Transfer',
+          description: `Transfer to ${titleCase(t.request_department)}`,
+          details: `Reason: ${t.reason || 'None'}`,
+          date: null,
+          status: t.status,
+          raw: t
+        }));
+
+        this.requests = [...leaves, ...reimbursements, ...transfers].sort((a, b) => {
+          if (a.date && b.date) return new Date(b.date) - new Date(a.date);
+          return 0;
+        });
+
+      } catch (error) {
+        console.error("Failed to fetch requests", error);
+        useNotify().error("Failed to fetch requests.");
+      } finally {
+        this.loading = false;
+      }
+    }
   },
+  mounted() {
+    this.fetchRequests();
+  }
 };
 </script>
 
 <style scoped>
-.user-requests {
-  padding: 24px 32px;
-  color: #1e293b;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 28px;
-}
-.page-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #1d4ed8;
-}
-.search {
-  width: 300px;
-  padding: 10px 16px;
-  border-radius: 24px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  font-size: 15px;
-  transition: all 0.25s ease;
-}
-.search:focus {
-  outline: none;
-  border-color: #2563eb;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.panel {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 24px;
-  transition: all 0.3s ease;
-}
-
-.requests-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-.request-card {
-  background: #f9fafb;
-  border-radius: 14px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.25s ease;
-  cursor: pointer;
-  border: 1px solid #e2e8f0;
-}
-.request-card:hover {
-  transform: translateY(-5px);
-  background: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.12);
-}
-.request-info {
-  margin-bottom: 12px;
-}
-.request-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1e3a8a;
-  margin-bottom: 4px;
-}
-.request-desc {
-  font-size: 14px;
-  color: #64748b;
-}
-.form-btn {
-  align-self: flex-start;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.25s ease;
-}
-.form-btn:hover {
-  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+.request-item:hover {
+  background: #fff !important;
   transform: translateY(-2px);
-}
-
-.form-section {
-  background: #eeeff1;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: inset 0 4px 8px rgba(37, 99, 235, 0.05);
-}
-.form-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1d4ed8;
-  margin-bottom: 16px;
-}
-.form-content {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
 }
 
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
 .slide-fade-enter-active {
   transition: all 0.4s ease;
 }
+
 .slide-fade-enter-from {
   opacity: 0;
   transform: translateY(20px);
-}
-
-@media (max-width: 768px) {
-  .search {
-    width: 100%;
-  }
-  .requests-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

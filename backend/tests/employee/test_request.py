@@ -58,8 +58,6 @@ def test_hr_get_all_requests_unauthorized(base_url):
 
 
 # GET /hr/request/{request_id}
-
-
 def test_hr_get_request_by_id_success(base_url, auth_hr, auth_employee):
     payload = {
         "leave_type": "Sick",
@@ -99,8 +97,6 @@ def test_hr_get_request_by_id_unauthorized(base_url):
 
 
 # PUT /hr/request/{request_id} — Accept/Reject
-
-
 def test_hr_update_request_accept_success(base_url, auth_hr, auth_employee):
     payload = {
         "leave_type": "Casual",
@@ -182,9 +178,6 @@ def test_hr_update_request_invalid_action(base_url, auth_hr, auth_employee):
 
 
 def test_hr_update_request_not_pending(base_url, auth_hr, auth_employee):
-    """
-    First accept a request → then try modifying again.
-    """
     payload = {
         "leave_type": "Medical",
         "from_date": datetime.now().isoformat(),
@@ -225,8 +218,6 @@ def test_hr_update_request_unauthorized(base_url):
 
 
 # LEAVE REQUESTS
-
-
 def test_get_all_leave_requests_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/employee/requests/leave", headers=auth_employee)
 
@@ -399,8 +390,6 @@ def test_delete_leave_request_not_found(base_url, auth_employee):
 
 
 # REIMBURSEMENT REQUESTS
-
-
 def test_get_all_reimbursements_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/employee/requests/reimbursement", headers=auth_employee)
 
@@ -582,8 +571,6 @@ def test_delete_reimbursement_not_found(base_url, auth_employee):
 
 
 # TRANSFER REQUESTS
-
-
 def test_get_all_transfer_requests_success(base_url, auth_employee):
     r = httpx.get(f"{base_url}/employee/requests/transfer", headers=auth_employee)
 

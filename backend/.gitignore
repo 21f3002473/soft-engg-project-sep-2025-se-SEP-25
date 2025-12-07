@@ -4,3 +4,8 @@ __pycache__/
 admin_api_docs.md
 requests.http
 .idea/  
+imp_requests.http
+vectorstore.pkl
+chunks/
+faiss.index
+vectors.npz

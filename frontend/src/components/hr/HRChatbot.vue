@@ -1,172 +1,285 @@
 <template>
-  <div class="chatbot-root">
-    <section class="chat-section py-5">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-              <div class="card-body">
-                <h1 class="card-title h4 mb-3">Chatbot (ask here)</h1>
-                <div class="mb-3">
-                  <textarea
-                    class="form-control"
-                    placeholder="Type your question for the HR Chatbot..."
-                    rows="8"
-                  ></textarea>
-                </div>
-                <div class="d-flex justify-content-end">
-                  <button class="btn btn-primary">Submit</button>
+  <div class="container h-100 py-4">
+    <div class="row justify-content-center h-100">
+      <div class="col-12 col-md-10 col-lg-8 h-100">
+        <div class="chat-card bg-white shadow rounded-4 overflow-hidden d-flex flex-column h-75">
+          <div class="chat-header p-3 border-bottom d-flex justify-content-between align-items-center text-white">
+            <div class="chat-header-info d-flex align-items-center gap-2">
+              <div
+                class="chat-avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold">
+                🤖</div>
+              <div>
+                <h3 class="h6 mb-0 fw-bold">Sync’em HR Assistant</h3>
+                <div class="small"><span class="status-dot d-inline-block rounded-circle bg-success me-1"></span>Online
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="chat-messages flex-grow-1 overflow-auto p-3 d-flex flex-column gap-2 bg-light"
+            ref="messagesContainer">
+            <div v-for="(msg, idx) in messages" :key="idx"
+              :class="['message p-2 px-3 rounded-4 position-relative', msg.sender]">
+              <div class="message-content text-break text-start" v-html="renderMessage(msg.text)"></div>
+              <div class="message-time small opacity-75 text-end mt-1">{{ formatTime(msg.time) }}</div>
+            </div>
+
+            <div v-if="isTyping" class="typing-indicator d-flex gap-1 p-2 align-self-start">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="chat-input p-3 border-top d-flex gap-2 bg-white">
+            <input type="text" class="form-control rounded-pill shadow-none" v-model="newMessage"
+              @keyup.enter="sendMessage" placeholder="Ask me anything..." />
+            <button @click="sendMessage" :disabled="!newMessage.trim()"
+              class="btn rounded-circle d-flex align-items-center justify-content-center p-0 text-white border-0 shadow-sm">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
-    </section>
-
-    <!-- <footer class="footer bg-light py-3">
-      <div class="container text-center">
-        <p class="mb-0">© 2025 Sync'em. All rights reserved.</p>
-      </div>
-    </footer> -->
+    </div>
   </div>
 </template>
 
 <script>
+import { make_postrequest } from "@/store/appState.js";
+import MarkdownIt from "markdown-it";
+import mk from "markdown-it-katex";
+import DOMPurify from "dompurify";
+
 export default {
-  name: 'HRChatbot'
-}
+  name: "HRChatbot",
+  data() {
+    return {
+      messages: [],
+      newMessage: "",
+      isTyping: false,
+      md: new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true
+      }).use(mk)
+    };
+  },
+  mounted() {
+    this.messages.push({
+      text: "Hello! I am your HR Assistant. How can I help you?",
+      sender: "bot",
+      time: new Date()
+    });
+  },
+  methods: {
+    formatTime(date) {
+      if (!date) return "";
+      const d = new Date(date);
+      return new Intl.DateTimeFormat("en", {
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(d);
+    },
+    renderMessage(text) {
+      if (!text) return "";
+      const rawHtml = this.md.render(text);
+      return DOMPurify.sanitize(rawHtml);
+    },
+    async sendMessage() {
+      if (!this.newMessage.trim()) return;
+
+      const userText = this.newMessage;
+      this.newMessage = "";
+
+      this.messages.push({
+        text: userText,
+        sender: "user",
+        time: new Date()
+      });
+      this.scrollToBottom();
+
+      this.isTyping = true;
+
+      try {
+        const response = await make_postrequest('/api/hr/assistant', { question: userText });
+
+        this.isTyping = false;
+
+        if (response && response.answer) {
+          this.messages.push({
+            text: "",
+            sender: "bot",
+            time: new Date()
+          });
+
+          const msgIndex = this.messages.length - 1;
+          this.typeWriter(response.answer, msgIndex);
+        }
+      } catch (error) {
+        this.isTyping = false;
+        console.error("Failed to send message:", error);
+        this.messages.push({
+          text: "Sorry, I'm having trouble retrieving that information. Please try again later.",
+          sender: "bot",
+          time: new Date()
+        });
+        this.scrollToBottom();
+      }
+    },
+    typeWriter(text, index) {
+      let i = 0;
+      const speed = 15;
+
+      const type = () => {
+        if (i < text.length) {
+          if (this.messages[index]) {
+            this.messages[index].text += text.charAt(i);
+            i++;
+            this.scrollToBottom();
+            setTimeout(type, speed);
+          }
+        }
+      };
+
+      type();
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const el = this.$refs.messagesContainer;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
+      });
+    }
+  }
+};
 </script>
 
-<!-- <style scoped>
-.chatbot-root {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial;
-  color: #0b1220;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  /* background: url('../../assets/images/landing/landingPageBackgroundImage.png') no-repeat center
-    center/cover; */
-  /* background-color: rgba(20, 40, 108, 0.85);
-  background-blend-mode: overlay; */
-}
-
-/* Navbar - fully transparent light blue */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(90, 160, 255, 0.1);
-  backdrop-filter: blur(4px);
-  padding: 20px 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.nav-left {
-  font-size: 24px;
-  color: white;
-  font-weight: 600;
-}
-
-.brand {
-  font-style: italic;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #ffffff;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-  margin-left: 25px;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #dce3ff;
-}
-
-/* Chat Section */
-.chat-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-  padding: 60px 20px;
-  color: white;
-}
-
-.chat-box {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 40px;
-  width: 90%;
-  max-width: 700px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.chat-title {
-  font-size: 32px;
-  color: #e2e8ff;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-.chat-input {
-  width: 100%;
-  border-radius: 10px;
-  padding: 16px;
-  font-size: 16px;
-  color: #1e3a8a;
+<style scoped>
+.chat-card {
+  height: 80vh !important;
   border: none;
-  outline: none;
-  resize: none;
-  background: rgba(255, 255, 255, 0.9);
-  margin-bottom: 20px;
-  font-family: inherit;
 }
 
-.chat-submit {
-  background: linear-gradient(90deg, #6366f1, #3b82f6);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    transform 0.3s ease,
-    background 0.3s ease;
+.chat-header {
+  background: linear-gradient(90deg, #007bff, #0056d2);
 }
 
-.chat-submit:hover {
-  background: linear-gradient(90deg, #818cf8, #60a5fa);
+.chat-avatar {
+  width: 36px;
+  height: 36px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.chat-messages {
+  background: #f8faff !important;
+}
+
+.message {
+  max-width: 80%;
+  word-break: break-word;
+  animation: fadeIn 0.2s ease;
+}
+
+.message.bot {
+  background: #e8f0ff;
+  color: #004085;
+  align-self: flex-start;
+  border: 1px solid #d0e0ff;
+}
+
+.message.user {
+  background: linear-gradient(90deg, #007bff, #0056d2);
+  color: #fff;
+  align-self: flex-end;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #cbd5e1;
+  border-radius: 50%;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.chat-input input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.chat-input button {
+  background: linear-gradient(90deg, #007bff, #0056d2);
+  width: 42px;
+  height: 42px;
+  transition: all 0.2s ease-in-out;
+}
+
+.chat-input button:hover {
+  background: linear-gradient(90deg, #0069d9, #004ab3);
   transform: translateY(-2px);
 }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 16px 0;
-  color: #e5e7eb;
-  background: rgba(0, 0, 0, 0.3);
-  font-size: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+.message-content {
+  text-align: left;
 }
-</style> -->
+
+.message-content :deep(ul),
+.message-content :deep(ol) {
+  padding-left: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content :deep(p) {
+  margin-bottom: 0.5rem;
+}
+
+.message-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.message-content :deep(pre) {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

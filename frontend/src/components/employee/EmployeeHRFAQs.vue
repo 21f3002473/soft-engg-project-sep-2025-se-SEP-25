@@ -1,82 +1,68 @@
 <template>
-  <div class="user-hr-faqs">
-    <div class="header-row">
-      <div class="spacer"></div>
-      <div class="header-right">
+  <div class="user-hr-faqs container-fluid p-0">
+    <div class="d-flex justify-content-end mb-4">
+      <div class="w-100" style="max-width: 360px;">
+        <input type="text" class="form-control rounded-pill shadow-sm" placeholder="Search FAQs..." v-model="search"
+          style="border-color: #d2d8f3;" />
       </div>
     </div>
 
-    <section class="section">
-      <h2 class="section-heading">HR FAQs</h2>
-      <div class="faq-container">
-        <div
-          class="faq-item"
-          v-for="(faq, i) in filteredFaqs"
-          :key="i"
-          @click="toggleFAQ(i)"
-        >
-          <div class="faq-question">
-            <span>{{ faq.question }}</span>
-            <span class="faq-icon">
-              {{ activeIndex === i ? "−" : "+" }}
-            </span>
-          </div>
-          <transition name="fade">
-            <div v-if="activeIndex === i" class="faq-answer">
-              {{ faq.answer }}
+    <section class="mb-5">
+      <h2 class="h4 text-primary fw-semibold mb-3">HR FAQs</h2>
+      <div v-if="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div v-else class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item list-group-item-action p-0 border-bottom-0" v-for="(faq, i) in filteredFaqs"
+            :key="i" @click="toggleFAQ(i)" style="cursor: pointer;">
+            <div
+              class="d-flex justify-content-between align-items-center p-3 fw-medium text-dark bg-white hover-bg-light transition-bg">
+              <span>{{ faq.question }}</span>
+              <span class="fs-5 fw-bold text-primary">
+                {{ activeIndex === i ? "−" : "+" }}
+              </span>
             </div>
-          </transition>
+            <transition name="fade">
+              <div v-if="activeIndex === i" class="px-3 pb-3 text-secondary"
+                style="font-size: 0.95rem; line-height: 1.5;">
+                {{ faq.answer }}
+              </div>
+            </transition>
+            <div class="border-bottom" v-if="i < filteredFaqs.length - 1"></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
-      <h2 class="section-heading">Need More Help?</h2>
-      <div class="help-box">
-        <p>
-          Still can’t find what you’re looking for?  
+    <section class="mb-5">
+      <h2 class="h4 text-primary fw-semibold mb-3">Need More Help?</h2>
+      <div class="help-box p-4 text-center rounded-3 shadow-sm">
+        <p class="mb-3 text-dark">
+          Still can’t find what you’re looking for?
           Reach out to our HR support team for assistance.
         </p>
-        <button class="contact-btn" @click="contactHR">Contact HR</button>
+        <button class="btn btn-primary fw-medium px-4 py-2 shadow-sm" @click="contactHR">Contact HR</button>
       </div>
     </section>
   </div>
 </template>
 
 <script>
+import { make_getrequest } from '@/store/appState.js';
+import { useNotify } from "@/utils/useNotify.js";
+
 export default {
   name: 'EmployeeHRFAQs',
   data() {
     return {
       search: '',
       activeIndex: null,
-      faqs: [
-        {
-          question: 'How do I apply for leave?',
-          answer:
-            'You can apply for leave from the Requests → Leave section in your dashboard.'
-        },
-        {
-          question: 'How can I update my personal information?',
-          answer:
-            'You can edit your details in the Profile section under Settings.'
-        },
-        {
-          question: 'When will I receive my reimbursement?',
-          answer:
-            'Reimbursements are typically processed within 7–10 business days after submission.'
-        },
-        {
-          question: 'Who do I contact for payroll issues?',
-          answer:
-            'For payroll-related queries, contact hr.payroll@syncem.com.'
-        },
-        {
-          question: 'When will I receive my reimbursement?',
-          answer:
-            'Reimbursements are typically processed within 7–10 business days after submission.'
-        }
-      ]
+      faqs: [],
+      loading: false
     };
   },
   computed: {
@@ -90,12 +76,27 @@ export default {
       );
     }
   },
+  mounted() {
+    this.fetchFAQs();
+  },
   methods: {
+    async fetchFAQs() {
+      this.loading = true;
+      try {
+        const response = await make_getrequest('/api/employee/hr-faqs');
+        this.faqs = response.faqs;
+      } catch (err) {
+        console.error('Failed to fetch FAQs:', err);
+        useNotify().error('Failed to load FAQs. Please try again later.');
+      } finally {
+        this.loading = false;
+      }
+    },
     toggleFAQ(index) {
       this.activeIndex = this.activeIndex === index ? null : index;
     },
     contactHR() {
-      alert('Redirecting to HR contact page...');
+      useNotify().info('Redirecting to HR contact page...');
     }
   }
 };
@@ -106,110 +107,24 @@ export default {
   animation: fadeIn 0.4s ease-in;
 }
 
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-.spacer {
-  flex: 1;
-}
-.header-right .search {
-  width: 360px;
-  max-width: 45%;
-  padding: 10px 16px;
-  border-radius: 24px;
-  border: 1px solid #d2d8f3;
-  background: #fff;
-  transition: all 0.2s ease;
-}
-.header-right .search:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-}
-
-.section {
-  margin-bottom: 32px;
-}
-.section-heading {
-  font-size: 22px;
-  margin-bottom: 14px;
-  font-weight: 600;
-  color: #007bff;
-}
-
-.faq-container {
-  background: #fff;
-  border: 1px solid #e1e5f2;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-}
-.faq-item {
-  border-bottom: 1px solid #f0f2fa;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.faq-item:last-child {
-  border-bottom: none;
-}
-.faq-item:hover {
-  background: #f8faff;
-}
-.faq-question {
-  display: flex;
-  justify-content: space-between;
-  padding: 14px 18px;
-  font-weight: 500;
-  color: #333;
-}
-.faq-icon {
-  font-size: 20px;
-  font-weight: bold;
-  color: #007bff;
-}
-.faq-answer {
-  padding: 0 18px 16px 18px;
-  color: #555;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
 .help-box {
   background: linear-gradient(145deg, #f0f6ff, #e7f0ff);
   border: 1px solid #d2e4ff;
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.05);
 }
-.help-box p {
-  font-size: 15px;
-  color: #333;
-  margin-bottom: 14px;
+
+.hover-bg-light:hover {
+  background-color: #f8faff !important;
 }
-.contact-btn {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-.contact-btn:hover {
-  background: #0066d3;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+
+.transition-bg {
+  transition: background-color 0.2s ease;
 }
 
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.25s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -220,19 +135,10 @@ export default {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (max-width: 720px) {
-  .header-right .search {
-    width: 100%;
-    max-width: none;
-  }
-  .section-heading {
-    font-size: 20px;
   }
 }
 </style>

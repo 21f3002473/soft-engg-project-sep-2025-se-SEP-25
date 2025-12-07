@@ -66,7 +66,7 @@ class HRReviewsListResource(Resource):
             - 500: Database query error
         """
         reviews = get_all_reviews(session)
-        return {"reviews": [r.dict() for r in reviews]}
+        return {"reviews": reviews}
 
     def post(
         self,

@@ -67,7 +67,6 @@ class User(SQLModel, table=True):
     transfer_requests: list["Transfer"] = Relationship(back_populates="user")
     todos: list["ToDo"] = Relationship(back_populates="user")
     user_courses: list["UserCourse"] = Relationship(back_populates="user")
-    announcements: list["Announcement"] = Relationship(back_populates="user")
 
     performance_reviews: list["PerformanceReview"] = Relationship(back_populates="user")
 
@@ -288,11 +287,8 @@ class ToDo(SQLModel, table=True):
 
 class Announcement(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
     announcement: str = Field(nullable=False)
     created_at: datetime = Field(default_factory=current_utc_time)
-
-    user: Optional["User"] = Relationship(back_populates="announcements")
 
 
 class FAQ(SQLModel, table=True):

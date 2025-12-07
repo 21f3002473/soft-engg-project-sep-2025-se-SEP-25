@@ -3,6 +3,9 @@ from datetime import timedelta
 from app.api.resources import ProtectedResource, UserLoginResource
 from app.api.resources.admin_resources.admin_resources import *
 from app.api.resources.employee import *
+from app.api.resources.hr.hr_assistant_resource import (
+    AIAssistantResource as HRAssistantResource,
+)
 from app.api.resources.hr.hr_employee_resource import (
     EmployeeDetailResource,
     EmployeeListResource,
@@ -11,6 +14,7 @@ from app.api.resources.hr.hr_policy_resource import (
     HRPolicyCollectionResource,
     HRPolicyDetailResource,
 )
+from app.api.resources.hr.hr_project_resource import HRProjectListResource
 from app.api.resources.hr.hr_review_resource import (
     HRReviewDetailResource,
     HRReviewsByUserResource,
@@ -54,13 +58,13 @@ class API:
         # HR
         hr_base_url = "/api/hr"
         self.register_router(HRReviewsListResource, f"{hr_base_url}/reviews")
+        self.register_router(HRReviewsListResource, f"{hr_base_url}/review/create")
         self.register_router(
             HRReviewsByUserResource, f"{hr_base_url}/reviews/{{user_id}}"
         )
         self.register_router(
             HRReviewDetailResource, f"{hr_base_url}/review/{{review_id}}"
         )
-
         self.register_router(HRPolicyCollectionResource, f"{hr_base_url}/policies")
         self.register_router(
             HRPolicyDetailResource, f"{hr_base_url}/policy/{{policy_id}}"
@@ -71,6 +75,9 @@ class API:
         self.register_router(
             EmployeeDetailResource, f"{hr_base_url}/employee/{{emp_id}}"
         )
+        self.register_router(HRProjectListResource, f"{hr_base_url}/projects-overview")
+
+        self.register_router(HRAssistantResource, f"{hr_base_url}/assistant")
 
         # Admin
         admin_base_url = "/api/admin"
@@ -81,6 +88,9 @@ class API:
         self.register_router(AdminBackupResource, f"{admin_base_url}/backup-config")
         self.register_router(AdminUpdatesResource, f"{admin_base_url}/updates")
         self.register_router(AdminAccountResource, f"{admin_base_url}/account")
+        self.register_router(
+            AdminDeleteUserResource, f"{admin_base_url}/deleteusers/{{user_id}}"
+        )
 
         # Product Manager
         pm_base_url = "/api/pm"
@@ -125,14 +135,13 @@ class API:
         )
         self.register_router(
             AnnouncementAdminListCreateResource,
-            f"{hr_base_url}/annoucement/{{user_id}}",
+            f"{hr_base_url}/annoucement",
         )
         self.register_router(
             AnnouncementAdminDetailResource,
             f"{hr_base_url}/annoucement/edit/{{ann_id}}",
         )
 
-        self.register_router(LearningResource, f"{emp_base_url}/learning")
         self.register_router(
             CourseAssignmentEmployeeResource, f"{emp_base_url}/courses"
         )
