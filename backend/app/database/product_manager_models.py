@@ -106,11 +106,6 @@ class EmpTodo(SQLModel, table=True):
 
 
 class RequirementRoadmap(SQLModel, table=True):
-    """
-    Database model to store AI-generated roadmaps for project requirements.
-    Tracks the execution plan, milestones, and workflow updates.
-    """
-
     id: Optional[int] = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id", nullable=False, index=True)
     client_id: int = Field(foreign_key="client.id", nullable=False, index=True)
@@ -138,11 +133,6 @@ class RequirementRoadmap(SQLModel, table=True):
 
 
 class ClientProgressEmail(SQLModel, table=True):
-    """
-    Database model to track all progress emails sent to clients.
-    Stores AI-generated email content and tracking information.
-    """
-
     id: Optional[int] = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id", nullable=False, index=True)
     client_id: int = Field(foreign_key="client.id", nullable=False, index=True)
@@ -175,11 +165,6 @@ class ClientProgressEmail(SQLModel, table=True):
 
 
 class ProjectDailyReport(SQLModel, table=True):
-    """
-    Database model to store daily AI-generated progress reports for projects.
-    Automatically generated every day to track project progress, blockers, and achievements.
-    """
-
     id: Optional[int] = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id", nullable=False, index=True)
     client_id: int = Field(foreign_key="client.id", nullable=False, index=True)
@@ -230,11 +215,6 @@ class ProjectDailyReport(SQLModel, table=True):
 
 
 class EmployeeDailyReport(SQLModel, table=True):
-    """
-    Database model to store daily AI-generated performance reports for employees.
-    Tracks employee performance across all assigned projects and tasks.
-    """
-
     id: Optional[int] = Field(default=None, primary_key=True)
     employee_id: int = Field(foreign_key="user.id", nullable=False, index=True)
 
@@ -291,12 +271,6 @@ class EmployeeDailyReport(SQLModel, table=True):
         default=None, description="Comma-separated task IDs covered"
     )
 
-
-# ============================================
-# AI-POWERED TEAM ALLOCATION MODELS
-# ============================================
-
-
 class AllocationPolicyTypeEnum(str, Enum):
     MAX_PROJECTS_PER_EMPLOYEE = "max_projects_per_employee"
     MAX_WORKLOAD_HOURS = "max_workload_hours"
@@ -307,7 +281,6 @@ class AllocationPolicyTypeEnum(str, Enum):
 
 
 class AllocationPolicy(SQLModel, table=True):
-    """Company-defined rules for team allocation"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     policy_name: str = Field(index=True, nullable=False)
@@ -329,13 +302,11 @@ class AllocationPolicy(SQLModel, table=True):
 
 
 class ProjectRequirementAnalysis(SQLModel, table=True):
-    """GenAI analysis of project requirements"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id", nullable=False)
     analysis_date: datetime = Field(default_factory=current_utc_time)
 
-    # AI-extracted requirements
     required_skills: str = Field(
         description="JSON array of required skills with proficiency levels"
     )
@@ -348,13 +319,11 @@ class ProjectRequirementAnalysis(SQLModel, table=True):
         default=None, description="AI-calculated complexity (0-100)"
     )
 
-    # Team composition recommendations
     recommended_roles: str = Field(
         description="JSON array of roles needed (e.g., frontend, backend, tester)"
     )
     workload_estimate_hours: Optional[float] = Field(default=None)
 
-    # AI analysis metadata
     ai_model_used: str = Field(default="groq/llama-3.3-70b-versatile")
     analysis_confidence: Optional[float] = Field(
         default=None, description="Confidence score (0-1)"
@@ -375,13 +344,11 @@ class AllocationRecommendationStatusEnum(str, Enum):
 
 
 class AllocationRecommendation(SQLModel, table=True):
-    """AI-generated employee allocation recommendations"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id", nullable=False)
     employee_id: int = Field(foreign_key="user.id", nullable=False)
 
-    # Recommendation metadata
     recommendation_date: datetime = Field(default_factory=current_utc_time)
     status: AllocationRecommendationStatusEnum = Field(
         default=AllocationRecommendationStatusEnum.PENDING_REVIEW,
@@ -391,7 +358,6 @@ class AllocationRecommendation(SQLModel, table=True):
         ),
     )
 
-    # Scoring and reasoning
     match_score: float = Field(
         description="Overall match score (0-100), higher is better"
     )
@@ -400,7 +366,6 @@ class AllocationRecommendation(SQLModel, table=True):
     availability_score: float = Field(default=0.0)
     workload_score: float = Field(default=0.0)
 
-    # Explainable AI reasoning
     reasoning: str = Field(description="Human-readable explanation for recommendation")
     matching_skills: str = Field(
         description="JSON array of employee skills matching project needs"
@@ -409,7 +374,6 @@ class AllocationRecommendation(SQLModel, table=True):
         default=None, description="JSON array of potential concerns or risks"
     )
 
-    # Policy compliance
     policy_violations: Optional[str] = Field(
         default=None, description="JSON array of policy violations if any"
     )
@@ -417,20 +381,17 @@ class AllocationRecommendation(SQLModel, table=True):
         default=100.0, description="Compliance score (0-100)"
     )
 
-    # Assignment details
     proposed_role: Optional[str] = Field(default=None)
     proposed_allocation_percentage: Optional[float] = Field(
         default=100.0, description="% of employee time allocated to this project"
     )
 
-    # Feedback and learning
     feedback_provided: bool = Field(default=False)
     feedback_text: Optional[str] = Field(default=None)
     feedback_date: Optional[datetime] = Field(default=None)
     reviewed_by: Optional[int] = Field(default=None, foreign_key="user.id")
     reviewed_at: Optional[datetime] = Field(default=None)
 
-    # AI metadata
     ai_model_version: str = Field(default="v1.0")
     recommendation_generation_time_ms: Optional[int] = Field(default=None)
 
@@ -448,14 +409,12 @@ class AllocationRecommendation(SQLModel, table=True):
 
 
 class AllocationQuery(SQLModel, table=True):
-    """Natural language queries from managers"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     query_text: str = Field(description="Natural language query from manager")
     query_date: datetime = Field(default_factory=current_utc_time)
     queried_by: int = Field(foreign_key="user.id", nullable=False)
 
-    # Query processing
     interpreted_intent: Optional[str] = Field(
         default=None, description="AI interpretation of query intent"
     )
@@ -463,7 +422,6 @@ class AllocationQuery(SQLModel, table=True):
         default=None, description="JSON of extracted parameters (skills, project, etc.)"
     )
 
-    # Response
     response_text: Optional[str] = Field(
         default=None, description="Natural language response from AI"
     )
@@ -472,7 +430,6 @@ class AllocationQuery(SQLModel, table=True):
     )
     response_time_ms: Optional[int] = Field(default=None)
 
-    # Related entities
     related_project_id: Optional[int] = Field(default=None, foreign_key="project.id")
     recommended_employees: Optional[str] = Field(
         default=None, description="Comma-separated employee IDs"
@@ -485,7 +442,6 @@ class AllocationQuery(SQLModel, table=True):
 
 
 class EmployeeSkill(SQLModel, table=True):
-    """Employee skills for matching"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     employee_id: int = Field(foreign_key="user.id", nullable=False)
@@ -495,12 +451,10 @@ class EmployeeSkill(SQLModel, table=True):
     )
     years_of_experience: Optional[float] = Field(default=None)
 
-    # Verification
     verified: bool = Field(default=False)
     verified_by: Optional[int] = Field(default=None, foreign_key="user.id")
     verified_at: Optional[datetime] = Field(default=None)
 
-    # Metadata
     added_at: datetime = Field(default_factory=current_utc_time)
     last_used_at: Optional[datetime] = Field(default=None)
 
@@ -513,12 +467,10 @@ class EmployeeSkill(SQLModel, table=True):
 
 
 class EmployeeAvailability(SQLModel, table=True):
-    """Track employee availability and current workload"""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     employee_id: int = Field(foreign_key="user.id", nullable=False, index=True)
 
-    # Current workload
     current_projects_count: int = Field(default=0)
     current_workload_hours_per_week: float = Field(
         default=0.0, description="Total hours allocated per week"
@@ -527,12 +479,10 @@ class EmployeeAvailability(SQLModel, table=True):
         default=40.0, description="Maximum working hours per week"
     )
 
-    # Availability
     is_available: bool = Field(default=True)
     availability_start_date: Optional[datetime] = Field(default=None)
     unavailability_reason: Optional[str] = Field(default=None)
 
-    # Updated tracking
     last_updated: datetime = Field(default_factory=current_utc_time)
     updated_by: Optional[int] = Field(default=None, foreign_key="user.id")
 
