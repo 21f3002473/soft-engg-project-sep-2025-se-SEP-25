@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 class GeminiLLM(LLM, BaseModel):
 
-    model_name: str = Field(default="gemini-2.0-flash")
+    model_name: str = Field(default="gemini-2.5-flash")
     api_key: str = Field(default=Config.GEMINI_API_KEY)
 
     class Config:

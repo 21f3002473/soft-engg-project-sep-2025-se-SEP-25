@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { make_postrequest } from "@/store/appState.js";
+import { make_postrequest, make_getrequest } from "@/store/appState.js";
 import MarkdownIt from "markdown-it";
 import mk from "markdown-it-katex";
 import DOMPurify from "dompurify";
@@ -66,11 +66,7 @@ export default {
     };
   },
   mounted() {
-    this.messages.push({
-      text: "Hello! I am your HR Assistant. How can I help you?",
-      sender: "bot",
-      time: new Date()
-    });
+    this.fetchHistory();
   },
   methods: {
     formatTime(date) {
@@ -85,6 +81,29 @@ export default {
       if (!text) return "";
       const rawHtml = this.md.render(text);
       return DOMPurify.sanitize(rawHtml);
+    },
+    async fetchHistory() {
+      try {
+        const response = await make_getrequest('/api/employee/assistant/history');
+        if (response && response.messages) {
+          this.messages = response.messages.map(msg => ({
+            text: msg.message,
+            sender: msg.role === "assistant" ? "bot" : "user",
+            time: msg.created_at
+          }));
+
+          if (this.messages.length === 0) {
+            this.messages.push({
+              text: "Hello! I am your HR Assistant. How can I help you?",
+              sender: "bot",
+              time: new Date()
+            });
+          }
+        }
+        this.scrollToBottom();
+      } catch (error) {
+        console.error("Failed to fetch chat history:", error);
+      }
     },
     async sendMessage() {
       if (!this.newMessage.trim()) return;
@@ -102,8 +121,8 @@ export default {
       this.isTyping = true;
 
       try {
-        const response = await make_postrequest('/api/hr/assistant', { question: userText });
-
+        const response = await make_postrequest('/api/hr/chatbot', { question: userText });
+        
         this.isTyping = false;
 
         if (response && response.answer) {

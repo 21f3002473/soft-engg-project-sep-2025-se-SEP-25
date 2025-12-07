@@ -2,35 +2,31 @@ import json
 import os
 
 import faiss
-import google.generativeai as genai
 import numpy as np
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
-
 EMBED_MODEL = "gemini-embedding-001"
-LLM_MODEL = "gemini-2.5-flash"
+LLM_MODEL = "gemini-2.0-flash"  # or gemini-2.5-pro
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CHUNKS_DIR = os.path.join(BASE_DIR, "chunks")
-VECTORS_FILE = os.path.join(BASE_DIR, "data", "vectors.npz")
-FAISS_INDEX_FILE = os.path.join(BASE_DIR, "data", "faiss.index")
+CHUNKS_DIR = "chunks"
+VECTORS_FILE = "vectors.npz"
+FAISS_INDEX_FILE = "faiss.index"
 
 
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
+
     if not api_key:
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
-
-    genai.configure(api_key=api_key)
-    return genai
+    return genai.Client(api_key=api_key)
 
 
 def embed_query(client, query):
-    """Use the correct new embedding API."""
-    resp = client.embed_content(model=EMBED_MODEL, content=query)
-    return np.array(resp["embedding"], dtype="float32")
+    resp = client.models.embed_content(model=EMBED_MODEL, contents=[query])
+    return np.array(resp.embeddings[0].values, dtype="float32")
 
 
 def load_chunk_text(cid):
@@ -43,6 +39,7 @@ def answer_question(question, top_k=5):
 
     print("Loading FAISS index...")
     index = faiss.read_index(FAISS_INDEX_FILE)
+
     vectors = np.load(VECTORS_FILE)["vectors"]
 
     print("Embedding query...")
@@ -72,21 +69,7 @@ Give a concise answer. If not found, say "I don't know".
 """
 
     print("Generating answer...")
-
-    model = genai.GenerativeModel(LLM_MODEL)
-    resp = model.generate_content(prompt)
+    resp = client.models.generate_content(model=LLM_MODEL, contents=prompt)
 
     print("\nANSWER:\n")
     print(resp.text)
-    return resp.text
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 2:
-        print('Usage: python ask_question.py "your question here"')
-        exit()
-
-    question = " ".join(sys.argv[1:])
-    answer_question(question)

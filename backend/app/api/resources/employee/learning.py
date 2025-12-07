@@ -687,7 +687,7 @@ class CourseRecommendationResource(Resource):
             all_course_names = [c.course_name for c in courses]
 
             genai.configure(api_key=Config.GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-2.0-flash")
+            model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
             prompt = f"""
 You are a Course Recommendation AI.
