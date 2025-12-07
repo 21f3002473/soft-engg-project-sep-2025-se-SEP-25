@@ -12,8 +12,15 @@
                         <div class="mb-3">
                             <label for="clientId" class="form-label">Client ID <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="clientId" v-model="clientForm.client_id"
-                                placeholder="Enter client ID (e.g., CL001)" required>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="clientId" v-model="clientForm.client_id"
+                                    placeholder="Auto-generated client ID" readonly required>
+                                <button type="button" class="btn btn-outline-secondary" @click="generateClientId"
+                                    title="Regenerate ID">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Auto-generated. Click to regenerate.</small>
                         </div>
                         <div class="mb-3">
                             <label for="clientName" class="form-label">Client Name <span
@@ -81,7 +88,14 @@ export default {
         const notify = useNotify();
         return { notify };
     },
+    mounted() {
+        this.generateClientId();
+    },
     methods: {
+        generateClientId() {
+            const uuid = crypto.randomUUID().split('-')[0].toUpperCase();
+            this.clientForm.client_id = `CL-${uuid}`;
+        },
         handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
