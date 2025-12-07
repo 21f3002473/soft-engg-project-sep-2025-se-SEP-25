@@ -80,30 +80,49 @@ def retrieve_relevant_chunks(question, top_k=TOP_K):
     chunks = [texts[i] for i in I[0]]
     return chunks
 
-
 def answer_question(question: str):
     try:
         client = get_client()
 
         relevant_chunks = retrieve_relevant_chunks(question, top_k=TOP_K)
         if not relevant_chunks:
-            return "I don't know"
+            prompt = f"""
+                You are a helpful and professional HR assistant chatbot.
+                If the user greets you (e.g., "hi", "hello", "hey") respond with a friendly greetings only and like profesinally only.
 
-        context = "\n".join(relevant_chunks)
-        prompt = f"""
-Use the following HR knowledge base to answer the question concisely.
-If the answer is not found in the knowledge base, reply "I don't know".
+                QUESTION:
+                {question}
+                
+                Use the HR knowledge base *only when it is relevant* to the user’s query and answer professionally like a HR assistant which has already worked in the field.
+                And if the user asks something unrelated to HR and also outside the knowledge base, reply politely with:
+                "I'm not sure about that, but I can help you with HR-related questions."
 
-CONTEXT:
-{context}
+                Provide a clear,concise, friendly, and professional answer following the ethics of the working environment.
+            """
+        else:
+            context = "\n".join(relevant_chunks)
+            prompt = f"""
+                You are a helpful and professional HR assistant chatbot.
 
-QUESTION:
-{question}
-"""
+                Use the following HR knowledge base *only when it is relevant* to the user’s query.
+
+                If the user greets you (e.g., "hi", "hello", "hey") respond with a friendly greeting.
+
+                If the user asks something unrelated to HR or outside the knowledge base, reply politely with:
+                "I'm not sure about that, but I can help you with HR-related questions."
+
+                CONTEXT:
+                {context}
+
+                QUESTION:
+                {question}
+
+                Provide a clear, friendly, and professional answer.
+            """
 
         model = client.GenerativeModel(LLM_MODEL)
         resp = model.generate_content(prompt)
-        return resp.text or "I don't know"
+        return resp.text
 
     except Exception as e:
         print(f"Error: {e}")
