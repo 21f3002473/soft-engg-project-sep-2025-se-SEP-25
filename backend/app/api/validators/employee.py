@@ -10,6 +10,16 @@ class LeaveCreate(BaseModel):
     to_date: datetime
     reason: Optional[str] = None
 
+class SkillAddRequest(BaseModel):
+    skill_name: str
+    proficiency_level: str
+    years_of_experience: float = 0.0
+
+class SkillUpdateRequest(BaseModel):
+    skill_name: Optional[str] = None
+    proficiency_level: Optional[str] = None
+    years_of_experience: Optional[float] = None
+
 
 class ReimbursementCreate(BaseModel):
     expense_type: str

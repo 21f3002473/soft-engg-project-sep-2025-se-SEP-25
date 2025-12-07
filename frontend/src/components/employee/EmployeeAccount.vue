@@ -37,21 +37,117 @@
       </div>
     </section>
 
-    <div class="d-flex justify-content-between align-items-center">
+    <section class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="h5 mb-0 text-dark fw-bold">Skills & Expertise</h3>
+          <button class="btn btn-primary btn-sm" @click="openAddSkillModal">
+            <i class="bi bi-plus-lg me-1"></i> Add Skill
+          </button>
+        </div>
+
+        <div v-if="skillsLoading" class="text-center py-4 text-muted fst-italic">
+          Loading skills...
+        </div>
+
+        <div v-else class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light text-secondary">
+              <tr>
+                <th class="border-0">Skill Name</th>
+                <th class="border-0">Proficiency</th>
+                <th class="border-0">Experience (Yrs)</th>
+                <th class="border-0 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="skill in skills" :key="skill.id">
+                <td class="fw-medium text-dark">{{ skill.skill_name }}</td>
+                <td>
+                  <span class="badge rounded-pill fw-normal px-3"
+                    :class="getProficiencyBadgeClass(skill.proficiency_level)">
+                    {{ skill.proficiency_level }}
+                  </span>
+                </td>
+                <td class="text-secondary">{{ skill.years_of_experience }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-link text-primary p-0 me-3" @click="openEditSkillModal(skill)"
+                    title="Edit">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button class="btn btn-sm btn-link text-danger p-0" @click="deleteSkill(skill)" title="Delete">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="skills.length === 0">
+                <td colspan="4" class="text-center py-4 text-muted">
+                  No skills added yet. Add your skills to showcase your expertise.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
       <button class="btn btn-primary px-4" @click="updateProfile" :disabled="loading">
-        Update
+        Update Profile
       </button>
       <button class="btn btn-danger px-4" @click="logout" :disabled="loading">
         Logout
       </button>
     </div>
+
+    <Teleport to="body">
+      <div class="modal fade" id="skillModal" tabindex="-1" ref="skillModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white border-bottom-0">
+              <h5 class="modal-title fw-bold">{{ editingSkillId ? 'Edit Skill' : 'Add Skill' }}</h5>
+              <button type="button" class="btn-close btn-close-white" @click="closeSkillModal"></button>
+            </div>
+            <div class="modal-body p-4">
+              <form @submit.prevent="saveSkill">
+                <div class="mb-3">
+                  <label for="skillName" class="form-label fw-medium text-secondary">Skill Name</label>
+                  <input type="text" class="form-control" id="skillName" v-model="skillForm.skill_name" required
+                    placeholder="e.g. Python, Project Management">
+                </div>
+                <div class="mb-3">
+                  <label for="proficiency" class="form-label fw-medium text-secondary">Proficiency Level</label>
+                  <select class="form-select" id="proficiency" v-model="skillForm.proficiency_level" required>
+                    <option v-for="opt in proficiencyOptions" :key="opt" :value="opt">{{ opt }}</option>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label for="experience" class="form-label fw-medium text-secondary">Years of Experience</label>
+                  <input type="number" step="0.5" min="0" class="form-control" id="experience"
+                    v-model.number="skillForm.years_of_experience" required>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-secondary" @click="closeSkillModal">Cancel</button>
+                  <button type="submit" class="btn btn-primary px-4 shadow-sm" :disabled="skillSubmitting">
+                    {{ skillSubmitting ? 'Saving...' : 'Save Skill' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
 <script>
-import { make_getrequest, make_putrequest } from "@/store/appState.js";
+import { make_getrequest, make_putrequest, make_postrequest, make_deleterequest } from "@/store/appState.js";
 import { useNotify } from "@/utils/useNotify.js";
 import Swal from 'sweetalert2';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 
 export default {
   name: "EmployeeAccount",
@@ -66,6 +162,20 @@ export default {
       },
       originalUser: {},
       loading: false,
+
+      skills: [],
+      skillsLoading: false,
+      showSkillModal: false,
+      skillSubmitting: false,
+      editingSkillId: null,
+      skillForm: {
+        skill_name: '',
+        proficiency_level: 'Intermediate',
+        years_of_experience: 0
+      },
+      proficiencyOptions: ['Beginner', 'Intermediate', 'Advanced', 'Expert'],
+      modalInstance: null,
+
       keyLabels: {
         name: "Full Name",
         email: "Email",
@@ -97,7 +207,9 @@ export default {
     },
   },
   mounted() {
+    this.modalInstance = new bootstrap.Modal(this.$refs.skillModal);
     this.fetchAccount();
+    this.fetchSkills();
   },
   methods: {
     async fetchAccount() {
@@ -156,6 +268,91 @@ export default {
         }
       });
     },
+
+    async fetchSkills() {
+      this.skillsLoading = true;
+      try {
+        const data = await make_getrequest("/api/employee/account/skills");
+        this.skills = data || [];
+      } catch (error) {
+        console.error("Failed to fetch skills:", error);
+      } finally {
+        this.skillsLoading = false;
+      }
+    },
+    openAddSkillModal() {
+      this.editingSkillId = null;
+      this.skillForm = {
+        skill_name: '',
+        proficiency_level: 'Intermediate',
+        years_of_experience: 0
+      };
+      this.modalInstance.show();
+    },
+    openEditSkillModal(skill) {
+      this.editingSkillId = skill.id;
+      this.skillForm = {
+        skill_name: skill.skill_name,
+        proficiency_level: skill.proficiency_level,
+        years_of_experience: skill.years_of_experience
+      };
+      this.modalInstance.show();
+    },
+    closeSkillModal() {
+      this.modalInstance.hide();
+      this.skillSubmitting = false;
+    },
+    async saveSkill() {
+      this.skillSubmitting = true;
+      try {
+        if (this.editingSkillId) {
+          await make_putrequest(`/api/employee/account/skills/${this.editingSkillId}`, this.skillForm);
+          useNotify().success("Skill updated successfully.");
+        } else {
+          await make_postrequest("/api/employee/account/skills", this.skillForm);
+          useNotify().success("Skill added successfully.");
+        }
+        await this.fetchSkills();
+        this.closeSkillModal();
+      } catch (error) {
+        console.error("Failed to save skill:", error);
+        useNotify().error("Failed to save skill. " + (error.message || ''));
+      } finally {
+        this.skillSubmitting = false;
+      }
+    },
+    async deleteSkill(skill) {
+      const result = await Swal.fire({
+        title: 'Delete Skill?',
+        text: `Are you sure you want to delete ${skill.skill_name}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await make_deleterequest(`/api/employee/account/skills/${skill.id}`);
+          useNotify().success("Skill deleted.");
+          await this.fetchSkills();
+        } catch (error) {
+          console.error("Failed to delete skill:", error);
+          useNotify().error("Failed to delete skill.");
+        }
+      }
+    },
+    getProficiencyBadgeClass(level) {
+      const map = {
+        'Beginner': 'bg-info-subtle text-info border border-info-subtle',
+        'Intermediate': 'bg-primary-subtle text-primary border border-primary-subtle',
+        'Advanced': 'bg-success-subtle text-success border border-success-subtle',
+        'Expert': 'bg-warning-subtle text-warning border border-warning-subtle'
+      };
+      return map[level] || 'bg-secondary-subtle text-secondary';
+    },
+
     async logout() {
       const result = await Swal.fire({
         title: 'Logout?',

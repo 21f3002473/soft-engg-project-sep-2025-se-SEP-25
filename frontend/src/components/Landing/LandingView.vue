@@ -20,7 +20,7 @@
         </p>
 
         <div class="d-flex align-items-center gap-2">
-          <router-link to="/signup" class="btn btn-primary custom-btn fw-semibold px-3 py-2">Get Started</router-link>
+          <router-link :to="{ name: 'Login' }" class="btn btn-primary custom-btn fw-semibold px-3 py-2">Get Started</router-link>
           <a href="#features" class="btn btn-outline-light fw-semibold px-3 py-2"
             style="border-color: rgba(255,255,255,0.12);">Learn More</a>
         </div>

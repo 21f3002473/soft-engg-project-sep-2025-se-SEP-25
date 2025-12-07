@@ -77,6 +77,14 @@ class User(SQLModel, table=True):
 
     chats: List["Chat"] = Relationship(back_populates="user")
 
+    skills: List["EmployeeSkill"] = Relationship(
+        back_populates="employee",
+        sa_relationship_kwargs={
+            "primaryjoin": "User.id==EmployeeSkill.employee_id",
+            "foreign_keys": "[EmployeeSkill.employee_id]",
+        },
+    )
+
     def generate_token(self) -> str:
 
         expiry = int(time.time()) + 86400

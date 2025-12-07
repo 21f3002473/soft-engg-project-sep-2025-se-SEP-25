@@ -460,6 +460,7 @@ class EmployeeSkill(SQLModel, table=True):
     last_used_at: Optional[datetime] = Field(default=None)
 
     employee: Optional["User"] = Relationship(
+        back_populates="skills",
         sa_relationship_kwargs={"foreign_keys": "[EmployeeSkill.employee_id]"}
     )
     verifier: Optional["User"] = Relationship(
