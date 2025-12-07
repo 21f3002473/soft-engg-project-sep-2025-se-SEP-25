@@ -1,8 +1,9 @@
-from typing_extensions import Self
-from langchain_community.vectorstores.chroma import Chroma
 from threading import Lock
+
 from chromadb import Client
 from chromadb.config import Settings
+from langchain_community.vectorstores.chroma import Chroma
+from typing_extensions import Self
 
 
 class ChromaVectorStore(Chroma):

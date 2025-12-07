@@ -31,8 +31,8 @@ from app.api.resources.pm_resources.employee import (
     EmployeesResource,
 )
 from app.api.resources.pm_resources.project import (
-    ProjectsResource,
     ProjectsDashboardResource,
+    ProjectsResource,
     ProjectViewResource,
 )
 from app.controllers import (

@@ -7,8 +7,8 @@ from app.middleware import require_pm
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from pydantic import BaseModel
-from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 

@@ -1,4 +1,5 @@
 import logging
+
 from app.celery_app import celery_app
 from app.utils.email import get_email_service
 

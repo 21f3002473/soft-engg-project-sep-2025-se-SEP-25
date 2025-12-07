@@ -1,5 +1,5 @@
-from celery import Celery
 from app.config import Config
+from celery import Celery
 
 celery_app = Celery(
     "worker",

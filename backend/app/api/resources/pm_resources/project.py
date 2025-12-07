@@ -5,8 +5,8 @@ from app.database import User, get_session
 from app.database.product_manager_models import (
     Client,
     Project,
-    StatusTypeEnum,
     Requirement,
+    StatusTypeEnum,
     Update,
 )
 from app.middleware import require_pm
