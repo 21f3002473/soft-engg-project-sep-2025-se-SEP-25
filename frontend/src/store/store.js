@@ -5,7 +5,7 @@ const notify = useNotify();
 
 const store = createStore({
     state: {
-        BASEURL: 'http://localhost:8000',
+        BASEURL: process.env.VUE_APP_API_URL || 'http://localhost:8000',
         TOKEN: null,
         USER: null,
         role: null,

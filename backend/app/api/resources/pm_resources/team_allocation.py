@@ -1,7 +1,3 @@
-"""
-API Resources for AI-Powered Team Allocation System
-"""
-
 import json
 import logging
 from datetime import datetime
@@ -29,7 +25,6 @@ from sqlmodel import Session, select
 logger = logging.getLogger(__name__)
 
 
-# Pydantic models for request validation
 class TeamAllocationRequest(BaseModel):
     team_size_hint: int = 3
     auto_assign: bool = False
@@ -37,7 +32,7 @@ class TeamAllocationRequest(BaseModel):
 
 
 class RecommendationActionRequest(BaseModel):
-    action: str  # "approve" or "reject"
+    action: str
     feedback: Optional[str] = None
     reviewer_id: Optional[int] = None
 
@@ -93,7 +88,6 @@ class TeamAllocationResource(Resource):
         }
         """
         try:
-            # Validate project exists
             project = session.exec(
                 select(Project).where(Project.id == project_id)
             ).first()
@@ -101,12 +95,10 @@ class TeamAllocationResource(Resource):
             if not project:
                 raise HTTPException(status_code=404, detail="Project not found")
 
-            # Get parameters from Pydantic model
             team_size_hint = data.team_size_hint
             auto_assign = data.auto_assign
             notify_email = data.notify_email
 
-            # Trigger async task
             task = generate_team_allocation_recommendations.delay(
                 project_id=project_id,
                 team_size_hint=team_size_hint,
@@ -141,7 +133,6 @@ class TeamAllocationResource(Resource):
         try:
             session = next(get_session())
 
-            # Build query
             query = select(AllocationRecommendation).where(
                 AllocationRecommendation.project_id == project_id
             )
@@ -149,16 +140,12 @@ class TeamAllocationResource(Resource):
             if status_filter:
                 query = query.where(AllocationRecommendation.status == status_filter)
 
-            # Order by match score
             query = query.order_by(AllocationRecommendation.match_score.desc())
 
-            # Get total count
             total_count = len(session.exec(query).all())
 
-            # Apply pagination
             recommendations = session.exec(query.offset(offset).limit(limit)).all()
 
-            # Format response
             data = []
             for rec in recommendations:
                 employee = session.exec(
@@ -243,10 +230,8 @@ class RecommendationApprovalResource(Resource):
             if action == "approve":
                 recommendation.status = AllocationRecommendationStatusEnum.APPROVED
 
-                # TODO: Actually assign employee to project (create UserProject record)
                 from app.database.product_manager_models import UserProject
 
-                # Check if already assigned
                 existing = session.exec(
                     select(UserProject).where(
                         UserProject.user_id == recommendation.employee_id,
@@ -319,7 +304,6 @@ class NaturalLanguageQueryResource(Resource):
             if not query_text:
                 raise HTTPException(status_code=400, detail="Query text is required")
 
-            # Use AI to interpret the query
             from app.config import Config
             from langchain_core.messages import HumanMessage, SystemMessage
             from langchain_groq import ChatGroq
@@ -354,7 +338,6 @@ Return as JSON:
             response = llm.invoke(messages)
             content = response.content
 
-            # Extract JSON
             if isinstance(content, str):
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0].strip()
@@ -365,12 +348,10 @@ Return as JSON:
             intent = interpreted.get("intent", "unknown")
             skills = interpreted.get("skills", [])
 
-            # Execute the query based on intent
             response_data = {}
             response_text = ""
 
             if intent == "find_employees" and skills:
-                # Find employees with matching skills
                 matching_employees = []
 
                 for skill_name in skills:
@@ -386,7 +367,6 @@ Return as JSON:
                         ).first()
 
                         if employee:
-                            # Check availability
                             availability = session.exec(
                                 select(EmployeeAvailability).where(
                                     EmployeeAvailability.employee_id == employee.id
@@ -428,7 +408,6 @@ Return as JSON:
                         response_text += f"- {emp['name']}: {emp['skill']} ({emp['proficiency']}, {emp['current_utilization']:.0f}% utilized)\n"
 
             elif intent == "check_availability":
-                # Get overall availability stats
                 availabilities = session.exec(select(EmployeeAvailability)).all()
 
                 available_count = sum(1 for a in availabilities if a.is_available)
@@ -459,7 +438,6 @@ Return as JSON:
             else:
                 response_text = "I understand your query, but I need more specific information to help. Try asking about specific skills or employee availability."
 
-            # Save query to database
             query_record = AllocationQuery(
                 query_text=query_text,
                 queried_by=queried_by,
@@ -613,10 +591,8 @@ class EmployeeAvailabilityResource(Resource):
             ).first()
 
             if not availability:
-                # Create new record
                 availability = EmployeeAvailability(employee_id=employee_id)
 
-            # Update fields from Pydantic model
             if data.current_projects_count is not None:
                 availability.current_projects_count = data.current_projects_count
             if data.current_workload_hours_per_week is not None:
