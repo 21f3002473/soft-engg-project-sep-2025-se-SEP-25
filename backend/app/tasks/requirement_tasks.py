@@ -7,6 +7,7 @@ from app.core.agents.pm_agents.pm_daily_report_agent import PMDailyReportAgent
 from app.core.agents.pm_agents.pm_email_agent import get_pm_email_agent
 from app.core.agents.pm_agents.pm_requirements_agent import get_pm_requirements_agent
 from app.core.agents.pm_agents.pm_roadmap_agent import get_pm_roadmap_agent
+from app.core.agents.pm_agents.team_allocation_agent import TeamAllocationAgent
 from app.database import get_session
 from app.tasks.email_tasks import send_email_task
 
@@ -836,6 +837,112 @@ def generate_employee_daily_report(
         logger.error(
             f"Error in employee report generation task: {str(e)}", exc_info=True
         )
+        if self.request.retries < self.max_retries:
+            raise self.retry(exc=e, countdown=60 * (2**self.request.retries))
+        return {"status": "error", "message": str(e)}
+
+
+@celery_app.task(bind=True, max_retries=2)
+def generate_team_allocation_recommendations(
+    self,
+    project_id: int,
+    team_size_hint: int = 3,
+    auto_assign: bool = False,
+    notify_email: str = None,
+):
+    """
+    Celery task: Generate AI-powered team allocation recommendations for a project
+    
+    This task analyzes project requirements using GenAI and recommends employees
+    based on skills, experience, availability, and company policies.
+    
+    Args:
+        project_id: Project ID to generate allocations for
+        team_size_hint: Suggested team size
+        auto_assign: If True, automatically assign recommended employees
+        notify_email: Email to notify when complete
+    """
+    from app.database.product_manager_models import Project
+    from sqlmodel import select
+
+    try:
+        logger.info(
+            f"Starting team allocation for project {project_id}, "
+            f"team_size={team_size_hint}, auto_assign={auto_assign}"
+        )
+
+        # Get database session
+        session = next(get_session())
+
+        # Get project
+        project = session.exec(select(Project).where(Project.id == project_id)).first()
+        if not project:
+            error_msg = f"Project {project_id} not found"
+            logger.error(error_msg)
+            return {"status": "error", "message": error_msg}
+
+        # Create allocation agent
+        agent = TeamAllocationAgent(session)
+
+        # Generate recommendations
+        result = agent.generate_recommendations(
+            project_id=project_id,
+            team_size_hint=team_size_hint,
+            required_skills_hint=[],
+            auto_assign=auto_assign,
+        )
+
+        if not result.get("success"):
+            error_msg = result.get("error", "Unknown error")
+            logger.error(f"Team allocation failed: {error_msg}")
+            raise self.retry(exc=Exception(error_msg), countdown=60 * (2**self.request.retries))
+
+        # Send notification email if requested
+        if notify_email:
+            recommendations = result.get("recommendations", [])
+            rec_list = "\n".join(
+                [
+                    f"- {r['employee_name']} (Match Score: {r['match_score']:.1f}%)"
+                    for r in recommendations[:5]
+                ]
+            )
+
+            email_body = f"""
+Team Allocation Recommendations for {project.project_name}
+
+AI-Generated Recommendations:
+{rec_list}
+
+Reasoning:
+{result.get('reasoning', 'N/A')}
+
+Total Candidates Analyzed: {result.get('total_candidates_analyzed', 0)}
+
+{"These employees have been automatically assigned." if auto_assign else "Please review and approve these recommendations."}
+"""
+
+            send_email_task.delay(
+                recipient=notify_email,
+                subject=f"Team Allocation: {project.project_name}",
+                body_text=email_body,
+                body_html=f"<pre>{email_body}</pre>",
+            )
+
+            logger.info(f"Notification email sent to {notify_email}")
+
+        logger.info(
+            f"Team allocation completed: {result['recommendations_count']} recommendations generated"
+        )
+
+        return {
+            "status": "success",
+            "project_id": project_id,
+            "recommendations_count": result["recommendations_count"],
+            "auto_assigned": auto_assign,
+        }
+
+    except Exception as e:
+        logger.error(f"Error in team allocation task: {str(e)}", exc_info=True)
         if self.request.retries < self.max_retries:
             raise self.retry(exc=e, countdown=60 * (2**self.request.retries))
         return {"status": "error", "message": str(e)}

@@ -214,6 +214,19 @@
                                     Daily Reports
                                 </button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button 
+                                    class="nav-link" 
+                                    id="team-allocation-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#team-allocation" 
+                                    type="button"
+                                    role="tab"
+                                >
+                                    <i class="bi bi-people-fill me-1"></i>
+                                    Team Allocation
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     
@@ -292,6 +305,10 @@
                         <div class="tab-pane fade" id="daily-reports" role="tabpanel">
                             <ProjectDailyReports :projectId="projectId" />
                         </div>
+
+                        <div class="tab-pane fade" id="team-allocation" role="tabpanel">
+                            <TeamAllocationAssistant :projectId="projectId" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -337,11 +354,13 @@
 import { make_getrequest, make_putrequest, make_deleterequest } from '@/store/appState';
 import { Modal } from 'bootstrap';
 import ProjectDailyReports from './ProjectDailyReports.vue';
+import TeamAllocationAssistant from './TeamAllocationAssistant.vue';
 
 export default {
     name: 'SingleProjectView',
     components: {
-        ProjectDailyReports
+        ProjectDailyReports,
+        TeamAllocationAssistant
     },
     props: {
         projectId: {

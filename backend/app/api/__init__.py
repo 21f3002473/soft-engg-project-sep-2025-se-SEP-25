@@ -43,6 +43,14 @@ from app.api.resources.pm_resources.progress_emails import (
     ProgressEmailDetailResource,
     ProjectProgressEmailResource,
 )
+from app.api.resources.pm_resources.team_allocation import (
+    AllocationPolicyResource,
+    EmployeeAvailabilityResource,
+    EmployeeSkillsResource,
+    NaturalLanguageQueryResource,
+    RecommendationApprovalResource,
+    TeamAllocationResource,
+)
 from app.api.resources.pm_resources.project import (
     ProjectsDashboardResource,
     ProjectsResource,
@@ -199,6 +207,32 @@ class API:
         self.register_router(
             EmployeeReportDetailResource,
             f"{pm_base_url}/employee-reports/{{report_id}}",
+        )
+
+        # Team Allocation
+        self.register_router(
+            TeamAllocationResource,
+            f"{pm_base_url}/projects/{{project_id}}/team-allocation",
+        )
+        self.register_router(
+            RecommendationApprovalResource,
+            f"{pm_base_url}/allocation-recommendations/{{recommendation_id}}",
+        )
+        self.register_router(
+            NaturalLanguageQueryResource,
+            f"{pm_base_url}/team-allocation/query",
+        )
+        self.register_router(
+            EmployeeSkillsResource,
+            f"{pm_base_url}/employees/{{employee_id}}/skills",
+        )
+        self.register_router(
+            EmployeeAvailabilityResource,
+            f"{pm_base_url}/employees/{{employee_id}}/availability",
+        )
+        self.register_router(
+            AllocationPolicyResource,
+            f"{pm_base_url}/allocation-policies",
         )
 
         # Employee
