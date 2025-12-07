@@ -135,10 +135,11 @@
 
     <AddRequirementModal :clientId="clientId" @requirement-created="onRequirementCreated" />
 
-    <div class="modal fade" id="editRequirementModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
+    <Teleport to="body">
+      <div class="modal fade" id="editRequirementModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">
               <i class="bi bi-pencil me-2"></i>Edit Requirement
             </h5>
@@ -181,9 +182,10 @@
               {{ editSaving ? 'Saving...' : 'Save Changes' }}
             </button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
 
 
   </div>

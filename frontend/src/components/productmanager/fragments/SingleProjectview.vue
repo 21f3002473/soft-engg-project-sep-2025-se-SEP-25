@@ -314,9 +314,10 @@
             </div>
         </div>
 
-        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        <Teleport to="body">
+          <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title">
                             <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
@@ -346,7 +347,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+          </div>
+        </Teleport>
     </div>
 </template>
 

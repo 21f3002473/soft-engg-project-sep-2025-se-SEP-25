@@ -1,8 +1,9 @@
 <template>
-    <div class="modal fade" id="addRequirementModal" tabindex="-1" aria-labelledby="addRequirementModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <Teleport to="body">
+        <div class="modal fade" id="addRequirementModal" tabindex="-1" aria-labelledby="addRequirementModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addRequirementModalLabel">
                         <i class="bi bi-plus-circle me-2"></i>Add New Requirement
@@ -67,7 +68,8 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+    </Teleport>
 </template>
 
 <script>

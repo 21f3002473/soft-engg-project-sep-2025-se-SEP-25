@@ -135,10 +135,11 @@
       </div>
     </div>
 
-    <div class="modal fade" id="addUpdateModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
+    <Teleport to="body">
+      <div class="modal fade" id="addUpdateModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">
               <i class="bi bi-plus-circle me-2"></i>
               {{ isEditing ? 'Edit Update' : 'Add New Update' }}
@@ -184,9 +185,10 @@
               {{ saving ? 'Saving...' : 'Save Update' }}
             </button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
 
 
   </div>

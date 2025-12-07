@@ -76,10 +76,11 @@
       </button>
     </div>
 
-    <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
+    <Teleport to="body">
+      <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
             <h5 class="modal-title">
               <i class="bi bi-file-earmark-text me-2"></i>
               Daily Report - {{ selectedReport ? formatDate(selectedReport.report_date) : '' }}
@@ -97,9 +98,10 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 

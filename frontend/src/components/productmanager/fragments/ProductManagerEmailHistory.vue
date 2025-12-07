@@ -86,10 +86,11 @@
       </div>
     </div>
 
-    <div class="modal fade" id="emailDetailModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
+    <Teleport to="body">
+      <div class="modal fade" id="emailDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">
               <i class="bi bi-envelope-open me-2"></i>
               Email Details
@@ -157,9 +158,10 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 

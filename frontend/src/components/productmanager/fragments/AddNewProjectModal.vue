@@ -1,8 +1,9 @@
 <template>
-    <div class="modal fade" id="addNewProjectModal" tabindex="-1" aria-labelledby="addNewProjectModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+    <Teleport to="body">
+        <div class="modal fade" id="addNewProjectModal" tabindex="-1" aria-labelledby="addNewProjectModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addNewProjectModalLabel">
                         <i class="bi bi-folder-plus me-2"></i>Add New Project
@@ -101,7 +102,8 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+    </Teleport>
 </template>
 
 <script>
