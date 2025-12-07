@@ -59,6 +59,7 @@ dependencies = [
     "numpy==2.3.5",
     "orjson==3.11.4",
     "packaging==25.0",
+    "pipreqs>=0.5.0",
     "pluggy==1.6.0",
     "propcache==0.4.1",
     "proto-plus==1.26.1",
