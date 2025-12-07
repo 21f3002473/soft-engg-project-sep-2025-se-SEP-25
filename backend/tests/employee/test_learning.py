@@ -412,6 +412,7 @@ def test_put_employee_course_status_missing_field(
 
     assert response.status_code in [400, 404]
 
+
 def test_put_assignment_invalid_status(base_url, auth_hr):
     list_resp = httpx.get(f"{base_url}/hr/course/assign/4", headers=auth_hr)
     assert list_resp.status_code == 200
