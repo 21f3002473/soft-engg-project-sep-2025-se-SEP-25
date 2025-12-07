@@ -1,14 +1,15 @@
-import os
 import json
-import numpy as np
+import os
+
 import faiss
-from google import genai
+import numpy as np
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
 EMBED_MODEL = "gemini-embedding-001"
-LLM_MODEL = "gemini-2.0-flash"   # or gemini-2.5-pro
+LLM_MODEL = "gemini-2.0-flash"  # or gemini-2.5-pro
 
 CHUNKS_DIR = "chunks"
 VECTORS_FILE = "vectors.npz"
@@ -17,17 +18,14 @@ FAISS_INDEX_FILE = "faiss.index"
 
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
-    
+
     if not api_key:
         raise RuntimeError("Set GEMINI_API_KEY environment variable.")
     return genai.Client(api_key=api_key)
 
 
 def embed_query(client, query):
-    resp = client.models.embed_content(
-        model=EMBED_MODEL,
-        contents=[query]
-    )
+    resp = client.models.embed_content(model=EMBED_MODEL, contents=[query])
     return np.array(resp.embeddings[0].values, dtype="float32")
 
 
@@ -71,10 +69,7 @@ Give a concise answer. If not found, say "I don't know".
 """
 
     print("Generating answer...")
-    resp = client.models.generate_content(
-        model=LLM_MODEL,
-        contents=prompt
-    )
+    resp = client.models.generate_content(model=LLM_MODEL, contents=prompt)
 
     print("\nANSWER:\n")
     print(resp.text)

@@ -80,6 +80,7 @@ def retrieve_relevant_chunks(question, top_k=TOP_K):
     chunks = [texts[i] for i in I[0]]
     return chunks
 
+
 def answer_question(question: str):
     try:
         client = get_client()
