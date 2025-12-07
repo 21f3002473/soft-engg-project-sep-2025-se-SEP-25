@@ -256,12 +256,14 @@ Analyze this project and extract requirements."""
                         "current_workload": availability.current_workload_hours_per_week,
                         "max_capacity": availability.max_capacity_hours_per_week,
                         "utilization": (
-                            availability.current_workload_hours_per_week
-                            / availability.max_capacity_hours_per_week
-                        )
-                        * 100
-                        if availability.max_capacity_hours_per_week > 0
-                        else 0,
+                            (
+                                availability.current_workload_hours_per_week
+                                / availability.max_capacity_hours_per_week
+                            )
+                            * 100
+                            if availability.max_capacity_hours_per_week > 0
+                            else 0
+                        ),
                     }
                 else:
                     # Default availability if not set
@@ -421,8 +423,8 @@ Analyze this project and extract requirements."""
             importance = req_skill.get("importance", "medium")
 
             # Importance weighting
-            importance_weight = (
-                {"critical": 3, "high": 2, "medium": 1, "low": 0.5}.get(importance, 1)
+            importance_weight = {"critical": 3, "high": 2, "medium": 1, "low": 0.5}.get(
+                importance, 1
             )
 
             max_possible_score += 4 * importance_weight

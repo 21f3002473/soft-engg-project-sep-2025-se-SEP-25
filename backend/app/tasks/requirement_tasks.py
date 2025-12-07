@@ -852,10 +852,10 @@ def generate_team_allocation_recommendations(
 ):
     """
     Celery task: Generate AI-powered team allocation recommendations for a project
-    
+
     This task analyzes project requirements using GenAI and recommends employees
     based on skills, experience, availability, and company policies.
-    
+
     Args:
         project_id: Project ID to generate allocations for
         team_size_hint: Suggested team size
@@ -895,7 +895,9 @@ def generate_team_allocation_recommendations(
         if not result.get("success"):
             error_msg = result.get("error", "Unknown error")
             logger.error(f"Team allocation failed: {error_msg}")
-            raise self.retry(exc=Exception(error_msg), countdown=60 * (2**self.request.retries))
+            raise self.retry(
+                exc=Exception(error_msg), countdown=60 * (2**self.request.retries)
+            )
 
         # Send notification email if requested
         if notify_email:

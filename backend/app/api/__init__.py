@@ -43,14 +43,6 @@ from app.api.resources.pm_resources.progress_emails import (
     ProgressEmailDetailResource,
     ProjectProgressEmailResource,
 )
-from app.api.resources.pm_resources.team_allocation import (
-    AllocationPolicyResource,
-    EmployeeAvailabilityResource,
-    EmployeeSkillsResource,
-    NaturalLanguageQueryResource,
-    RecommendationApprovalResource,
-    TeamAllocationResource,
-)
 from app.api.resources.pm_resources.project import (
     ProjectsDashboardResource,
     ProjectsResource,
@@ -62,6 +54,14 @@ from app.api.resources.pm_resources.requirement_analysis import (
 from app.api.resources.pm_resources.roadmap import (
     ProjectRoadmapResource,
     RoadmapHistoryResource,
+)
+from app.api.resources.pm_resources.team_allocation import (
+    AllocationPolicyResource,
+    EmployeeAvailabilityResource,
+    EmployeeSkillsResource,
+    NaturalLanguageQueryResource,
+    RecommendationApprovalResource,
+    TeamAllocationResource,
 )
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
