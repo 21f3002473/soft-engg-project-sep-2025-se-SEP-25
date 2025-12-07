@@ -2,8 +2,9 @@ from logging import getLogger
 from typing import Optional
 
 from app.database import User, get_session
-from app.database.product_manager_models import Client, Project, Requirement, Update
+from app.database.product_manager_models import Client, Project, Requirement, Update, StatusTypeEnum
 from app.middleware import require_pm
+from app.tasks.requirement_tasks import analyze_project_requirements_ai
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from pydantic import BaseModel
@@ -35,6 +36,7 @@ class RequirementCreateModel(BaseModel):
 class RequirementUpdateModel(BaseModel):
     requirements: Optional[str] = None
     project_id: Optional[str] = None  # Changed to str
+    status: Optional[StatusTypeEnum] = None  # Added status field
 
 
 class UpdateCreateModel(BaseModel):
@@ -291,16 +293,19 @@ class ClientRequirementResource(Resource):
             )
             requirements = session.exec(requirement_statement).all()
 
-            requirement_list = [
-                {
+            requirement_list = []
+            for req in requirements:
+                project = session.exec(
+                    select(Project).where(Project.id == req.project_id)
+                ).first()
+                requirement_list.append({
                     "id": req.id,
                     "requirement_id": req.requirement_id,
                     "description": req.requirements,
                     "project_id": req.project_id,
+                    "project_name": project.project_name if project else None,
                     "status": req.status,
-                }
-                for req in requirements
-            ]
+                })
 
             return {
                 "message": "Requirements retrieved successfully",
@@ -359,20 +364,28 @@ class ClientRequirementResource(Resource):
             new_requirement = Requirement(
                 requirement_id=data.requirement_id,
                 requirements=data.requirements,
-                project_id=project.id,  # Use the integer id from the project
+                project_id=project.id,
                 client_id=client_id,
             )
             session.add(new_requirement)
             session.commit()
             session.refresh(new_requirement)
 
+            # Trigger AI-powered async analysis
+            logger.info(f"Triggering AI analysis for project {project.id}")
+            analyze_project_requirements_ai.delay(
+                project_id=project.id,
+                new_requirement_id=new_requirement.id,
+                notify_email=current_user.email
+            )
+
             return {
-                "message": "Requirement created successfully",
+                "message": "Requirement created successfully. AI analysis report will be sent to your email.",
                 "data": {
                     "id": new_requirement.id,
                     "requirement_id": new_requirement.requirement_id,
                     "description": new_requirement.requirements,
-                    "project_id": data.project_id,  # Return the string project_id
+                    "project_id": data.project_id,
                 },
             }
 
@@ -405,10 +418,15 @@ class ClientRequirementResource(Resource):
             if not requirement:
                 raise HTTPException(status_code=404, detail="Requirement not found")
 
+            # Track if status changed
+            status_changed = False
+            if data.status is not None and data.status != requirement.status:
+                status_changed = True
+                requirement.status = data.status
+            
             if data.requirements is not None:
                 requirement.requirements = data.requirements
             if data.project_id is not None:
-                # Find project by project_id (string) to get the actual id (int)
                 project = session.exec(
                     select(Project).where(Project.project_id == data.project_id)
                 ).first()
@@ -420,12 +438,22 @@ class ClientRequirementResource(Resource):
             session.commit()
             session.refresh(requirement)
 
+            # Trigger AI analysis if status changed
+            if status_changed:
+                logger.info(f"Status changed, triggering AI analysis for project {requirement.project_id}")
+                analyze_project_requirements_ai.delay(
+                    project_id=requirement.project_id,
+                    new_requirement_id=requirement.id,
+                    notify_email=current_user.email
+                )
+
             return {
-                "message": "Requirement updated successfully",
+                "message": "Requirement updated successfully" + (" AI analysis triggered." if status_changed else ""),
                 "data": {
                     "id": requirement.id,
                     "requirement_id": requirement.requirement_id,
                     "description": requirement.requirements,
+                    "status": requirement.status,
                 },
             }
 

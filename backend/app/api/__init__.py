@@ -35,6 +35,7 @@ from app.api.resources.pm_resources.project import (
     ProjectsResource,
     ProjectViewResource,
 )
+from app.api.resources.pm_resources.requirement_analysis import RequirementAnalysisResource
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -97,9 +98,16 @@ class API:
         self.register_router(PRDashboardResource, f"{pm_base_url}/dashboard")
         self.register_router(ClientsResource, f"{pm_base_url}/clients")
 
+        # Client requirements - list and create
         self.register_router(
             ClientRequirementResource,
             f"{pm_base_url}/client/requirements/{{client_id}}",
+        )
+        
+        # Client requirements - update and delete specific requirement
+        self.register_router(
+            ClientRequirementResource,
+            f"{pm_base_url}/client/requirements/{{client_id}}/{{requirement_id}}",
         )
 
         self.register_router(
@@ -110,9 +118,16 @@ class API:
             ProjectViewResource, f"{pm_base_url}/project/{{project_id}}"
         )
 
+        # Client updates - list and create
         self.register_router(
             ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}"
         )
+        
+        # Client updates - update and delete specific update
+        self.register_router(
+            ClientUpdatesResource, f"{pm_base_url}/client/updates/{{client_id}}/{{update_id}}",
+        )
+
         self.register_router(EmployeesResource, f"{pm_base_url}/employees")
         self.register_router(
             EmployeePerformanceResource,
