@@ -1,8 +1,9 @@
 from app.agents.hr.ask_questions import answer_question
+from app.api.validators.hr import QuestionRequest
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi_restful import Resource
-from app.api.validators.hr import QuestionRequest
+
 
 class AIAssistantResource(Resource):
     async def post(self, request: Request):
