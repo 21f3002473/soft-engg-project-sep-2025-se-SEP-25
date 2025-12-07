@@ -1,5 +1,5 @@
 <template>
-  <div class="container h-100 py-4">
+  <div class="container-fluid h-100 py-4">
     <div class="row justify-content-center h-100">
       <div class="col-12 col-md-10 col-lg-8 h-100">
         <div class="chat-card bg-white shadow rounded-4 overflow-hidden d-flex flex-column h-75">
@@ -122,7 +122,7 @@ export default {
 
       try {
         const response = await make_postrequest('/api/hr/chatbot', { question: userText });
-        
+
         this.isTyping = false;
 
         if (response && response.answer) {

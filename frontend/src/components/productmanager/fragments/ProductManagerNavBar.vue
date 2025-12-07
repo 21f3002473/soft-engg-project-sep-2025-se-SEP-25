@@ -2,7 +2,7 @@
     <div class="user-shell d-flex flex-column min-vh-100">
         <ProductManagerNavigation />
 
-        <main class="container-xl flex-grow-1 my-4 px-3" style="max-width: 1200px;">
+        <main class="container-fluid flex-grow-1 my-4 px-3" style="max-width: 90%;">
             <section class="page-body shadow p-4 rounded-4 bg-white bg-opacity-75"
                 style="backdrop-filter: blur(5px); min-height: 250px;">
                 <router-view />

@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4 dashboard-page">
+  <div class="container-fluid py-4 dashboard-page">
     <section class="mb-4">
       <div class="card border-0 shadow text-white welcome-card p-4">
         <div class="card-body p-0">

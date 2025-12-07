@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-content">
+    <div class="container-fluid dashboard-content">
         <!-- Header Section -->
         <section class="mb-4">
             <div class="card border-0 shadow text-white welcome-card p-4">

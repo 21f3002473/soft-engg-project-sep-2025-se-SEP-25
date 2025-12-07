@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4" style="max-width: 850px;">
+  <div class="container-fluid py-4" style="max-width: 850px;">
     <section class="card border-0 shadow-sm mb-4">
       <div class="card-body p-4 d-flex align-items-center gap-4 flex-wrap flex-sm-nowrap">
         <div class="avatar flex-shrink-0">
