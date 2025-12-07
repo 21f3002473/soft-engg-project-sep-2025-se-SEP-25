@@ -1,6 +1,5 @@
 <template>
     <div class="container-fluid py-4">
-        <!-- Loading State -->
         <div v-if="loading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -8,7 +7,6 @@
             <p class="mt-3 text-muted">Loading project details...</p>
         </div>
 
-        <!-- Error State -->
         <div v-else-if="error" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             {{ error }}
@@ -17,9 +15,7 @@
             </button>
         </div>
 
-        <!-- Main Content -->
         <div v-else-if="project" class="row g-4">
-            <!-- Project Header -->
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -64,7 +60,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <!-- Success/Error Messages -->
                         <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
                             <button type="button" class="btn-close" @click="successMessage = null"></button>
@@ -75,7 +70,6 @@
                         </div>
 
                         <div class="row">
-                            <!-- Project Info -->
                             <div class="col-md-8">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Project Name</label>
@@ -130,7 +124,6 @@
                                 </div>
                             </div>
 
-                            <!-- Client & Stats Sidebar -->
                             <div class="col-md-4">
                                 <div class="card bg-light">
                                     <div class="card-body">
@@ -178,7 +171,6 @@
                 </div>
             </div>
 
-            <!-- Tabbed Sections -->
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white">
@@ -222,11 +214,23 @@
                                     Daily Reports
                                 </button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button 
+                                    class="nav-link" 
+                                    id="team-allocation-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#team-allocation" 
+                                    type="button"
+                                    role="tab"
+                                >
+                                    <i class="bi bi-people-fill me-1"></i>
+                                    Team Allocation
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     
                     <div class="tab-content">
-                        <!-- Requirements Tab -->
                         <div class="tab-pane fade show active" id="requirements" role="tabpanel">
                             <div class="card-body">
                         <div v-if="project.requirements && project.requirements.length > 0" class="table-responsive">
@@ -260,7 +264,6 @@
                             </div>
                         </div>
 
-                        <!-- Updates Tab -->
                         <div class="tab-pane fade" id="updates" role="tabpanel">
                             <div class="card-body">
                         <div v-if="project.updates && project.updates.length > 0" class="timeline">
@@ -299,19 +302,22 @@
                             </div>
                         </div>
 
-                        <!-- Daily Reports Tab -->
                         <div class="tab-pane fade" id="daily-reports" role="tabpanel">
                             <ProjectDailyReports :projectId="projectId" />
+                        </div>
+
+                        <div class="tab-pane fade" id="team-allocation" role="tabpanel">
+                            <TeamAllocationAssistant :projectId="projectId" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
-        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        <Teleport to="body">
+          <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                  <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title">
                             <i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete
@@ -341,7 +347,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+          </div>
+        </Teleport>
     </div>
 </template>
 
@@ -349,11 +356,13 @@
 import { make_getrequest, make_putrequest, make_deleterequest } from '@/store/appState';
 import { Modal } from 'bootstrap';
 import ProjectDailyReports from './ProjectDailyReports.vue';
+import TeamAllocationAssistant from './TeamAllocationAssistant.vue';
 
 export default {
     name: 'SingleProjectView',
     components: {
-        ProjectDailyReports
+        ProjectDailyReports,
+        TeamAllocationAssistant
     },
     props: {
         projectId: {
@@ -457,7 +466,6 @@ export default {
 
                 if (response && response.message) {
                     this.deleteModal.hide();
-                    // Navigate back to projects list
                     this.$router.push({ name: 'ProductManagerProjectDetails' });
                 } else {
                     this.updateError = response.message || 'Failed to delete project';
@@ -554,7 +562,6 @@ textarea.form-control {
     vertical-align: middle;
 }
 
-/* Tab styles */
 .nav-tabs {
     border-bottom: 2px solid #dee2e6;
 }

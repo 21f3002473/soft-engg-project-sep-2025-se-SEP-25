@@ -2,7 +2,7 @@
   <div class="user-shell d-flex flex-column min-vh-100">
     <HRNavBar />
 
-    <main class="container-xl flex-grow-1 my-4 px-3" style="max-width: 1200px;">
+    <main class="container-fluid flex-grow-1 my-4 px-3" style="max-width: 90%;">
       <transition name="fade-slide" mode="out-in">
         <div v-if="$route.meta.title" key="title" class="mb-4 text-start">
           <h1 class="fw-bold mb-2" style="color: #1e3a8a; font-size: 28px;">{{ $route.meta.title }}</h1>

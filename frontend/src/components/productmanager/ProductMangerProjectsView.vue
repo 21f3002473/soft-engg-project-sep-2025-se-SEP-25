@@ -17,7 +17,6 @@
       </div>
     </div>
 
-    <!-- Loading State -->
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -25,13 +24,11 @@
       <p class="mt-3">Loading projects...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger" role="alert">
       <h4 class="alert-heading">Error!</h4>
       <p>{{ error }}</p>
     </div>
 
-    <!-- Projects Grid -->
     <div v-else-if="projects.length > 0" class="row g-4">
       <div v-for="project in projects" :key="project.id" class="col-12 col-md-6 col-lg-4">
         <div class="card h-100 shadow-sm">
@@ -78,13 +75,11 @@
       </div>
     </div>
 
-    <!-- Empty State -->
     <div v-else class="text-center py-5">
       <h4 class="text-muted">No projects found</h4>
       <p>There are currently no projects in the system.</p>
     </div>
 
-    <!-- Add New Project Modal -->
     <AddNewProjectModal @project-created="onProjectCreated" />
   </div>
 </template>
@@ -114,15 +109,11 @@ export default {
             try {
                 const result = await make_getrequest('/api/pm/projects/dashboard');
                 console.log('Full API Response:', result);
-                
-                // The API returns: { message: "...", data: { projects: [...], total_projects: N } }
-                // make_getrequest might wrap it or return it as-is
-                
+                                
                 if (result && result.data && result.data.projects) {
                     this.projects = result.data.projects;
                     this.totalProjects = result.data.total_projects;
                 } else if (result && result.projects) {
-                    // In case make_getrequest returns data directly
                     this.projects = result.projects;
                     this.totalProjects = result.total_projects;
                 } else {
@@ -161,7 +152,6 @@ export default {
         },
         onProjectCreated(newProject) {
             console.log('New project created:', newProject);
-            // Refresh the projects list
             this.fetchProjects();
         }
     },

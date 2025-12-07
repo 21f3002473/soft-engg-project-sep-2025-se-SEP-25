@@ -1,6 +1,6 @@
 <template>
   <section class="min-vh-100 d-flex align-items-center justify-content-center bg-body-tertiary bg-gradient py-5">
-    <div class="container">
+    <div class="container-fluid">
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
           <div class="card shadow-lg border-0 rounded-4 overflow-hidden">

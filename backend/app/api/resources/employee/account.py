@@ -1,11 +1,17 @@
 from logging import getLogger
 
-from app.api.validators import AccountOut, AccountUpdate
+from app.api.validators import (
+    AccountOut,
+    AccountUpdate,
+    SkillAddRequest,
+    SkillUpdateRequest,
+)
 from app.database import Department, User, get_session
+from app.database.product_manager_models import EmployeeSkill
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 logger = getLogger(__name__)
 
@@ -143,3 +149,165 @@ class AccountResource(Resource):
         except Exception as e:
             logger.error("Account Update error", exc_info=True)
             raise HTTPException(500, "Internal server error")
+
+
+class EmployeeSkillListResource(Resource):
+    def get(
+        self,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Get the list of skills for the current logged-in employee.
+        """
+        try:
+            skills = session.exec(
+                select(EmployeeSkill).where(
+                    EmployeeSkill.employee_id == current_user.id
+                )
+            ).all()
+
+            return [
+                {
+                    "id": skill.id,
+                    "skill_name": skill.skill_name,
+                    "proficiency_level": skill.proficiency_level,
+                    "years_of_experience": skill.years_of_experience,
+                    "verified": skill.verified,
+                    "verified_at": skill.verified_at,
+                }
+                for skill in skills
+            ]
+        except Exception as e:
+            logger.error(f"Error fetching skills: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def post(
+        self,
+        data: SkillAddRequest,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Add a new skill to the current logged-in employee's profile.
+        """
+        try:
+            new_skill = EmployeeSkill(
+                employee_id=current_user.id,
+                skill_name=data.skill_name,
+                proficiency_level=data.proficiency_level,
+                years_of_experience=data.years_of_experience,
+            )
+            session.add(new_skill)
+            session.commit()
+            session.refresh(new_skill)
+
+            return {"message": "Skill added successfully", "id": new_skill.id}
+        except Exception as e:
+            logger.error(f"Error adding skill: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+
+class EmployeeSkillDetailResource(Resource):
+    def get(
+        self,
+        skill_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Get details of a specific skill.
+        """
+        try:
+            skill = session.exec(
+                select(EmployeeSkill).where(
+                    EmployeeSkill.id == skill_id,
+                    EmployeeSkill.employee_id == current_user.id,
+                )
+            ).first()
+
+            if not skill:
+                raise HTTPException(status_code=404, detail="Skill not found")
+
+            return {
+                "id": skill.id,
+                "skill_name": skill.skill_name,
+                "proficiency_level": skill.proficiency_level,
+                "years_of_experience": skill.years_of_experience,
+                "verified": skill.verified,
+                "verified_at": skill.verified_at,
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error fetching skill details: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def put(
+        self,
+        skill_id: int,
+        data: SkillUpdateRequest,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Update a specific skill.
+        """
+        try:
+            skill = session.exec(
+                select(EmployeeSkill).where(
+                    EmployeeSkill.id == skill_id,
+                    EmployeeSkill.employee_id == current_user.id,
+                )
+            ).first()
+
+            if not skill:
+                raise HTTPException(status_code=404, detail="Skill not found")
+
+            if data.skill_name is not None:
+                skill.skill_name = data.skill_name
+            if data.proficiency_level is not None:
+                skill.proficiency_level = data.proficiency_level
+            if data.years_of_experience is not None:
+                skill.years_of_experience = data.years_of_experience
+
+            session.add(skill)
+            session.commit()
+            session.refresh(skill)
+
+            return {"message": "Skill updated successfully"}
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error updating skill: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")
+
+    def delete(
+        self,
+        skill_id: int,
+        current_user: User = Depends(require_employee()),
+        session: Session = Depends(get_session),
+    ):
+        """
+        Delete a skill from the current logged-in employee's profile.
+        """
+        try:
+            skill = session.exec(
+                select(EmployeeSkill).where(
+                    EmployeeSkill.id == skill_id,
+                    EmployeeSkill.employee_id == current_user.id,
+                )
+            ).first()
+
+            if not skill:
+                raise HTTPException(status_code=404, detail="Skill not found")
+
+            session.delete(skill)
+            session.commit()
+
+            return {"message": "Skill deleted successfully"}
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error deleting skill: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Internal server error")

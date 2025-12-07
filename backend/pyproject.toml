@@ -82,6 +82,7 @@ dependencies = [
     "requests==2.32.5",
     "requests-toolbelt==1.0.0",
     "rsa==4.9.1",
+    "sentence-transformers>=5.1.2",
     "six==1.17.0",
     "sqlalchemy==2.0.44",
     "sqlmodel==0.0.27",

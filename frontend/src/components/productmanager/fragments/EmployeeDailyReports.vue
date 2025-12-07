@@ -1,6 +1,5 @@
 <template>
   <div class="daily-reports-container">
-    <!-- Header -->
     <div class="reports-header">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">
@@ -19,7 +18,6 @@
       </div>
     </div>
 
-    <!-- Loading State -->
     <div v-if="loading" class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -27,13 +25,11 @@
       <p class="mt-2 text-muted">Loading reports...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger" role="alert">
       <i class="bi bi-exclamation-triangle me-2"></i>
       {{ error }}
     </div>
 
-    <!-- Reports List -->
     <div v-else-if="reports.length > 0" class="reports-list">
       <div 
         v-for="report in reports" 
@@ -72,7 +68,6 @@
         </div>
       </div>
 
-      <!-- Load More Button -->
       <div v-if="hasMore" class="text-center mt-3">
         <button 
           class="btn btn-outline-primary btn-sm"
@@ -85,7 +80,6 @@
       </div>
     </div>
 
-    <!-- Empty State -->
     <div v-else class="empty-state text-center py-5">
       <i class="bi bi-inbox fs-1 text-muted"></i>
       <p class="mt-3 text-muted">No performance reports yet</p>
@@ -95,11 +89,11 @@
       </button>
     </div>
 
-    <!-- Report Detail Modal -->
-    <div class="modal fade" id="employeeReportDetailModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
+    <Teleport to="body">
+      <div class="modal fade" id="employeeReportDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
             <h5 class="modal-title">
               <i class="bi bi-file-earmark-text me-2"></i>
               Performance Report - {{ selectedReport ? formatDate(selectedReport.report_date) : '' }}
@@ -111,16 +105,16 @@
               <div class="spinner-border text-primary"></div>
             </div>
             <div v-else-if="selectedReport" class="report-detail">
-              <!-- Report HTML Content -->
               <div v-html="selectedReport.report_body_html"></div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -206,7 +200,6 @@ export default {
             type: 'success'
           });
           
-          // Refresh reports after a delay
           setTimeout(() => {
             this.fetchReports();
           }, 3000);
@@ -351,7 +344,6 @@ export default {
   overflow-y: auto;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .report-badges {
     margin-top: 8px;

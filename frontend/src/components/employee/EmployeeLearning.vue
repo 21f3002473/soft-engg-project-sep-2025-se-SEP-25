@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-4">
+  <div class="container-fluid py-4">
     <section class="mb-5">
       <h2 class="h2 fw-bold text-primary mb-4">Personalized Learning</h2>
 

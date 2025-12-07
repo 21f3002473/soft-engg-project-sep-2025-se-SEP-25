@@ -1,4 +1,8 @@
-from .account import AccountResource
+from .account import (
+    AccountResource,
+    EmployeeSkillDetailResource,
+    EmployeeSkillListResource,
+)
 from .assistant import AIAssistantResource, AIChatHistoryResource
 from .dashboard import (
     AllToDoResource,
@@ -60,6 +64,8 @@ __all__ = [
     "QuickNotesResource",
     "AllQuickNotesResource",
     "AccountResource",
+    "EmployeeSkillListResource",
+    "EmployeeSkillDetailResource",
     "AIAssistantResource",
     "AIChatHistoryResource",
 ]

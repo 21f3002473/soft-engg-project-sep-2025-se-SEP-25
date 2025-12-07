@@ -7,7 +7,6 @@
             </div>
         </div>
 
-        <!-- Loading State -->
         <div v-if="loading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -15,13 +14,11 @@
             <p class="mt-3 text-muted">Loading clients...</p>
         </div>
 
-        <!-- Error State -->
         <div v-else-if="error" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             {{ error }}
         </div>
 
-        <!-- Clients Grid -->
         <div v-else>
             <div v-if="ClientList.length > 0" class="row g-3 g-md-4">
                 <div 
@@ -81,7 +78,6 @@ export default {
                 
                 console.log('Clients Response:', response);
 
-                // Extract data from nested response.data structure
                 const responseData = response?.data || {};
                 
                 this.ClientList = responseData?.clients || [];
@@ -100,10 +96,8 @@ export default {
             if (!description) return 'No description available';
             
             try {
-                // Try to decode base64 if it's encoded
                 return atob(description);
             } catch (e) {
-                // If decoding fails, return as is
                 return description;
             }
         }

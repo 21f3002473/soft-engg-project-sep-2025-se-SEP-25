@@ -1,133 +1,131 @@
 <template>
-    <div class="dashboard">
-        <div class="container-fluid">
-            <!-- Page Header -->
-            <div class="row mb-4">
-                <div class="col-12 d-flex justify-content-between align-items-center">
+    <div class="container-fluid dashboard-content">
+        <!-- Header Section -->
+        <section class="mb-4">
+            <div class="card border-0 shadow text-white welcome-card p-4">
+                <div class="card-body p-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
-                        <h2 class="fw-bold mb-3">Product Manager Dashboard</h2>
-                        <p class="text-muted">Overview of projects and client information</p>
+                        <h2 class="fw-bold mb-2 display-6">Product Manager Dashboard</h2>
+                        <p class="mb-0 opacity-75 fs-5">Overview of projects and client information</p>
                     </div>
-                    <button 
-                        type="button" 
-                        class="btn btn-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#newClientModal"
-                    >
+                    <button type="button" class="btn btn-light text-primary fw-semibold shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#newClientModal">
                         <i class="bi bi-plus-lg me-2"></i>Add New Client
                     </button>
                 </div>
             </div>
+        </section>
 
-            <div class="client-list-section">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <h3 class="fw-bold">Client Projects</h3>
-                    </div>
-                </div>
-
-                <div v-if="ClientList.length > 0" class="row g-3">
-                    <div 
-                        v-for="Client in ClientList" 
-                        :key="Client.id"
-                        class="col-12 col-sm-6 col-md-4 col-xl-3"
-                    >
-                        <RouterLink 
-                            :to="{ name: 'ProductManagerRequirements', params: { clientId: Client.id } }"
-                            class="text-decoration-none"
-                        >
-                            <ProductMangerClientCard 
-                                :id="Client.id" 
-                                :clientname="Client.clientname" 
-                                :description="Client.description"
-                                :image="Client.image"
-                            />
-                        </RouterLink>
-                    </div>
-                </div>
-
-                <div v-else class="row">
-                    <div class="col-12">
-                        <div class="alert alert-info text-center" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            No clients available at the moment.
+        <!-- Stats Section -->
+        <div v-if="stats" class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100 stat-card-hover">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div
+                            class="stat-icon bg-primary rounded-3 text-white d-flex align-items-center justify-content-center me-3">
+                            <i class="bi bi-folder2-open fs-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ stats.total_projects }}</h3>
+                            <p class="text-muted mb-0 small">Total Projects</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Stats Section -->
-            <div v-if="stats" class="stats-section mb-5">
-                <!-- Stats Cards Row -->
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card text-center text-white bg-primary shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="display-6 fw-bold mb-2">{{ stats.total_projects }}</h3>
-                                <p class="mb-0">Total Projects</p>
-                            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100 stat-card-hover">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div
+                            class="stat-icon bg-success rounded-3 text-white d-flex align-items-center justify-content-center me-3">
+                            <i class="bi bi-play-circle fs-4"></i>
                         </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card text-center text-white bg-success shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="display-6 fw-bold mb-2">{{ stats.active_projects }}</h3>
-                                <p class="mb-0">Active Projects</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card text-center text-white bg-info shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="display-6 fw-bold mb-2">{{ stats.completed_projects }}</h3>
-                                <p class="mb-0">Completed Projects</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="card text-center text-white bg-warning shadow-sm h-100">
-                            <div class="card-body">
-                                <h3 class="display-6 fw-bold mb-2">{{ stats.pending_projects || 0 }}</h3>
-                                <p class="mb-0">Pending Projects</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Row -->
-                <div class="row g-3">
-                    <div class="col-12 col-lg-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-white">
-                                <h5 class="card-title mb-0">Project Statistics</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas ref="statsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-white">
-                                <h5 class="card-title mb-0">Project Status Distribution</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas ref="statusChart"></canvas>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ stats.active_projects }}</h3>
+                            <p class="text-muted mb-0 small">Active Projects</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Client List Section -->
-            
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100 stat-card-hover">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div
+                            class="stat-icon bg-info rounded-3 text-white d-flex align-items-center justify-content-center me-3">
+                            <i class="bi bi-check-circle fs-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ stats.completed_projects }}</h3>
+                            <p class="text-muted mb-0 small">Completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100 stat-card-hover">
+                    <div class="card-body d-flex align-items-center p-3">
+                        <div
+                            class="stat-icon bg-warning rounded-3 text-white d-flex align-items-center justify-content-center me-3">
+                            <i class="bi bi-hourglass-split fs-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">{{ stats.pending_projects || 0 }}</h3>
+                            <p class="text-muted mb-0 small">Pending</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- New Client Modal -->
+        <!-- Client List Section -->
+        <div class="client-list-section mb-5">
+            <h3 class="fw-bold text-primary mb-3"><i class="bi bi-building me-2"></i>Client Projects</h3>
+
+            <div v-if="ClientList.length > 0" class="row g-3">
+                <div v-for="Client in ClientList" :key="Client.id" class="col-12 col-sm-6 col-md-4 col-xl-3">
+                    <RouterLink :to="{ name: 'ProductManagerRequirements', params: { clientId: Client.id } }"
+                        class="text-decoration-none">
+                        <ProductMangerClientCard :id="Client.id" :clientname="Client.clientname"
+                            :description="Client.description" :image="Client.image" />
+                    </RouterLink>
+                </div>
+            </div>
+
+            <div v-else class="alert alert-info border-0 shadow-sm text-center py-4">
+                <i class="bi bi-info-circle me-2 fs-5"></i>
+                <span class="fs-6">No clients available at the moment.</span>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div v-if="stats" class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-3 ps-3">
+                        <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-bar-chart me-2"></i>Project
+                            Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas ref="statsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-3 ps-3">
+                        <h5 class="card-title fw-bold text-primary mb-0"><i class="bi bi-pie-chart me-2"></i>Status
+                            Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas ref="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <NewClientModal @client-created="onClientCreated" />
     </div>
 </template>
@@ -139,10 +137,9 @@ import ProductMangerClientCard from './fragments/ProductMangerClientCard.vue';
 import NewClientModal from './fragments/NewClientModal.vue';
 import { make_getrequest } from '@/store/appState';
 import { Chart, registerables } from 'chart.js';
+import { useNotify } from '@/utils/useNotify';
 
 Chart.register(...registerables);
-
-// make API call to the endpoint "/api/pm/dashboard" to get the list of clients
 
 export default {
     name: 'ProductmanagerDashboard',
@@ -155,6 +152,10 @@ export default {
             statusChartInstance: null
         };
     },
+    setup() {
+        const notify = useNotify();
+        return { notify };
+    },
     components: {
         ProductMangerClientCard,
         NewClientModal
@@ -163,12 +164,9 @@ export default {
         async fetchClientList() {
             try {
                 const response = await make_getrequest('/api/pm/dashboard');
-                
-                // Handle the nested response structure - data is inside response.data
+
                 const dashboardData = response?.data || {};
-                
-                // Map ClientList to match the card component props
-                // API returns: { id, clientname, image } where image is image_base64
+
                 const rawClients = dashboardData?.ClientList || dashboardData?.clients || [];
                 this.ClientList = rawClients.map(client => ({
                     id: client.id,
@@ -176,47 +174,42 @@ export default {
                     description: 'Click to view details',
                     image: client.image || null
                 }));
-                
+
                 this.stats = dashboardData?.stats || null;
                 this.user = dashboardData?.user || null;
-                
+
                 console.log('Fetched Client List:', this.ClientList);
                 console.log('Dashboard Stats:', this.stats);
                 console.log('User Info:', this.user);
-                
-                // Render charts after data is loaded
+
                 this.$nextTick(() => {
                     this.renderCharts();
                 });
             } catch (error) {
                 console.error('Error fetching client list:', error);
-                // Ensure ClientList is empty array on error
+                this.notify.error('Failed to load dashboard data');
                 this.ClientList = [];
             }
         },
         decodedDescription(description) {
             if (!description) return 'No description available';
-            
+
             try {
-                // Try to decode base64 if it's encoded
                 return atob(description);
             } catch (e) {
-                // If decoding fails, return as is
                 return description;
             }
         },
         renderCharts() {
             if (!this.stats) return;
-            
-            // Destroy existing charts if they exist
+
             if (this.statsChartInstance) {
                 this.statsChartInstance.destroy();
             }
             if (this.statusChartInstance) {
                 this.statusChartInstance.destroy();
             }
-            
-            // Bar Chart for Stats
+
             const statsCtx = this.$refs.statsChart?.getContext('2d');
             if (statsCtx) {
                 this.statsChartInstance = new Chart(statsCtx, {
@@ -260,12 +253,11 @@ export default {
                     }
                 });
             }
-            
-            // Doughnut Chart for Status
+
             const statusCtx = this.$refs.statusChart?.getContext('2d');
             if (statusCtx) {
                 const pendingProjects = this.stats.pending_projects || 0;
-                
+
                 this.statusChartInstance = new Chart(statusCtx, {
                     type: 'doughnut',
                     data: {
@@ -303,7 +295,6 @@ export default {
         },
         onClientCreated(newClient) {
             console.log('New client created:', newClient);
-            // Refresh the client list after a new client is created
             this.fetchClientList();
         }
     },
@@ -311,7 +302,6 @@ export default {
         this.fetchClientList();
     },
     beforeUnmount() {
-        // Clean up charts when component is destroyed
         if (this.statsChartInstance) {
             this.statsChartInstance.destroy();
         }
@@ -323,39 +313,28 @@ export default {
 </script>
 
 <style scoped>
-.dashboard {
-    background-color: #f8f9fa;
-    min-height: 100vh;
-    max-width: 100vw;
-    overflow-x: hidden;
-    padding: 1.5rem 0;
+.welcome-card {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
-.container-fluid {
-    max-width: 100%;
-    /* padding-left: 1rem;
-    padding-right: 1rem; */
+.stat-icon {
+    width: 48px;
+    height: 48px;
 }
 
-.card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+.stat-card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.client-list-section {
-    margin-top: 2rem;
+.stat-card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }
 
 .text-decoration-none:hover {
     text-decoration: none !important;
 }
 
-/* Ensure charts are responsive */
 .chart-container {
     position: relative;
     width: 100%;
@@ -365,32 +344,5 @@ export default {
 .chart-container canvas {
     max-width: 100%;
     height: auto !important;
-}
-
-/* Fix Bootstrap row overflow */
-.row {
-    --bs-gutter-x: 1.5rem;
-    margin-left: calc(var(--bs-gutter-x) * -0.5);
-    margin-right: calc(var(--bs-gutter-x) * -0.5);
-}
-
-/* Responsive padding adjustments */
-@media (min-width: 768px) {
-    .container-fluid {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-}
-
-@media (min-width: 1200px) {
-    .container-fluid {
-        padding-left: 3rem;
-        padding-right: 3rem;
-    }
-}
-
-/* Ensure no element causes overflow */
-* {
-    box-sizing: border-box;
 }
 </style>

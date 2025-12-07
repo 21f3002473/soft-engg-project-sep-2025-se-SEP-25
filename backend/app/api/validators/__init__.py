@@ -10,6 +10,8 @@ from .employee import (
     QuickNoteOut,
     QuickNoteUpdate,
     ReimbursementCreate,
+    SkillAddRequest,
+    SkillUpdateRequest,
     TransferCreate,
 )
 from .user import UserLoginValidator
@@ -17,6 +19,8 @@ from .user import UserLoginValidator
 __all__ = [
     "UserLoginValidator",
     "LeaveCreate",
+    "SkillAddRequest",
+    "SkillUpdateRequest",
     "ReimbursementCreate",
     "TransferCreate",
     "FAQCreate",

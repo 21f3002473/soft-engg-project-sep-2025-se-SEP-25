@@ -1,6 +1,5 @@
 <template>
-  <div class="container-fluid py-4">
-    <!-- Loading State -->
+  <div class="product-manager-employee-performance">
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -8,15 +7,12 @@
       <p class="mt-3 text-muted">Loading employee performance...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
       {{ error }}
     </div>
 
-    <!-- Main Content -->
     <div v-else>
-      <!-- Page Header with Employee Info -->
       <div class="row mb-4">
         <div class="col-12">
           <div class="card shadow-sm border-0 bg-gradient-primary text-white">
@@ -43,36 +39,19 @@
         </div>
       </div>
 
-      <!-- Tabs Navigation -->
       <div class="row mb-4">
         <div class="col-12">
           <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button 
-                class="nav-link active" 
-                id="stats-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#stats" 
-                type="button" 
-                role="tab" 
-                aria-controls="stats" 
-                aria-selected="true"
-              >
+              <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button"
+                role="tab" aria-controls="stats" aria-selected="true">
                 <i class="bi bi-bar-chart-line me-2"></i>
                 Performance Stats
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button 
-                class="nav-link" 
-                id="reports-tab" 
-                data-bs-toggle="tab" 
-                data-bs-target="#reports" 
-                type="button" 
-                role="tab" 
-                aria-controls="reports" 
-                aria-selected="false"
-              >
+              <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button"
+                role="tab" aria-controls="reports" aria-selected="false">
                 <i class="bi bi-file-earmark-text me-2"></i>
                 Daily Reports
               </button>
@@ -81,11 +60,8 @@
         </div>
       </div>
 
-      <!-- Tab Content -->
       <div class="tab-content">
-        <!-- Stats Tab -->
         <div class="tab-pane fade show active" id="stats" role="tabpanel" aria-labelledby="stats-tab">
-          <!-- Current Stats Cards -->
           <div class="row g-3 mb-4">
             <div class="col-12 col-sm-6 col-lg-3">
               <div class="card shadow-sm h-100 border-0">
@@ -140,9 +116,7 @@
             </div>
           </div>
 
-          <!-- Charts Row -->
           <div class="row g-3">
-            <!-- Performance Trends Chart -->
             <div class="col-12 col-lg-8">
               <div class="card shadow-sm h-100 border-0">
                 <div class="card-header bg-white border-0">
@@ -159,7 +133,6 @@
               </div>
             </div>
 
-            <!-- Task Distribution Chart -->
             <div class="col-12 col-lg-4">
               <div class="card shadow-sm h-100 border-0">
                 <div class="card-header bg-white border-0">
@@ -178,7 +151,6 @@
           </div>
         </div>
 
-        <!-- Reports Tab -->
         <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
           <EmployeeDailyReports :employeeId="employeeId" />
         </div>
@@ -191,6 +163,7 @@
 import { make_getrequest } from '@/store/appState';
 import { Chart, registerables } from 'chart.js';
 import EmployeeDailyReports from './fragments/EmployeeDailyReports.vue';
+import { useNotify } from '@/utils/useNotify';
 
 Chart.register(...registerables);
 
@@ -216,6 +189,10 @@ export default {
       distributionChartInstance: null
     };
   },
+  setup() {
+    const notify = useNotify();
+    return { notify };
+  },
   methods: {
     async fetchPerformanceData() {
       this.loading = true;
@@ -223,11 +200,11 @@ export default {
 
       try {
         const response = await make_getrequest(`/api/pm/employee/performance/${this.employeeId}`);
-        
+
         console.log('Performance Response:', response);
 
         const responseData = response?.data || {};
-        
+
         this.employeeData = responseData?.employee || null;
         this.currentStats = responseData?.current_stats || null;
         this.performanceTrends = responseData?.performance_trends || [];
@@ -239,16 +216,16 @@ export default {
         this.$nextTick(() => {
           this.renderCharts();
         });
-        
+
       } catch (error) {
         console.error('Error fetching performance data:', error);
         this.error = error.message || 'Failed to load performance data. Please try again.';
+        this.notify.error(this.error);
       } finally {
         this.loading = false;
       }
     },
     renderCharts() {
-      // Destroy existing charts
       if (this.performanceChartInstance) {
         this.performanceChartInstance.destroy();
       }
@@ -256,7 +233,6 @@ export default {
         this.distributionChartInstance.destroy();
       }
 
-      // Performance Trends Line Chart
       const performanceCtx = this.$refs.performanceChart?.getContext('2d');
       if (performanceCtx && this.performanceTrends.length > 0) {
         const months = this.performanceTrends.map(item => item.month);
@@ -301,7 +277,7 @@ export default {
                 beginAtZero: true,
                 max: 100,
                 ticks: {
-                  callback: function(value) {
+                  callback: function (value) {
                     return value + '%';
                   }
                 }
@@ -311,7 +287,6 @@ export default {
         });
       }
 
-      // Task Distribution Doughnut Chart
       const distributionCtx = this.$refs.distributionChart?.getContext('2d');
       if (distributionCtx && this.currentStats) {
         this.distributionChartInstance = new Chart(distributionCtx, {
@@ -422,7 +397,6 @@ export default {
   height: auto !important;
 }
 
-/* Tabs styling */
 .nav-tabs {
   border-bottom: 2px solid #e0e0e0;
 }
@@ -456,7 +430,7 @@ export default {
   .employee-avatar-lg {
     font-size: 3rem;
   }
-  
+
   .nav-tabs .nav-link {
     padding: 10px 16px;
     font-size: 0.9rem;

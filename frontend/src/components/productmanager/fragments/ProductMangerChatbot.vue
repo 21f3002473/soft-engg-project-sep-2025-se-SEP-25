@@ -1,6 +1,5 @@
 <template>
   <div class="chatbot-container d-flex flex-column h-100">
-    <!-- Chat Messages Area -->
     <div class="chat-messages flex-grow-1 overflow-auto mb-3 p-2" ref="messageContainer">
       <div v-if="messages.length === 0" class="text-center text-muted py-4">
         <i class="bi bi-chat-quote fs-1"></i>
@@ -23,7 +22,6 @@
       </div>
     </div>
 
-    <!-- Input Area -->
     <div class="chat-input">
       <form @submit.prevent="sendMessage" class="d-flex gap-2">
         <input
@@ -81,12 +79,10 @@ export default {
       this.userInput = '';
       this.isSending = true;
 
-      // Scroll to bottom
       this.$nextTick(() => {
         this.scrollToBottom();
       });
 
-      // Simulate AI response (replace with actual API call)
       setTimeout(() => {
         const aiMessage = {
           sender: 'ai',
@@ -109,7 +105,6 @@ export default {
     }
   },
   mounted() {
-    // Welcome message
     this.messages.push({
       sender: 'ai',
       text: `Hello! I'm here to help you with ${this.clientName}'s requirements and project details. How can I assist you today?`,

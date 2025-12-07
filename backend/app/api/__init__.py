@@ -55,6 +55,14 @@ from app.api.resources.pm_resources.roadmap import (
     ProjectRoadmapResource,
     RoadmapHistoryResource,
 )
+from app.api.resources.pm_resources.team_allocation import (
+    AllocationPolicyResource,
+    EmployeeAvailabilityResource,
+    EmployeeSkillsResource,
+    NaturalLanguageQueryResource,
+    RecommendationApprovalResource,
+    TeamAllocationResource,
+)
 from app.controllers import (
     ACCESS_TOKEN_EXPIRE_DAYS,
     Token,
@@ -201,6 +209,32 @@ class API:
             f"{pm_base_url}/employee-reports/{{report_id}}",
         )
 
+        # Team Allocation
+        self.register_router(
+            TeamAllocationResource,
+            f"{pm_base_url}/projects/{{project_id}}/team-allocation",
+        )
+        self.register_router(
+            RecommendationApprovalResource,
+            f"{pm_base_url}/allocation-recommendations/{{recommendation_id}}",
+        )
+        self.register_router(
+            NaturalLanguageQueryResource,
+            f"{pm_base_url}/team-allocation/query",
+        )
+        self.register_router(
+            EmployeeSkillsResource,
+            f"{pm_base_url}/employees/{{employee_id}}/skills",
+        )
+        self.register_router(
+            EmployeeAvailabilityResource,
+            f"{pm_base_url}/employees/{{employee_id}}/availability",
+        )
+        self.register_router(
+            AllocationPolicyResource,
+            f"{pm_base_url}/allocation-policies",
+        )
+
         # Employee
         emp_base_url = "/api/employee"
         hr_base_url = "/api/hr"
@@ -273,6 +307,12 @@ class API:
         self.register_router(QuickNotesResource, f"{emp_base_url}/writing/{{note_id}}")
 
         self.register_router(AccountResource, f"{emp_base_url}/account")
+        self.register_router(
+            EmployeeSkillListResource, f"{emp_base_url}/account/skills"
+        )
+        self.register_router(
+            EmployeeSkillDetailResource, f"{emp_base_url}/account/skills/{{skill_id}}"
+        )
 
         self.register_router(AIAssistantResource, f"{emp_base_url}/assistant")
         self.register_router(AIChatHistoryResource, f"{emp_base_url}/assistant/history")
