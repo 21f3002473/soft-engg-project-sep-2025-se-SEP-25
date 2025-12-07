@@ -1,19 +1,12 @@
 <template>
   <div id="app">
-    <ToastContainer />
     <router-view />
   </div>
 </template>
 
 <script>
-import { ToastContainer } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
-
 export default {
-  name: 'App',
-  components: {
-    ToastContainer
-  }
+  name: 'App'
 }
 </script>
 

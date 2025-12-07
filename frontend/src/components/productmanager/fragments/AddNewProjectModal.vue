@@ -112,6 +112,7 @@ import { useNotify } from '@/utils/useNotify';
 import bootstrap from 'bootstrap';
 export default {
     name: 'AddNewProjectModal',
+    emits: ['project-created'],
     data() {
         return {
             projectForm: {

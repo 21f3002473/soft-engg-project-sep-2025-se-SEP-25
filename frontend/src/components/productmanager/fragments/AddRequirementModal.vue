@@ -78,6 +78,7 @@ import { useNotify } from '@/utils/useNotify';
 import bootstrap from 'bootstrap';
 export default {
     name: 'AddRequirementModal',
+    emits: ['requirement-created'],
     props: {
         clientId: {
             type: [String, Number],
