@@ -2,16 +2,9 @@ from app.agents.hr.ask_questions import answer_question
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi_restful import Resource
-from pydantic import BaseModel
-
-
-class QuestionRequest(BaseModel):
-    question: str
-    top_k: int = 5
-
+from app.api.validators.hr import QuestionRequest
 
 class AIAssistantResource(Resource):
-
     async def post(self, request: Request):
         body = await request.json()
         try:
