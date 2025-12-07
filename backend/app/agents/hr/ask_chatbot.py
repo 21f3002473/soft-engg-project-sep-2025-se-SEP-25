@@ -17,6 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "data", "data.txt")
 VECTOR_STORE_FILE = os.path.join(BASE_DIR, "data", "hr_vectors.pkl")
 
+
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
