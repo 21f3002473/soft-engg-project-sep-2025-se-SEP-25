@@ -1,6 +1,5 @@
 <template>
   <div class="daily-reports-container">
-    <!-- Header -->
     <div class="reports-header">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">
@@ -33,7 +32,6 @@
       {{ error }}
     </div>
 
-    <!-- Reports List -->
     <div v-else-if="reports.length > 0" class="reports-list">
       <div 
         v-for="report in reports" 
@@ -72,7 +70,6 @@
         </div>
       </div>
 
-      <!-- Load More Button -->
       <div v-if="hasMore" class="text-center mt-3">
         <button 
           class="btn btn-outline-primary btn-sm"
@@ -85,7 +82,6 @@
       </div>
     </div>
 
-    <!-- Empty State -->
     <div v-else class="empty-state text-center py-5">
       <i class="bi bi-inbox fs-1 text-muted"></i>
       <p class="mt-3 text-muted">No daily reports yet</p>
@@ -95,7 +91,6 @@
       </button>
     </div>
 
-    <!-- Report Detail Modal -->
     <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -111,7 +106,6 @@
               <div class="spinner-border text-primary"></div>
             </div>
             <div v-else-if="selectedReport" class="report-detail">
-              <!-- Report HTML Content -->
               <div v-html="selectedReport.report_body_html"></div>
             </div>
           </div>
@@ -206,7 +200,6 @@ export default {
             type: 'success'
           });
           
-          // Refresh reports after a delay
           setTimeout(() => {
             this.fetchReports();
           }, 3000);

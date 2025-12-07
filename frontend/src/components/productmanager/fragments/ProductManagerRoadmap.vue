@@ -1,6 +1,5 @@
 <template>
   <div class="roadmap-viewer">
-    <!-- Header -->
     <div class="roadmap-header">
       <div class="d-flex justify-content-between align-items-center">
         <h3 class="mb-0">
@@ -8,19 +7,11 @@
           Project Roadmap
         </h3>
         <div class="d-flex gap-2">
-          <button 
-            class="btn btn-sm btn-outline-primary btn-hover" 
-            @click="fetchRoadmap"
-            :disabled="loading"
-          >
+          <button class="btn btn-sm btn-outline-primary btn-hover" @click="fetchRoadmap" :disabled="loading">
             <i class="bi bi-arrow-clockwise me-1" :class="{ 'rotating': loading }"></i>
             {{ loading ? 'Loading...' : 'Refresh' }}
           </button>
-          <button 
-            class="btn btn-sm btn-primary btn-gradient" 
-            @click="generateNewRoadmap"
-            :disabled="generating"
-          >
+          <button class="btn btn-sm btn-primary btn-gradient" @click="generateNewRoadmap" :disabled="generating">
             <i class="bi bi-plus-circle me-1"></i>
             {{ generating ? 'Generating...' : 'Generate New' }}
           </button>
@@ -28,7 +19,6 @@
       </div>
     </div>
 
-    <!-- Loading State -->
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary loading-spinner" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -36,20 +26,17 @@
       <p class="mt-3 text-muted fw-semibold">Loading roadmap...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger custom-alert" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
       {{ error }}
     </div>
 
-    <!-- Roadmap Content -->
     <div v-else-if="roadmap" class="roadmap-content">
-      <!-- Summary Section -->
       <div class="roadmap-section">
         <div class="summary-card">
           <h5><i class="bi bi-info-circle me-2"></i>Summary</h5>
           <p>{{ roadmap.summary }}</p>
-          
+
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">{{ roadmap.total_requirements || 0 }}</div>
@@ -71,7 +58,6 @@
         </div>
       </div>
 
-      <!-- Timeline Section -->
       <div class="roadmap-section">
         <h5><i class="bi bi-calendar3 me-2"></i>Timeline</h5>
         <div class="timeline-card">
@@ -92,15 +78,10 @@
         </div>
       </div>
 
-      <!-- Milestones Section -->
       <div class="roadmap-section">
         <h5><i class="bi bi-flag me-2"></i>Milestones</h5>
         <div class="milestones-container">
-          <div 
-            v-for="(milestone, index) in roadmap.milestones" 
-            :key="index"
-            class="milestone-card"
-          >
+          <div v-for="(milestone, index) in roadmap.milestones" :key="index" class="milestone-card">
             <div class="milestone-header">
               <div class="milestone-number">{{ index + 1 }}</div>
               <div class="milestone-info">
@@ -122,24 +103,15 @@
         </div>
       </div>
 
-      <!-- Workflow Steps Section -->
       <div class="roadmap-section" v-if="roadmap.workflow_steps && roadmap.workflow_steps.length > 0">
         <h5><i class="bi bi-diagram-3 me-2"></i>Workflow Steps</h5>
         <div class="workflow-container">
-          <div 
-            v-for="(workflow, index) in roadmap.workflow_steps" 
-            :key="index"
-            class="workflow-milestone"
-          >
+          <div v-for="(workflow, index) in roadmap.workflow_steps" :key="index" class="workflow-milestone">
             <h6 class="workflow-milestone-title">
               Milestone {{ workflow.milestone_id }} Steps
             </h6>
             <div class="workflow-steps">
-              <div 
-                v-for="(step, stepIndex) in workflow.steps" 
-                :key="stepIndex"
-                class="workflow-step"
-              >
+              <div v-for="(step, stepIndex) in workflow.steps" :key="stepIndex" class="workflow-step">
                 <div class="step-number">{{ stepIndex + 1 }}</div>
                 <div class="step-content">
                   <h6 class="step-name">{{ step.step_name }}</h6>
@@ -158,22 +130,16 @@
         </div>
       </div>
 
-      <!-- Recommendations Section -->
       <div class="roadmap-section">
         <h5><i class="bi bi-lightbulb me-2"></i>Recommendations</h5>
         <div class="recommendations-container">
-          <div 
-            v-for="(recommendation, index) in roadmap.recommendations" 
-            :key="index"
-            class="recommendation-item"
-          >
+          <div v-for="(recommendation, index) in roadmap.recommendations" :key="index" class="recommendation-item">
             <i class="bi bi-check-circle-fill recommendation-icon"></i>
             <span>{{ recommendation }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Version Info -->
       <div class="roadmap-footer">
         <small class="text-muted">
           <i class="bi bi-info-circle me-1"></i>
@@ -182,7 +148,6 @@
       </div>
     </div>
 
-    <!-- No Roadmap State -->
     <div v-else class="text-center py-5 no-roadmap-state">
       <div class="empty-state-icon">
         <i class="bi bi-map"></i>
@@ -221,16 +186,20 @@ export default {
       error: null
     };
   },
+  setup() {
+    const notify = useNotify();
+    return { notify };
+  },
   methods: {
     async fetchRoadmap() {
       this.loading = true;
       this.error = null;
-      
+
       try {
         const response = await make_getrequest(
           `/api/pm/project/${this.projectId}/client/${this.clientId}/roadmap`
         );
-        
+
         if (response && response.data) {
           this.roadmap = response.data.data || response.data;
         } else {
@@ -246,7 +215,7 @@ export default {
     async generateNewRoadmap() {
       this.generating = true;
       this.error = null;
-      
+
       try {
         const response = await make_postrequest(
           `/api/pm/project/${this.projectId}/client/${this.clientId}/roadmap`,
@@ -255,21 +224,18 @@ export default {
             send_email: true
           }
         );
-        
+
         if (response && response.data) {
           this.roadmap = response.data.data || response.data;
-          // Show success notification
-          useNotify({
-            title: 'Success',
-            text: 'Roadmap generated successfully! Check your email for details.',
-            type: 'success'
-          });
+          this.notify.success('Roadmap generated successfully! Check your email for details.');
         } else {
           this.error = 'Failed to generate roadmap';
+          this.notify.error('Failed to generate roadmap');
         }
       } catch (error) {
         console.error('Error generating roadmap:', error);
         this.error = error.message || 'Failed to generate roadmap';
+        this.notify.error(this.error);
       } finally {
         this.generating = false;
       }
@@ -528,10 +494,13 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.5;
@@ -685,22 +654,21 @@ export default {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .timeline-item {
     flex-direction: column;
     gap: 5px;
   }
-  
+
   .milestone-header {
     flex-direction: column;
   }
-  
+
   .workflow-step {
     flex-direction: column;
   }
 }
 
-/* Custom scrollbar */
 .roadmap-content::-webkit-scrollbar {
   width: 10px;
 }
@@ -720,7 +688,6 @@ export default {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
-/* Workflow improvements */
 .workflow-container {
   background: white;
   padding: 20px;
@@ -759,7 +726,6 @@ export default {
   box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
 }
 
-/* Button styles */
 .btn-gradient {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
@@ -782,7 +748,6 @@ export default {
   box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
 }
 
-/* Loading spinner */
 .loading-spinner {
   width: 3rem;
   height: 3rem;
@@ -797,12 +762,12 @@ export default {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-/* Empty state */
 .no-roadmap-state {
   background: white;
   border-radius: 15px;
@@ -824,11 +789,9 @@ export default {
   font-weight: 500;
 }
 
-/* Badge improvements */
 .badge {
   padding: 8px 12px;
   font-weight: 600;
   font-size: 13px;
 }
-
 </style>

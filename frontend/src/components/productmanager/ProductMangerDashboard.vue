@@ -1,19 +1,14 @@
 <template>
     <div class="dashboard">
         <div class="container-fluid">
-            <!-- Page Header -->
             <div class="row mb-4">
                 <div class="col-12 d-flex justify-content-between align-items-center">
                     <div>
                         <h2 class="fw-bold mb-3">Product Manager Dashboard</h2>
                         <p class="text-muted">Overview of projects and client information</p>
                     </div>
-                    <button 
-                        type="button" 
-                        class="btn btn-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#newClientModal"
-                    >
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#newClientModal">
                         <i class="bi bi-plus-lg me-2"></i>Add New Client
                     </button>
                 </div>
@@ -27,21 +22,11 @@
                 </div>
 
                 <div v-if="ClientList.length > 0" class="row g-3">
-                    <div 
-                        v-for="Client in ClientList" 
-                        :key="Client.id"
-                        class="col-12 col-sm-6 col-md-4 col-xl-3"
-                    >
-                        <RouterLink 
-                            :to="{ name: 'ProductManagerRequirements', params: { clientId: Client.id } }"
-                            class="text-decoration-none"
-                        >
-                            <ProductMangerClientCard 
-                                :id="Client.id" 
-                                :clientname="Client.clientname" 
-                                :description="Client.description"
-                                :image="Client.image"
-                            />
+                    <div v-for="Client in ClientList" :key="Client.id" class="col-12 col-sm-6 col-md-4 col-xl-3">
+                        <RouterLink :to="{ name: 'ProductManagerRequirements', params: { clientId: Client.id } }"
+                            class="text-decoration-none">
+                            <ProductMangerClientCard :id="Client.id" :clientname="Client.clientname"
+                                :description="Client.description" :image="Client.image" />
                         </RouterLink>
                     </div>
                 </div>
@@ -56,9 +41,7 @@
                 </div>
             </div>
 
-            <!-- Stats Section -->
             <div v-if="stats" class="stats-section mb-5">
-                <!-- Stats Cards Row -->
                 <div class="row g-3 mb-4">
                     <div class="col-12 col-sm-6 col-lg-3">
                         <div class="card text-center text-white bg-primary shadow-sm h-100">
@@ -94,7 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Charts Row -->
                 <div class="row g-3">
                     <div class="col-12 col-lg-6">
                         <div class="card shadow-sm h-100">
@@ -122,12 +104,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Client List Section -->
-            
         </div>
 
-        <!-- New Client Modal -->
         <NewClientModal @client-created="onClientCreated" />
     </div>
 </template>
@@ -139,10 +117,9 @@ import ProductMangerClientCard from './fragments/ProductMangerClientCard.vue';
 import NewClientModal from './fragments/NewClientModal.vue';
 import { make_getrequest } from '@/store/appState';
 import { Chart, registerables } from 'chart.js';
+import { useNotify } from '@/utils/useNotify';
 
 Chart.register(...registerables);
-
-// make API call to the endpoint "/api/pm/dashboard" to get the list of clients
 
 export default {
     name: 'ProductmanagerDashboard',
@@ -155,6 +132,10 @@ export default {
             statusChartInstance: null
         };
     },
+    setup() {
+        const notify = useNotify();
+        return { notify };
+    },
     components: {
         ProductMangerClientCard,
         NewClientModal
@@ -163,12 +144,9 @@ export default {
         async fetchClientList() {
             try {
                 const response = await make_getrequest('/api/pm/dashboard');
-                
-                // Handle the nested response structure - data is inside response.data
+
                 const dashboardData = response?.data || {};
-                
-                // Map ClientList to match the card component props
-                // API returns: { id, clientname, image } where image is image_base64
+
                 const rawClients = dashboardData?.ClientList || dashboardData?.clients || [];
                 this.ClientList = rawClients.map(client => ({
                     id: client.id,
@@ -176,47 +154,42 @@ export default {
                     description: 'Click to view details',
                     image: client.image || null
                 }));
-                
+
                 this.stats = dashboardData?.stats || null;
                 this.user = dashboardData?.user || null;
-                
+
                 console.log('Fetched Client List:', this.ClientList);
                 console.log('Dashboard Stats:', this.stats);
                 console.log('User Info:', this.user);
-                
-                // Render charts after data is loaded
+
                 this.$nextTick(() => {
                     this.renderCharts();
                 });
             } catch (error) {
                 console.error('Error fetching client list:', error);
-                // Ensure ClientList is empty array on error
+                this.notify.error('Failed to load dashboard data');
                 this.ClientList = [];
             }
         },
         decodedDescription(description) {
             if (!description) return 'No description available';
-            
+
             try {
-                // Try to decode base64 if it's encoded
                 return atob(description);
             } catch (e) {
-                // If decoding fails, return as is
                 return description;
             }
         },
         renderCharts() {
             if (!this.stats) return;
-            
-            // Destroy existing charts if they exist
+
             if (this.statsChartInstance) {
                 this.statsChartInstance.destroy();
             }
             if (this.statusChartInstance) {
                 this.statusChartInstance.destroy();
             }
-            
-            // Bar Chart for Stats
+
             const statsCtx = this.$refs.statsChart?.getContext('2d');
             if (statsCtx) {
                 this.statsChartInstance = new Chart(statsCtx, {
@@ -260,12 +233,11 @@ export default {
                     }
                 });
             }
-            
-            // Doughnut Chart for Status
+
             const statusCtx = this.$refs.statusChart?.getContext('2d');
             if (statusCtx) {
                 const pendingProjects = this.stats.pending_projects || 0;
-                
+
                 this.statusChartInstance = new Chart(statusCtx, {
                     type: 'doughnut',
                     data: {
@@ -303,7 +275,6 @@ export default {
         },
         onClientCreated(newClient) {
             console.log('New client created:', newClient);
-            // Refresh the client list after a new client is created
             this.fetchClientList();
         }
     },
@@ -311,7 +282,6 @@ export default {
         this.fetchClientList();
     },
     beforeUnmount() {
-        // Clean up charts when component is destroyed
         if (this.statsChartInstance) {
             this.statsChartInstance.destroy();
         }
@@ -333,8 +303,6 @@ export default {
 
 .container-fluid {
     max-width: 100%;
-    /* padding-left: 1rem;
-    padding-right: 1rem; */
 }
 
 .card {
@@ -367,14 +335,12 @@ export default {
     height: auto !important;
 }
 
-/* Fix Bootstrap row overflow */
 .row {
     --bs-gutter-x: 1.5rem;
     margin-left: calc(var(--bs-gutter-x) * -0.5);
     margin-right: calc(var(--bs-gutter-x) * -0.5);
 }
 
-/* Responsive padding adjustments */
 @media (min-width: 768px) {
     .container-fluid {
         padding-left: 2rem;
@@ -389,7 +355,6 @@ export default {
     }
 }
 
-/* Ensure no element causes overflow */
 * {
     box-sizing: border-box;
 }

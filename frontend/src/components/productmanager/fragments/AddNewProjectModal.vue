@@ -1,26 +1,16 @@
 <template>
-    <div class="modal fade" id="addNewProjectModal" tabindex="-1" aria-labelledby="addNewProjectModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addNewProjectModal" tabindex="-1" aria-labelledby="addNewProjectModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addNewProjectModalLabel">
                         <i class="bi bi-folder-plus me-2"></i>Add New Project
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Success Alert -->
-                    <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
-                        <button type="button" class="btn-close" @click="successMessage = null"></button>
-                    </div>
-                    
-                    <!-- Error Alert -->
-                    <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
-                        <button type="button" class="btn-close" @click="errorMessage = null"></button>
-                    </div>
-
                     <form @submit.prevent="saveProject">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -28,38 +18,23 @@
                                     Project ID <span class="text-danger">*</span>
                                 </label>
                                 <div class="input-group">
-                                    <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        id="projectId" 
-                                        v-model="projectForm.project_id"
-                                        placeholder="Auto-generated project ID"
-                                        readonly
-                                    >
-                                    <button 
-                                        type="button" 
-                                        class="btn btn-outline-secondary" 
-                                        @click="generateProjectId"
-                                        title="Regenerate ID"
-                                    >
+                                    <input type="text" class="form-control" id="projectId"
+                                        v-model="projectForm.project_id" placeholder="Auto-generated project ID"
+                                        readonly>
+                                    <button type="button" class="btn btn-outline-secondary" @click="generateProjectId"
+                                        title="Regenerate ID">
                                         <i class="bi bi-arrow-clockwise"></i>
                                     </button>
                                 </div>
                                 <small class="text-muted">Auto-generated. Click to regenerate.</small>
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label for="projectName" class="form-label">
                                     Project Name <span class="text-danger">*</span>
                                 </label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="projectName" 
-                                    v-model="projectForm.project_name"
-                                    placeholder="Enter project name"
-                                    required
-                                >
+                                <input type="text" class="form-control" id="projectName"
+                                    v-model="projectForm.project_name" placeholder="Enter project name" required>
                             </div>
                         </div>
 
@@ -67,14 +42,8 @@
                             <label for="description" class="form-label">
                                 Description <span class="text-danger">*</span>
                             </label>
-                            <textarea 
-                                class="form-control" 
-                                id="description" 
-                                v-model="projectForm.description"
-                                placeholder="Enter project description"
-                                rows="3"
-                                required
-                            ></textarea>
+                            <textarea class="form-control" id="description" v-model="projectForm.description"
+                                placeholder="Enter project description" rows="3" required></textarea>
                         </div>
 
                         <div class="row">
@@ -82,12 +51,7 @@
                                 <label for="status" class="form-label">
                                     Status <span class="text-danger">*</span>
                                 </label>
-                                <select 
-                                    class="form-select" 
-                                    id="status" 
-                                    v-model="projectForm.status"
-                                    required
-                                >
+                                <select class="form-select" id="status" v-model="projectForm.status" required>
                                     <option value="" disabled>Select status</option>
                                     <option value="PENDING">Pending</option>
                                     <option value="IN_PROGRESS">In Progress</option>
@@ -101,21 +65,12 @@
                                 <label for="clientId" class="form-label">
                                     Client <span class="text-danger">*</span>
                                 </label>
-                                <select 
-                                    class="form-select" 
-                                    id="clientId" 
-                                    v-model="projectForm.client_id"
-                                    required
-                                    :disabled="clientsLoading"
-                                >
+                                <select class="form-select" id="clientId" v-model="projectForm.client_id" required
+                                    :disabled="clientsLoading">
                                     <option value="" disabled>
                                         {{ clientsLoading ? 'Loading clients...' : 'Select a client' }}
                                     </option>
-                                    <option 
-                                        v-for="client in clients" 
-                                        :key="client.id" 
-                                        :value="client.id"
-                                    >
+                                    <option v-for="client in clients" :key="client.id" :value="client.id">
                                         {{ client.client_name }} ({{ client.client_id }})
                                     </option>
                                 </select>
@@ -129,13 +84,8 @@
                             <label for="managerId" class="form-label">
                                 Manager ID <span class="text-muted">(Optional)</span>
                             </label>
-                            <input 
-                                type="number" 
-                                class="form-control" 
-                                id="managerId" 
-                                v-model.number="projectForm.manager_id"
-                                placeholder="Enter manager ID (optional)"
-                            >
+                            <input type="number" class="form-control" id="managerId"
+                                v-model.number="projectForm.manager_id" placeholder="Enter manager ID (optional)">
                         </div>
                     </form>
                 </div>
@@ -143,12 +93,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-lg me-1"></i>Close
                     </button>
-                    <button 
-                        type="button" 
-                        class="btn btn-primary" 
-                        @click="saveProject"
-                        :disabled="loading"
-                    >
+                    <button type="button" class="btn btn-primary" @click="saveProject" :disabled="loading">
                         <span v-if="loading" class="spinner-border spinner-border-sm me-1" role="status"></span>
                         <i v-else class="bi bi-check-lg me-1"></i>
                         {{ loading ? 'Creating...' : 'Create Project' }}
@@ -161,6 +106,7 @@
 
 <script>
 import { make_postrequest, make_getrequest } from '@/store/appState';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
     name: 'AddNewProjectModal',
@@ -176,14 +122,15 @@ export default {
             },
             clients: [],
             clientsLoading: false,
-            loading: false,
-            successMessage: null,
-            errorMessage: null
+            loading: false
         };
+    },
+    setup() {
+        const notify = useNotify();
+        return { notify };
     },
     methods: {
         generateProjectId() {
-            // Generate a short UUID and prefix with 'PRJ-'
             const uuid = crypto.randomUUID().split('-')[0].toUpperCase();
             this.projectForm.project_id = `PRJ-${uuid}`;
         },
@@ -192,7 +139,7 @@ export default {
             try {
                 const response = await make_getrequest('/api/pm/clients');
                 console.log('Clients Response:', response);
-                
+
                 if (response && response.data && response.data.clients) {
                     this.clients = response.data.clients;
                 } else if (response && response.clients) {
@@ -200,10 +147,11 @@ export default {
                 } else {
                     this.clients = [];
                 }
-                
+
                 console.log('Loaded clients:', this.clients);
             } catch (error) {
                 console.error('Error fetching clients:', error);
+                this.notify.error('Failed to load clients');
                 this.clients = [];
             } finally {
                 this.clientsLoading = false;
@@ -211,31 +159,34 @@ export default {
         },
         async saveProject() {
             this.loading = true;
-            this.successMessage = null;
-            this.errorMessage = null;
 
             try {
-                // Prepare data - remove manager_id if not provided
                 const payload = { ...this.projectForm };
                 if (!payload.manager_id) {
                     delete payload.manager_id;
                 }
-                // Ensure client_id is a number
                 payload.client_id = parseInt(payload.client_id);
 
                 const response = await make_postrequest('/api/pm/projects', payload);
                 console.log('Create Project Response:', response);
 
                 if (response && response.data) {
-                    this.successMessage = response.message || 'Project created successfully!';
+                    this.notify.success(response.message || 'Project created successfully!');
                     this.resetForm();
                     this.$emit('project-created', response.data);
+
+                    // Close modal
+                    const modalElement = document.getElementById('addNewProjectModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
                 } else {
-                    this.errorMessage = response.message || 'Failed to create project';
+                    throw new Error(response.message || 'Failed to create project');
                 }
             } catch (error) {
                 console.error('Error creating project:', error);
-                this.errorMessage = error.message || 'An error occurred while creating the project';
+                this.notify.error(error.message || 'An error occurred while creating the project');
             } finally {
                 this.loading = false;
             }
@@ -249,18 +200,14 @@ export default {
                 client_id: '',
                 manager_id: null
             };
-            // Generate new project ID after reset
             this.generateProjectId();
         }
     },
     mounted() {
-        // Generate initial project ID
         this.generateProjectId();
-        
-        // Fetch clients when modal is mounted
+
         this.fetchClients();
-        
-        // Refresh clients and generate new ID when modal is shown
+
         const modal = document.getElementById('addNewProjectModal');
         if (modal) {
             modal.addEventListener('show.bs.modal', () => {

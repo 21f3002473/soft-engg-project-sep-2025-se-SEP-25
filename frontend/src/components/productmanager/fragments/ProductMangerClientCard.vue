@@ -51,15 +51,12 @@ export default {
     },
     computed: {
         clientImage() {
-            // If image error occurred or no image, use fallback
             if (this.imageError || !this.image) {
                 return `https://dummyjson.com/icon/${encodeURIComponent(this.clientname)}/150`;
             }
-            // Check if image is already a full data URL or just base64
             if (this.image.startsWith('data:image')) {
                 return this.image;
             }
-            // Assume it's base64 encoded, add data URL prefix
             return `data:image/png;base64,${this.image}`;
         }
     },

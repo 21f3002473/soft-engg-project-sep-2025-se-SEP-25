@@ -1,6 +1,5 @@
 <template>
   <div class="email-history-container">
-    <!-- Loading State -->
     <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading emails...</span>
@@ -8,38 +7,26 @@
       <p class="mt-3 text-muted">Loading email history...</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger" role="alert">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
       {{ error }}
     </div>
 
-    <!-- Email History Content -->
     <div v-else>
-      <!-- Header with Generate Button -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="text-primary mb-0">
           <i class="bi bi-envelope-check me-2"></i>
           Email History ({{ totalEmails }})
         </h5>
-        <button 
-          class="btn btn-primary btn-sm"
-          @click="generateEmail"
-          :disabled="generating"
-        >
+        <button class="btn btn-primary btn-sm" @click="generateEmail" :disabled="generating">
           <span v-if="generating" class="spinner-border spinner-border-sm me-1"></span>
           <i v-else class="bi bi-send me-1"></i>
           {{ generating ? 'Generating...' : 'Generate & Send Email' }}
         </button>
       </div>
 
-      <!-- Success Message -->
-      <div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
-        <button type="button" class="btn-close" @click="successMessage = null"></button>
-      </div>
 
-      <!-- No Emails State -->
+
       <div v-if="emails.length === 0" class="text-center py-5 bg-light rounded">
         <i class="bi bi-inbox fs-1 text-muted"></i>
         <p class="mt-3 text-muted">No emails sent yet</p>
@@ -49,16 +36,10 @@
         </button>
       </div>
 
-      <!-- Email Timeline -->
       <div v-else class="email-timeline">
-        <div 
-          v-for="email in emails" 
-          :key="email.id"
-          class="email-card mb-3"
-        >
+        <div v-for="email in emails" :key="email.id" class="email-card mb-3">
           <div class="card shadow-sm">
             <div class="card-body">
-              <!-- Email Header -->
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="flex-fill">
                   <h6 class="mb-1 fw-bold">{{ email.subject }}</h6>
@@ -71,14 +52,11 @@
                       <i class="bi bi-envelope me-1"></i>
                       {{ email.recipient_email }}
                     </span>
-                    <span 
-                      class="badge"
-                      :class="{
-                        'bg-success': email.delivery_status === 'sent',
-                        'bg-danger': email.delivery_status === 'failed',
-                        'bg-warning': email.delivery_status === 'pending'
-                      }"
-                    >
+                    <span class="badge" :class="{
+                      'bg-success': email.delivery_status === 'sent',
+                      'bg-danger': email.delivery_status === 'failed',
+                      'bg-warning': email.delivery_status === 'pending'
+                    }">
                       {{ email.delivery_status }}
                     </span>
                     <span v-if="email.opened" class="badge bg-info">
@@ -86,17 +64,12 @@
                     </span>
                   </div>
                 </div>
-                <button 
-                  class="btn btn-sm btn-outline-primary"
-                  @click="viewEmailDetails(email.id)"
-                  data-bs-toggle="modal"
-                  data-bs-target="#emailDetailModal"
-                >
+                <button class="btn btn-sm btn-outline-primary" @click="viewEmailDetails(email.id)"
+                  data-bs-toggle="modal" data-bs-target="#emailDetailModal">
                   <i class="bi bi-eye"></i>
                 </button>
               </div>
 
-              <!-- Email Metadata -->
               <div class="d-flex flex-wrap gap-3 small text-muted">
                 <span v-if="email.project_status">
                   <i class="bi bi-diagram-3 me-1"></i>
@@ -113,7 +86,6 @@
       </div>
     </div>
 
-    <!-- Email Detail Modal -->
     <div class="modal fade" id="emailDetailModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -129,7 +101,6 @@
               <div class="spinner-border text-primary" role="status"></div>
             </div>
             <div v-else-if="selectedEmail">
-              <!-- Email Info -->
               <div class="mb-4">
                 <h6 class="fw-bold mb-3">{{ selectedEmail.email.subject }}</h6>
                 <div class="row g-2 mb-3">
@@ -152,52 +123,33 @@
                 </div>
               </div>
 
-              <!-- Project Info -->
               <div v-if="selectedEmail.project" class="mb-4 p-3 bg-light rounded">
                 <small class="text-muted">Project:</small>
                 <p class="mb-0 fw-bold">{{ selectedEmail.project.project_name }}</p>
               </div>
 
-              <!-- Email Content Tabs -->
               <ul class="nav nav-tabs mb-3" role="tablist">
                 <li class="nav-item">
-                  <button 
-                    class="nav-link active" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#html-content"
-                    type="button"
-                  >
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#html-content" type="button">
                     <i class="bi bi-file-code me-1"></i>HTML Preview
                   </button>
                 </li>
                 <li class="nav-item">
-                  <button 
-                    class="nav-link" 
-                    data-bs-toggle="tab" 
-                    data-bs-target="#text-content"
-                    type="button"
-                  >
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#text-content" type="button">
                     <i class="bi bi-file-text me-1"></i>Plain Text
                   </button>
                 </li>
               </ul>
 
               <div class="tab-content">
-                <!-- HTML Preview -->
                 <div class="tab-pane fade show active" id="html-content">
-                  <div 
-                    class="border rounded p-3" 
-                    style="max-height: 500px; overflow-y: auto; background-color: white;"
-                    v-html="selectedEmail.email.email_body_html"
-                  ></div>
+                  <div class="border rounded p-3" style="max-height: 500px; overflow-y: auto; background-color: white;"
+                    v-html="selectedEmail.email.email_body_html"></div>
                 </div>
 
-                <!-- Plain Text -->
                 <div class="tab-pane fade" id="text-content">
-                  <pre 
-                    class="border rounded p-3 bg-light" 
-                    style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;"
-                  >{{ selectedEmail.email.email_body_text }}</pre>
+                  <pre class="border rounded p-3 bg-light"
+                    style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;">{{ selectedEmail.email.email_body_text }}</pre>
                 </div>
               </div>
             </div>
@@ -212,7 +164,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { make_getrequest, make_postrequest } from '@/store/appState';
+import { useNotify } from '@/utils/useNotify';
 
 export default {
   name: 'ProductManagerEmailHistory',
@@ -230,9 +183,12 @@ export default {
       loadingDetail: false,
       generating: false,
       error: null,
-      successMessage: null,
       totalEmails: 0
     };
+  },
+  setup() {
+    const notify = useNotify();
+    return { notify };
   },
   mounted() {
     this.fetchEmails();
@@ -242,22 +198,23 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get(
-          `${this.$store.state.BASEURL}/api/pm/project/${this.projectId}/progress-emails`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          }
+        const response = await make_getrequest(
+          `/api/pm/project/${this.projectId}/progress-emails`
         );
-        
-        if (response.data.message) {
-          this.emails = response.data.emails || [];
-          this.totalEmails = response.data.total_emails || 0;
+
+        if (response && response.data) {
+          const data = response.data;
+          this.emails = data.emails || [];
+          this.totalEmails = data.total_emails || 0;
+        } else {
+          // Fallback if data structure is different or empty
+          this.emails = [];
         }
+
       } catch (error) {
         console.error('Error fetching email history:', error);
-        this.error = error.response?.data?.detail || 'Failed to load email history';
+        this.error = error.message || 'Failed to load email history';
+        // Optional: keep error in UI instead of toast for initial load
       } finally {
         this.loading = false;
       }
@@ -266,28 +223,29 @@ export default {
     async generateEmail() {
       this.generating = true;
       this.error = null;
-      this.successMessage = null;
       try {
-        const response = await axios.post(
-          `${this.$store.state.BASEURL}/api/pm/project/${this.projectId}/progress-emails?auto_send=true&trigger_type=manual`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          }
+        const response = await make_postrequest(
+          `/api/pm/project/${this.projectId}/progress-emails?auto_send=true&trigger_type=manual`,
+          {}
         );
-        
-        if (response.data.message) {
-          this.successMessage = response.data.message + ' - Email will be sent shortly!';
-          // Refresh email list after a delay
+
+        if (response && response.message) {
+          this.notify.success(response.message + ' - Email will be sent shortly!');
           setTimeout(() => {
             this.fetchEmails();
           }, 3000);
+        } else if (response && response.data && response.data.message) {
+          this.notify.success(response.data.message + ' - Email will be sent shortly!');
+          setTimeout(() => {
+            this.fetchEmails();
+          }, 3000);
+        } else {
+          this.notify.error("Failed to generate email");
         }
       } catch (error) {
         console.error('Error generating email:', error);
-        this.error = error.response?.data?.detail || 'Failed to generate email';
+        const errMsg = error.message || 'Failed to generate email';
+        this.notify.error(errMsg);
       } finally {
         this.generating = false;
       }
@@ -296,21 +254,18 @@ export default {
     async viewEmailDetails(emailId) {
       this.loadingDetail = true;
       try {
-        const response = await axios.get(
-          `${this.$store.state.BASEURL}/api/pm/progress-emails/${emailId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          }
+        const response = await make_getrequest(
+          `/api/pm/progress-emails/${emailId}`
         );
-        
-        if (response.data.message) {
+
+        if (response && response.data) {
           this.selectedEmail = response.data;
+        } else if (response && response.message) { // Sometimes it returns data directly depending on wrapper but usually .data
+          this.selectedEmail = response;
         }
       } catch (error) {
         console.error('Error fetching email details:', error);
-        this.error = error.response?.data?.detail || 'Failed to load email details';
+        this.notify.error(error.message || 'Failed to load email details');
       } finally {
         this.loadingDetail = false;
       }
