@@ -1,12 +1,17 @@
 from logging import getLogger
 
-from app.api.validators import AccountOut, AccountUpdate, SkillAddRequest, SkillUpdateRequest
+from app.api.validators import (
+    AccountOut,
+    AccountUpdate,
+    SkillAddRequest,
+    SkillUpdateRequest,
+)
 from app.database import Department, User, get_session
+from app.database.product_manager_models import EmployeeSkill
 from app.middleware import require_employee
 from fastapi import Depends, HTTPException
 from fastapi_restful import Resource
 from sqlmodel import Session, select
-from app.database.product_manager_models import EmployeeSkill
 
 logger = getLogger(__name__)
 
@@ -145,6 +150,7 @@ class AccountResource(Resource):
             logger.error("Account Update error", exc_info=True)
             raise HTTPException(500, "Internal server error")
 
+
 class EmployeeSkillListResource(Resource):
     def get(
         self,
@@ -156,7 +162,9 @@ class EmployeeSkillListResource(Resource):
         """
         try:
             skills = session.exec(
-                select(EmployeeSkill).where(EmployeeSkill.employee_id == current_user.id)
+                select(EmployeeSkill).where(
+                    EmployeeSkill.employee_id == current_user.id
+                )
             ).all()
 
             return [
@@ -199,6 +207,7 @@ class EmployeeSkillListResource(Resource):
             logger.error(f"Error adding skill: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail="Internal server error")
 
+
 class EmployeeSkillDetailResource(Resource):
     def get(
         self,
@@ -213,7 +222,7 @@ class EmployeeSkillDetailResource(Resource):
             skill = session.exec(
                 select(EmployeeSkill).where(
                     EmployeeSkill.id == skill_id,
-                    EmployeeSkill.employee_id == current_user.id
+                    EmployeeSkill.employee_id == current_user.id,
                 )
             ).first()
 
@@ -248,7 +257,7 @@ class EmployeeSkillDetailResource(Resource):
             skill = session.exec(
                 select(EmployeeSkill).where(
                     EmployeeSkill.id == skill_id,
-                    EmployeeSkill.employee_id == current_user.id
+                    EmployeeSkill.employee_id == current_user.id,
                 )
             ).first()
 
@@ -261,7 +270,7 @@ class EmployeeSkillDetailResource(Resource):
                 skill.proficiency_level = data.proficiency_level
             if data.years_of_experience is not None:
                 skill.years_of_experience = data.years_of_experience
-            
+
             session.add(skill)
             session.commit()
             session.refresh(skill)
@@ -286,7 +295,7 @@ class EmployeeSkillDetailResource(Resource):
             skill = session.exec(
                 select(EmployeeSkill).where(
                     EmployeeSkill.id == skill_id,
-                    EmployeeSkill.employee_id == current_user.id
+                    EmployeeSkill.employee_id == current_user.id,
                 )
             ).first()
 

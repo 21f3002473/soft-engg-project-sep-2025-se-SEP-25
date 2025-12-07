@@ -6,12 +6,12 @@ from .employee import (
     FAQCreate,
     FAQOut,
     LeaveCreate,
-    SkillAddRequest,
-    SkillUpdateRequest,
     QuickNoteCreate,
     QuickNoteOut,
     QuickNoteUpdate,
     ReimbursementCreate,
+    SkillAddRequest,
+    SkillUpdateRequest,
     TransferCreate,
 )
 from .user import UserLoginValidator

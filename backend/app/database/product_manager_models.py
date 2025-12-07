@@ -461,7 +461,7 @@ class EmployeeSkill(SQLModel, table=True):
 
     employee: Optional["User"] = Relationship(
         back_populates="skills",
-        sa_relationship_kwargs={"foreign_keys": "[EmployeeSkill.employee_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[EmployeeSkill.employee_id]"},
     )
     verifier: Optional["User"] = Relationship(
         sa_relationship_kwargs={"foreign_keys": "[EmployeeSkill.verified_by]"}

@@ -307,7 +307,9 @@ class API:
         self.register_router(QuickNotesResource, f"{emp_base_url}/writing/{{note_id}}")
 
         self.register_router(AccountResource, f"{emp_base_url}/account")
-        self.register_router(EmployeeSkillListResource, f"{emp_base_url}/account/skills")
+        self.register_router(
+            EmployeeSkillListResource, f"{emp_base_url}/account/skills"
+        )
         self.register_router(
             EmployeeSkillDetailResource, f"{emp_base_url}/account/skills/{{skill_id}}"
         )

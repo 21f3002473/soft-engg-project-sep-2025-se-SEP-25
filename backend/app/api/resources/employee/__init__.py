@@ -1,4 +1,8 @@
-from .account import AccountResource, EmployeeSkillListResource, EmployeeSkillDetailResource
+from .account import (
+    AccountResource,
+    EmployeeSkillDetailResource,
+    EmployeeSkillListResource,
+)
 from .assistant import AIAssistantResource, AIChatHistoryResource
 from .dashboard import (
     AllToDoResource,
