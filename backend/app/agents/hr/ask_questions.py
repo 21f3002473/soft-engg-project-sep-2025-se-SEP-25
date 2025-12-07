@@ -12,9 +12,10 @@ load_dotenv()
 EMBED_MODEL = "gemini-embedding-001"
 LLM_MODEL = "gemini-2.5-flash"
 
-CHUNKS_DIR = "chunks"
-VECTORS_FILE = "vectors.npz"
-FAISS_INDEX_FILE = "faiss.index"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CHUNKS_DIR = os.path.join(BASE_DIR, "chunks")
+VECTORS_FILE = os.path.join(BASE_DIR, "data", "vectors.npz")
+FAISS_INDEX_FILE = os.path.join(BASE_DIR, "data", "faiss.index")
 
 
 def get_client():

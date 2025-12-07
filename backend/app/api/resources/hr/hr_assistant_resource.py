@@ -3,7 +3,9 @@ from app.api.validators.hr import QuestionRequest
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi_restful import Resource
+from logging import getLogger
 
+logger = getLogger(__name__)
 
 class AIAssistantResource(Resource):
     async def post(self, request: Request):
@@ -27,6 +29,7 @@ class AIAssistantResource(Resource):
             answer = answer_question(question, top_k=data.top_k)
             return JSONResponse(content={"answer": answer})
         except Exception as e:
+            logger.error(f"Failed to process question: {str(e)}")
             return JSONResponse(
                 status_code=500,
                 content={"error": f"Failed to process question: {str(e)}"},
