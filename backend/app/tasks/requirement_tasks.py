@@ -924,10 +924,10 @@ Total Candidates Analyzed: {result.get('total_candidates_analyzed', 0)}
 """
 
             send_email_task.delay(
-                recipient=notify_email,
+                to_email=notify_email,
                 subject=f"Team Allocation: {project.project_name}",
-                body_text=email_body,
-                body_html=f"<pre>{email_body}</pre>",
+                body=email_body,
+                html_body=f"<pre>{email_body}</pre>",
             )
 
             logger.info(f"Notification email sent to {notify_email}")

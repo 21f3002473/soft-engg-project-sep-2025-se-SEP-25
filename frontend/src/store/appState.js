@@ -17,6 +17,7 @@ export async function submitLogin(params = {}, router) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "ngrok-skip-browser-warning": "true",
       },
 
       body: JSON.stringify({ email, password }),
@@ -94,6 +95,7 @@ export async function make_getrequest(url, params = {}) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${cleanToken}`,
+      "ngrok-skip-browser-warning": "true",
     },
   });
   if (!response.ok) {
@@ -113,6 +115,7 @@ export async function make_postrequest(url, data = {}) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${cleanToken}`,
+      "ngrok-skip-browser-warning": "true",
     },
     body: JSON.stringify(data),
   });
@@ -134,6 +137,7 @@ export async function make_putrequest(url, data = {}) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${cleanToken}`,
+      "ngrok-skip-browser-warning": "true",
     },
     body: JSON.stringify(data),
   });
@@ -155,6 +159,7 @@ export async function make_deleterequest(url) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${cleanToken}`,
+      "ngrok-skip-browser-warning": "true",
     },
   });
   if (!response.ok) {
