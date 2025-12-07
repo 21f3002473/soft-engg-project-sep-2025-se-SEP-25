@@ -84,12 +84,8 @@ def test_hr_employee_update_unauthorized(base_url):
 # DELETE EMPLOYEE (DELETE /api/hr/employee/{id})
 def test_hr_employee_delete_success(base_url, auth_admin, auth_hr):
     from admin.test_admin_apis import create_user
-    create_user(
-        client=httpx,
-        auth_admin=auth_admin,
-        name="John Doe",
-        role="employee"
-    )
+
+    create_user(client=httpx, auth_admin=auth_admin, name="John Doe", role="employee")
     list_resp = httpx.get(f"{base_url}/hr/employees", headers=auth_hr)
     assert list_resp.status_code == 200
     data = assert_json(list_resp)

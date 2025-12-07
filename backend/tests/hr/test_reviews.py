@@ -20,12 +20,11 @@ def test_review_create_success(base_url, auth_hr):
 
 
 def review_create(base_url, auth_hr):
-    payload = {"user_id": 1, "rating": 4,
-               "comments": "Good performance overall."}
+    payload = {"user_id": 1, "rating": 4, "comments": "Good performance overall."}
 
-    r = httpx.post(f"{base_url}/hr/review/create",
-                   json=payload, headers=auth_hr)
+    r = httpx.post(f"{base_url}/hr/review/create", json=payload, headers=auth_hr)
     return r.json().get("review").get("id")
+
 
 def test_review_create_sever_error(base_url, auth_hr):
     payload = {"user_id": 1}

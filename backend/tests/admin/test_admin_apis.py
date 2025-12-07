@@ -164,12 +164,11 @@ def test_put_admin_account_failure(client, auth_admin):
 
     assert response.status_code in list(range(400, 600))
 
+
 def create_user(client, auth_admin, name, role):
     import random
-    payload = {
-        "name": name,
-        "role": role
-    }
+
+    payload = {"name": name, "role": role}
     client.post(
         f"{BASE_URL}/api/admin/employees",
         json=payload,
