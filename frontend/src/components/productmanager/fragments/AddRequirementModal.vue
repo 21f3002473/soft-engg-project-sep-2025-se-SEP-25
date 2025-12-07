@@ -73,7 +73,7 @@
 <script>
 import { make_postrequest, make_getrequest } from '@/store/appState';
 import { useNotify } from '@/utils/useNotify';
-
+import bootstrap from 'bootstrap';
 export default {
     name: 'AddRequirementModal',
     props: {

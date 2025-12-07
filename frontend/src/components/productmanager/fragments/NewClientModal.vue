@@ -59,7 +59,7 @@
 <script>
 import { make_postrequest } from '@/store/appState';
 import { useNotify } from '@/utils/useNotify';
-
+import bootstrap from 'bootstrap';
 export default {
     name: 'NewClientModal',
     data() {
