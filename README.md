@@ -15,31 +15,43 @@ Technologies used:
 # 📁 Project Structure
 ```
 Syncem/
-├── backend/
-│   ├── app/
-│   │   ├── api/                 # FastAPI routes (admin/hr/pm/employee)
-│   │   ├── agents/              # GenAI chatbot, RAG modules
-│   │   ├── controllers/         # Business logic layer
-│   │   ├── database/            # Models + DB connection
-│   │   ├── tasks/               # Celery tasks
-│   │   ├── utils/
-│   │   ├── middleware/
-│   │   └── static/              # HR policy PDFs & assets
-│   ├── tests/                   # Pytest suite
-│   ├── main.py
-│   └── requirements.txt
+├── .github/
+│   └── workflows/                # CI/CD pipelines
 │
-├── frontend/
+├── backend/                      # FastAPI backend + Celery + AI agents
+│   ├── app/
+│   │   ├── agents/               # GenAI agents (Employee, HR, PM)
+│   │   ├── api/                  # API routes + validators
+│   │   ├── controllers/          # Business logic
+│   │   ├── core/                 # Core AI logic (PM agents)
+│   │   ├── database/             # Models + DB connection
+│   │   ├── middleware/           # Authentication + logging middleware
+│   │   ├── services/             # Shared services
+│   │   ├── static/               # Static files (docs, employee data)
+│   │   ├── tasks/                # Celery background tasks
+│   │   └── utils/                # Helper utilities
+│   │
+│   ├── tests/                    # Pytest suite
+│   ├── images/
+│   ├── Makefile
+│   ├── requirements.txt
+│   ├── pyproject.toml
+│   └── main.py
+│
+├── frontend/                     # Vue.js frontend
+│   ├── public/                   # Static assets
 │   ├── src/
-│   │   ├── components/          # Vue components
-│   │   ├── router/
-│   │   ├── store/
-│   │   ├── utils/
-│   │   └── App.vue
-│   ├── public/
-│   ├── .env                     # VUE_APP_API_URL lives here
-│   ├── .env-dev
-│   └── package.json
+│   │   ├── components/           # All Vue components grouped by role
+│   │   ├── router/               # App routing
+│   │   ├── store/                # Global state
+│   │   ├── utils/                # Reusable utilities
+│   │   └── assets/               # Images & brand assets
+│   │
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── .env-dev
+│
+├── Client Meetings/              # Minutes of meetings with client
 │
 └── Milestones/ (All M1–M5 docs + code)
 ```
