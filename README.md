@@ -12,12 +12,6 @@ Technologies used:
 
 ---
 
-# 👥 Team 25 — IIT Madras (Software Engineering)
-Akbar Ali • Deon Levon Dmello • D Narendran • Sampriti Raha •  
-Sayan Bhowmick • Soham Chakraborty • Telvin Varghese • Tummala Naveen
-
----
-
 # 📁 Project Structure
 ```
 Syncem/
@@ -363,7 +357,15 @@ pytest tests/login -vv
 ---
 
 # 👨‍💻 Contributors
-Team 25 — IIT Madras BS Degree Program
+## 👥 Team 25 — IIT Madras (Software Engineering)
+- Deon Levon Dmello
+- Tummala Naveen
+- Sayan Bhowmick
+- Telvin Varghese
+- Akbar Ali
+- Sampriti Raha
+- D Narendran 
+- Soham Chakraborty
 
 ---
 
