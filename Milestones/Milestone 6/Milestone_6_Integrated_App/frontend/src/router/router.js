@@ -210,6 +210,11 @@ const routes = [
                 name: 'ProductManagerSingleProject',
                 component: () => import('@/components/productmanager/fragments/SingleProjectview.vue'),
                 props: (route) => ({ projectId: route.params.projectId })
+            },
+            {
+                path: 'account',
+                name: 'PMAccount',
+                component: () => import('@/components/productmanager/PMAccount.vue'),
             }
         ],
     },

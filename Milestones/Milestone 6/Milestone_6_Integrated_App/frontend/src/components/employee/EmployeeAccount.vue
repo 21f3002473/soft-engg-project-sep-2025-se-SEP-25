@@ -39,6 +39,35 @@
 
     <section class="card border-0 shadow-sm mb-4">
       <div class="card-body p-4">
+        <h3 class="h5 mb-4 text-dark fw-bold">Change Password</h3>
+        <form @submit.prevent="changePassword">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="oldPassword" class="form-label fw-medium text-secondary">Old Password</label>
+              <input type="password" class="form-control" id="oldPassword" v-model="passwordForm.oldPassword" required>
+            </div>
+            <div class="col-md-4">
+              <label for="newPassword" class="form-label fw-medium text-secondary">New Password</label>
+              <input type="password" class="form-control" id="newPassword" v-model="passwordForm.newPassword" required
+                minlength="6">
+            </div>
+            <div class="col-md-4">
+              <label for="confirmPassword" class="form-label fw-medium text-secondary">Confirm Password</label>
+              <input type="password" class="form-control" id="confirmPassword" v-model="passwordForm.confirmPassword"
+                required minlength="6">
+            </div>
+            <div class="col-12 text-end">
+              <button type="submit" class="btn btn-outline-primary" :disabled="passwordLoading">
+                {{ passwordLoading ? 'Updating...' : 'Update Password' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h3 class="h5 mb-0 text-dark fw-bold">Skills & Expertise</h3>
           <button class="btn btn-primary btn-sm" @click="openAddSkillModal">
@@ -186,6 +215,13 @@ export default {
         email: "email",
         department: "text",
       },
+
+      passwordForm: {
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      },
+      passwordLoading: false,
     };
   },
   computed: {
@@ -250,6 +286,33 @@ export default {
         useNotify().error("Failed to update profile. Please try again.");
       } finally {
         this.loading = false;
+      }
+
+    },
+    async changePassword() {
+      if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+        useNotify().error("Passwords do not match!");
+        return;
+      }
+
+      this.passwordLoading = true;
+      try {
+        const payload = {
+          old_password: this.passwordForm.oldPassword,
+          password: this.passwordForm.newPassword
+        };
+
+        await make_putrequest("/api/employee/account", payload);
+
+        this.passwordForm.oldPassword = "";
+        this.passwordForm.newPassword = "";
+        this.passwordForm.confirmPassword = "";
+        useNotify().success("Password updated successfully!");
+      } catch (error) {
+        console.error("Failed to update password:", error);
+        useNotify().error(error.message || "Failed to update password. Please check your old password.");
+      } finally {
+        this.passwordLoading = false;
       }
     },
     resetForm() {

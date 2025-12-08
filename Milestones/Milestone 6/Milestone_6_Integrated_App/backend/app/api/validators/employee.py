@@ -73,6 +73,8 @@ class AccountUpdate(BaseModel):
     img_base64: Optional[str] = None
     department_id: Optional[int] = None
     reporting_manager: Optional[int] = None
+    old_password: Optional[str] = None
+    password: Optional[str] = None
 
 
 class AccountOut(BaseModel):

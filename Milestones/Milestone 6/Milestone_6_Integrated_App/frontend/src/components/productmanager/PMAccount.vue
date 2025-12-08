@@ -69,14 +69,15 @@
             </div>
         </section>
 
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center mb-5">
             <button class="btn btn-primary px-4" @click="updateProfile" :disabled="loading">
-                Update
+                Update Profile
             </button>
             <button class="btn btn-danger px-4" @click="logout" :disabled="loading">
                 Logout
             </button>
         </div>
+
     </div>
 </template>
 
@@ -84,9 +85,10 @@
 import { make_getrequest, make_putrequest } from "@/store/appState.js";
 import { useNotify } from "@/utils/useNotify.js";
 import Swal from 'sweetalert2';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default {
-    name: "HRAccount",
+    name: "PMAccount",
     data() {
         return {
             user: {
@@ -98,6 +100,7 @@ export default {
             },
             originalUser: {},
             loading: false,
+
             keyLabels: {
                 name: "Full Name",
                 email: "Email",
@@ -108,6 +111,7 @@ export default {
                 email: "email",
                 department: "text",
             },
+
             passwordForm: {
                 oldPassword: "",
                 newPassword: "",
@@ -177,6 +181,7 @@ export default {
             } finally {
                 this.loading = false;
             }
+
         },
         async changePassword() {
             if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
@@ -220,6 +225,7 @@ export default {
                 }
             });
         },
+
         async logout() {
             const result = await Swal.fire({
                 title: 'Logout?',

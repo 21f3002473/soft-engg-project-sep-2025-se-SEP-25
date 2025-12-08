@@ -37,6 +37,9 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
+                    <router-link :to="{ name: 'PMAccount' }" class="nav-link" active-class="active">
+                        <i class="bi bi-person-circle me-2"></i>Account
+                    </router-link>
                     <button class="btn d-flex align-items-center gap-2 fw-semibold account-btn" @click="logout">
                         <i class="bi bi-box-arrow-right fs-5"></i>
                         <span>Logout</span>
