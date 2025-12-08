@@ -86,17 +86,66 @@ pip install -r requirements.txt
 
 ---
 
-## 3️⃣ PostgreSQL Setup
-Inside psql:
+## 3️⃣ PostgreSQL Installation & Setup
+### 1. Install PostgreSQL
+
+### **Ubuntu / Debian (Linux)**
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
 ```
+
+Start and enable PostgreSQL:
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+### **macOS (Homebrew)**
+```bash
+brew update
+brew install postgresql
+brew services start postgresql
+```
+
+### **Windows**
+Download the installer:  
+https://www.postgresql.org/download/windows/
+
+During installation:
+- Set password for the **postgres** superuser  
+- Install pgAdmin (optional GUI)
+
+### 2. Entering the PostgreSQL Shell (`psql`)
+
+### **Linux / macOS**
+Switch to postgres user:
+```bash
+sudo -i -u postgres
+```
+
+Enter the shell:
+```bash
+psql
+```
+
+### **Windows**
+Open **SQL Shell (psql)** from Start Menu  
+or use **pgAdmin**.
+
+### 3. Create Database, User & Permissions
+
+Run the following inside the `psql` terminal:
+
+```sql
 CREATE DATABASE se_preprod;
 CREATE USER myuser WITH PASSWORD '12345678';
 GRANT ALL PRIVILEGES ON DATABASE se_preprod TO myuser;
 
--- Give ownership
+-- Give ownership of schema
 ALTER SCHEMA public OWNER TO myuser;
 
--- Grant full access on schema
+-- Allow usage + creation inside public schema
 GRANT USAGE, CREATE ON SCHEMA public TO myuser;
 
 -- Allow access to existing objects
@@ -104,21 +153,28 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO myuser;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO myuser;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO myuser;
 
--- Ensure future objects are usable
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
-GRANT ALL PRIVILEGES ON TABLES TO myuser;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
-GRANT ALL PRIVILEGES ON SEQUENCES TO myuser;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
-GRANT ALL PRIVILEGES ON FUNCTIONS TO myuser;
+-- Ensure future objects also grant privileges
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO myuser;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO myuser;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO myuser;
 ```
 
-`.env` file:
+### 4. Exit psql
+```sql
+\q
+```
+
+### 5. Exit postgres system user (Linux/macOS)
+```bash
+exit
+```
+
+### 6. Update Your `.env` File
+
+Add the database connection string:
+
 ```
 DATABASE_URL=postgresql://myuser:12345678@localhost/se_preprod
-SECRET_KEY=your_generated_secure_key
 ```
 
 ---
