@@ -265,7 +265,7 @@ Download: https://github.com/mailhog/MailHog/releases
 
 ### Docker (any OS)
 ```
-docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+sudo docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
 ```
 
 Start MailHog:
@@ -311,16 +311,22 @@ Download redis package from Microsoft archive.
 ## Start Celery
 Worker:
 ```
+cd backend
+source .venv/bin/activate
 celery -A app.celery_app worker --loglevel=info
 ```
 
 Beat:
 ```
+cd backend
+source .venv/bin/activate
 celery -A app.celery_app beat --loglevel=info
 ```
 
 Flower Dashboard:
 ```
+cd backend
+source .venv/bin/activate
 celery -A app.celery_app flower --port=5555
 ```
 
@@ -346,10 +352,6 @@ http://localhost:5555
 - Batch alerts  
 - Cleanup jobs  
 
-Example:
-```python
-send_welcome_email.delay(email="user@example.com", name="John")
-```
 
 ---
 
