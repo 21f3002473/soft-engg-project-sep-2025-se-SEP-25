@@ -109,7 +109,7 @@
 <script>
 import { make_postrequest, make_getrequest } from '@/store/appState';
 import { useNotify } from '@/utils/useNotify';
-import bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 export default {
     name: 'AddNewProjectModal',
     emits: ['project-created'],
@@ -179,7 +179,7 @@ export default {
                     this.$emit('project-created', response.data);
 
                     const modalElement = document.getElementById('addNewProjectModal');
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    const modalInstance = Modal.getInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.hide();
                     }

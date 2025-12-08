@@ -68,7 +68,7 @@
 <script>
 import { make_postrequest } from '@/store/appState';
 import { useNotify } from '@/utils/useNotify';
-import bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 export default {
     name: 'NewClientModal',
     emits: ['client-created'],
@@ -138,7 +138,7 @@ export default {
 
                     // Close modal
                     const modalElement = document.getElementById('newClientModal');
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    const modalInstance = Modal.getInstance(modalElement);
                     if (modalInstance) {
                         modalInstance.hide();
                     }
