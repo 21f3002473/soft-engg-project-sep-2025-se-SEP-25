@@ -189,7 +189,31 @@ DATABASE_URL=postgresql://myuser:12345678@localhost/se_preprod
 
 ---
 
-## 4️⃣ Run the Backend
+## 4️⃣ GenAI Setup (LLM & RAG)
+
+### 1. Configure API Keys
+Add your **Gemini** and **Groq** API keys to the `.env` file in `backend/`:
+```ini
+GEMINI_API_KEY=your_gemini_key
+GROQ_API_KEY=your_groq_key
+```
+
+### 2. Build Vector Store (RAG)
+Run the script to generate embeddings for the HR policy chatbot. 
+Ensure you are in the `backend/` directory and your virtual environment is active.
+
+```bash
+# Windows
+python app/agents/employee/rag/build_vector_store.py
+
+# macOS / Linux
+python3 app/agents/employee/rag/build_vector_store.py
+```
+> This generates `vectorstore.pkl` in `backend/app/static/employee/`.
+
+---
+
+## 5️⃣ Run the Backend
 ### Windows
 ```
 .venv\Scripts\activate
@@ -305,7 +329,7 @@ http://localhost:5555
 
 ---
 
-## 5️⃣ Option: Using Makefile (Linux/macOS)
+## 6️⃣ Option: Using Makefile (Linux/macOS)
 For Linux and macOS users, a `Makefile` is included in the `backend/` directory to simplify managing services like Redis, MailHog, and Celery.
 
 **Available Commands:**

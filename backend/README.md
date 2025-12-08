@@ -29,7 +29,31 @@
      ```
    - Add it to your `.env` file.
 
-## 2️⃣ Running the Application
+## 2️⃣ GenAI & Vector Store Setup
+
+### 1. API Configuration
+Add your API keys to the `.env` file:
+```ini
+GEMINI_API_KEY=your_gemini_key
+GROQ_API_KEY=your_groq_key
+```
+
+### 2. Generate Vector Store
+The employee RAG chatbot requires a vector store (`vectorstore.pkl`) generated from HR policies.
+Run this script from the `backend/` directory:
+
+```bash
+# Windows
+python app/agents/employee/rag/build_vector_store.py
+
+# macOS / Linux
+python3 app/agents/employee/rag/build_vector_store.py
+```
+**Note:** This requires the `backend` virtual environment to be active.
+
+---
+
+## 3️⃣ Running the Application
 Start the FastAPI server:
 ```bash
 python main.py
@@ -39,7 +63,7 @@ python main.py
 
 ---
 
-## 3️⃣ PostgreSQL Database Setup
+## 4️⃣ PostgreSQL Database Setup
 Follow these steps to set up the database correctly.
 
 ### 1. Database User Setup
@@ -105,7 +129,7 @@ GRANT ALL ON SCHEMA public TO myuser;
 
 ---
 
-## 4️⃣ Celery & Redis Setup (Async Tasks)
+## 5️⃣ Celery & Redis Setup (Async Tasks)
 For background tasks (emails, reports, notifications), we use **Celery** with **Redis**.
 
 ### 1. Install Redis
@@ -145,7 +169,7 @@ For more advanced configuration, see [CELERY_README.md](./CELERY_README.md).
 
 ---
 
-## 5️⃣ MailHog Setup (Email Testing)
+## 6️⃣ MailHog Setup (Email Testing)
 MailHog is an email testing tool for developers that captures all emails sent via SMTP and provides a web UI to view them.
 
 ### 1. Installation
@@ -178,7 +202,7 @@ For more details, see [MAILHOG_SETUP.md](./MAILHOG_SETUP.md).
 
 ---
 
-## 6️⃣ Testing (Pytest)
+## 7️⃣ Testing (Pytest)
 
 ### Run all tests
 ```bash
@@ -199,7 +223,7 @@ pytest tests/test_user_login.py::test_post_admin_login -vv
 
 ---
 
-## 7️⃣ Option: Doing it with Makefile (Linux/macOS)
+## 8️⃣ Option: Doing it with Makefile (Linux/macOS)
 For Linux and macOS users, we provide a `Makefile` to quickly start/stop services.
 
 **Usage:**
