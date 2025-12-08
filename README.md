@@ -79,10 +79,11 @@ source .venv/bin/activate
 
 ---
 
-## 2️⃣ Install Dependencies
+## 2️⃣ Install Dependencies & Configure
 ```
 pip install -r requirements.txt
 ```
+Create `.env` by copying sample from `.env-dev` in `backend/`.
 
 ---
 
@@ -135,13 +136,22 @@ or use **pgAdmin**.
 
 ### 3. Create Database, User & Permissions
 
+#### Step 1: Inside psql, connected to postgres
 Run the following inside the `psql` terminal:
 
 ```sql
 CREATE DATABASE se_preprod;
 CREATE USER myuser WITH PASSWORD '12345678';
 GRANT ALL PRIVILEGES ON DATABASE se_preprod TO myuser;
+```
+#### Step 2: Switch to the new DB
 
+```sql
+\c se_preprod
+```
+#### Step 3: Now run schema + privilege commands
+
+```sql
 -- Give ownership of schema
 ALTER SCHEMA public OWNER TO myuser;
 
@@ -208,7 +218,7 @@ npm install
 ```
 
 ## 2️⃣ Configure API URL  
-Create `.env` in `frontend/`:
+Create `.env` by copying sample from `.env-dev` in `frontend/`:
 
 ```
 VUE_APP_API_URL=http://127.0.0.1:8000
@@ -231,15 +241,6 @@ npm run serve
 Runs on:
 ```
 http://localhost:8080/
-```
-
-### Local Test Accounts
-```
-root@example.com
-pm@example.com
-hr@example.com
-employee@example.com
-Password: supersecretpassword
 ```
 
 ---
