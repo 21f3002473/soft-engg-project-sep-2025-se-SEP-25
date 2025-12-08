@@ -136,12 +136,14 @@ class AccountResource(Resource):
             if "password" in update_data:
                 password = update_data.pop("password")
                 old_password = update_data.pop("old_password", None)
-                
+
                 if not old_password:
-                    raise HTTPException(400, "Old password is required to set a new password")
-                    
+                    raise HTTPException(
+                        400, "Old password is required to set a new password"
+                    )
+
                 if not current_user.verify_password(old_password):
-                     raise HTTPException(400, "Incorrect old password")
+                    raise HTTPException(400, "Incorrect old password")
 
                 password_hash, salt = User.hash_password(password)
                 user.password_hash = password_hash
