@@ -49,15 +49,8 @@ class Config:
     PROJECT_NAME = "soft-engg-project-sep-2025-se-SEP-25"
     PROJECT_DESCRIPTION = ""
     VERSION = "0.0.1"
-    OPENAI_API_KEY = get_key(".env", "OPENAI_API_KEY")
-    if OPENAI_API_KEY is not None:
-        os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-
     GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-    if GROQ_API_KEY:
-        os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
     MODE = get_key(".env", "MODE")
 

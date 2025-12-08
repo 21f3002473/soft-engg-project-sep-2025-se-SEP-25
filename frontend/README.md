@@ -1,47 +1,55 @@
-# frontend
+# 🎨 Frontend Setup & Development Guide
 
-## Project setup
-```
+## 1️⃣ Prerequisites
+- **Node.js**: v16+ (Recommended)
+- **npm** or **yarn**
+- **Backend**: Ensure the backend is running for full functionality (see `../backend/README.md`).
+
+## 2️⃣ Installation
+
+### 1. Install Dependencies
+Navigate to the `frontend` directory and run:
+```bash
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 2. Configure Environment
+Create a `.env` file in the `frontend/` directory (copy from `.env-dev`):
+```bash
+# Example .env content
+VUE_APP_API_URL=http://127.0.0.1:8000
 ```
+> Update `VUE_APP_API_URL` if your backend is running on a different port/host.
+
+## 3️⃣ Running the Application
+
+### Start Development Server
+Compiles and hot-reloads for development:
+```bash
 npm run serve
 ```
+> App runs at: http://localhost:8080/
 
-### Compiles and minifies for production
-```
+### Build for Production
+Compiles and minifies for production:
+```bash
 npm run build
 ```
 
-### Lints and fixes files
-```
+### Linting
+Lints and fixes files:
+```bash
 npm run lint
 ```
 
-### predefined credentials for local login (to be removed after backend integration)
+---
 
-```
-ROOT_USER_EMAIL=root@example.com
-ROOT_USER_PASSWORD=supersecretpassword
+## 4️⃣ Testing Credentials
+Use these credentials to test different roles (if using seeded/predefined data):
 
-
-# pm
-PM_USER_EMAIL=pm@example.com
-PM_USER_PASSWORD=supersecretpassword
-
-
-# hr
-HR_USER_EMAIL=hr@example.com
-HR_USER_PASSWORD=supersecretpassword
-
-# employee
-EMPLOYEE_USER_EMAIL=employee@example.com
-EMPLOYEE_USER_PASSWORD=supersecretpassword
-```
-
-## Prerequisites
-- Node.js (recommend v16+)
-- npm (or yarn)
-- A running backend (optional; app supports local predefined credentials for development)
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `root@example.com` | `supersecretpassword` |
+| **Project Manager** | `pm@example.com` | `supersecretpassword` |
+| **HR Manager** | `hr@example.com` | `supersecretpassword` |
+| **Employee** | `employee@example.com` | `supersecretpassword` |
