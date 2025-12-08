@@ -196,3 +196,23 @@ pytest tests/login/test_user_login.py -vv
 # Run a specific function
 pytest tests/test_user_login.py::test_post_admin_login -vv
 ```
+
+---
+
+## 7️⃣ Option: Doing it with Makefile (Linux/macOS)
+For Linux and macOS users, we provide a `Makefile` to quickly start/stop services.
+
+**Usage:**
+Navigate to the `backend/` directory and run:
+
+| Command | Description |
+|---------|-------------|
+| `make help` | Show help message |
+| `make redis` | Start Redis server |
+| `make mailhog` | Start MailHog |
+| `make worker` | Start Celery Worker |
+| `make beat` | Start Celery Beat |
+| `make flower` | Start Flower Dashboard |
+| `make all` | Start **all** (Redis + MailHog + Celery) |
+| `make stop-all` | **Kill** all background services |
+| `make clean` | Remove temp files (`__pycache__`, pid files) |

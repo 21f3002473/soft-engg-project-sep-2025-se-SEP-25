@@ -207,43 +207,27 @@ Swagger documentation:
 http://127.0.0.1:8000/docs
 ```
 
----
-
-# 🎨 Frontend Setup
-
-## 1️⃣ Install Dependencies
-```
-cd frontend
-npm install
-```
-
-## 2️⃣ Configure API URL  
-Create `.env` by copying sample from `.env-dev` in `frontend/`:
-
-```
-VUE_APP_API_URL=http://127.0.0.1:8000
-```
-
-For production:
-```
-VUE_APP_API_URL=https://api.syncem.com
-```
-
-Restart the dev server after editing `.env`.
 
 ---
 
-## 3️⃣ Start Frontend
-```
-npm run serve
-```
+## 5️⃣ Option: Using Makefile (Linux/macOS)
+For Linux and macOS users, a `Makefile` is included in the `backend/` directory to simplify managing services like Redis, MailHog, and Celery.
 
-Runs on:
-```
-http://localhost:8080/
-```
+**Available Commands:**
+- `make help`      : Show available commands
+- `make redis`     : Start Redis server
+- `make mailhog`   : Start MailHog email server
+- `make worker`    : Start Celery worker
+- `make beat`      : Start Celery beat scheduler
+- `make flower`    : Start Flower monitoring
+- `make all`       : Start all services
+- `make stop-all`  : Stop all services
+- `make clean`     : Clean temporary files
+
+To use it, simply navigate to the `backend/` directory and run the desired command (e.g., `make all`).
 
 ---
+
 
 # 📨 MailHog Setup (Email Testing)
 
@@ -327,6 +311,42 @@ celery -A app.celery_app flower --port=5555
 Dashboard:
 ```
 http://localhost:5555
+```
+
+---
+
+# 🎨 Frontend Setup
+
+## 1️⃣ Install Dependencies
+```
+cd frontend
+npm install
+```
+
+## 2️⃣ Configure API URL  
+Create `.env` by copying sample from `.env-dev` in `frontend/`:
+
+```
+VUE_APP_API_URL=http://127.0.0.1:8000
+```
+
+For production:
+```
+VUE_APP_API_URL=https://api.syncem.com
+```
+
+Restart the dev server after editing `.env`.
+
+---
+
+## 3️⃣ Start Frontend
+```
+npm run serve
+```
+
+Runs on:
+```
+http://localhost:8080/
 ```
 
 ---
