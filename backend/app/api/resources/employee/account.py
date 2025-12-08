@@ -133,6 +133,25 @@ class AccountResource(Resource):
             if restricted & update_data.keys():
                 raise HTTPException(400, "You cannot update these fields")
 
+            if "password" in update_data:
+                password = update_data.pop("password")
+                old_password = update_data.pop("old_password", None)
+                
+                if not old_password:
+                    raise HTTPException(400, "Old password is required to set a new password")
+                    
+                if not current_user.verify_password(old_password):
+                     raise HTTPException(400, "Incorrect old password")
+
+                password_hash, salt = User.hash_password(password)
+                user.password_hash = password_hash
+                user.salt = salt
+
+            # Remove old_password from update_data if it exists but password was not being updated
+            # (though normally they should come together)
+            if "old_password" in update_data:
+                update_data.pop("old_password")
+
             for key, value in update_data.items():
                 setattr(user, key, value)
 
